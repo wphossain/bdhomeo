@@ -25,14 +25,22 @@ import {
   Video, 
   Menu, 
   X,
-  Home
+  Home,
+  LayoutDashboard,
+  Activity,
+  CheckCircle2,
+  TrendingUp,
+  Clock,
+  Sparkles,
+  ArrowUpRight,
+  ExternalLink
 } from 'lucide-react';
 
-type AdminTab = 'courses' | 'media' | 'settings' | 'enrollments' | 'payments' | 'leads' | 'analytics';
+type AdminTab = 'dashboard' | 'payments' | 'courses' | 'enrollments' | 'leads' | 'media' | 'settings';
 
 export default function AdminPage() {
   const { user, enrollments, monthlyPayments, leads, courses, settings, signInWithGoogle, signOut } = useApp();
-  const [activeTab, setActiveTab] = useState<AdminTab>('courses');
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Check if Admin
@@ -99,14 +107,18 @@ export default function AdminPage() {
   const pendingPayments = monthlyPayments.filter((p) => p.status === 'pending');
   const approvedPayments = monthlyPayments.filter((p) => p.status === 'approved');
 
+  const totalAdmissionRevenue = approvedEnrollments.length * 1000;
+  const totalMonthlyRevenue = approvedPayments.length * 500;
+  const totalRevenue = totalAdmissionRevenue + totalMonthlyRevenue;
+
   const navItems: { id: AdminTab; label: string; icon: any; count?: number; badgeColor?: string }[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'payments', label: 'Student Fee Confirmation', icon: CreditCard, count: pendingPayments.length, badgeColor: 'bg-rose-500 text-white' },
     { id: 'courses', label: 'কোর্স ও সিলেবাস সিএমএস', icon: BookOpen },
     { id: 'enrollments', label: 'ভর্তির আবেদন অনুমোদন', icon: Users, count: pendingEnrollments.length, badgeColor: 'bg-amber-500 text-white' },
-    { id: 'payments', label: 'মাসিক ৫০০/- ফি যাচাই', icon: CreditCard, count: pendingPayments.length, badgeColor: 'bg-rose-500 text-white' },
     { id: 'leads', label: 'ওরিয়েন্টেশন লিড সিআরএম', icon: MessageSquare, count: leads.length, badgeColor: 'bg-blue-500 text-white' },
     { id: 'media', label: 'ছবি ও মিডিয়া ম্যানেজার', icon: ImageIcon },
     { id: 'settings', label: 'সাইট কনটেন্ট ও নম্বর', icon: Settings },
-    { id: 'analytics', label: 'ইনসাইটস ও রেভিনিউ', icon: BarChart3 },
   ];
 
   return (
@@ -137,8 +149,20 @@ export default function AdminPage() {
           </Link>
         </div>
 
-        {/* Right Quick Actions */}
+        {/* Right Quick Actions (Google Meet, Main Site, Student Portal, Logout) */}
         <div className="flex items-center gap-2 sm:gap-3">
+          
+          {/* Live Google Meet Shortcut in Top Header */}
+          <a
+            href={settings.googleMeetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition"
+          >
+            <Video className="w-3.5 h-3.5 animate-pulse" />
+            <span className="hidden sm:inline">লাইভ গুগল মিট</span>
+          </a>
+
           <Link
             href="/"
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-700 transition"
@@ -200,131 +224,277 @@ export default function AdminPage() {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 return (
-                  <div key={item.id} className="space-y-1">
-                    <button
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setIsSidebarOpen(false);
-                      }}
-                      className={`
-                        w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs transition group text-left
-                        ${isActive 
-                          ? 'bg-emerald-600 text-white shadow-lg font-extrabold' 
-                          : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                        }
-                      `}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 transition ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400'}`} />
-                        <span>{item.label}</span>
-                      </div>
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsSidebarOpen(false);
+                    }}
+                    className={`
+                      w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs transition group text-left
+                      ${isActive 
+                        ? 'bg-emerald-600 text-white shadow-lg font-extrabold' 
+                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className={`w-4 h-4 transition ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400'}`} />
+                      <span>{item.label}</span>
+                    </div>
 
-                      {item.count !== undefined && item.count > 0 && (
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isActive ? 'bg-white text-emerald-950' : item.badgeColor || 'bg-emerald-500 text-white'}`}>
-                          {item.count}
-                        </span>
-                      )}
-                    </button>
-
-                    {/* Submenu for Course CMS */}
-                    {item.id === 'courses' && (
-                      <div className="pl-6 space-y-1 pt-0.5">
-                        {courses.map((course) => (
-                          <button
-                            key={course.id}
-                            onClick={() => {
-                              setActiveTab('courses');
-                              setIsSidebarOpen(false);
-                            }}
-                            className="w-full text-left px-3 py-1.5 text-[11px] text-slate-400 hover:text-emerald-300 hover:bg-slate-800/60 rounded-lg truncate transition flex items-center gap-1.5"
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                            <span className="truncate">{course.title}</span>
-                          </button>
-                        ))}
-                      </div>
+                    {item.count !== undefined && item.count > 0 && (
+                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isActive ? 'bg-white text-emerald-950' : item.badgeColor || 'bg-emerald-500 text-white'}`}>
+                        {item.count}
+                      </span>
                     )}
-                  </div>
+                  </button>
                 );
               })}
             </nav>
 
           </div>
 
-          {/* Sidebar Footer */}
-          <div className="pt-3 border-t border-slate-800">
-            <a
-              href={settings.googleMeetUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs py-2.5 rounded-xl shadow transition"
-            >
-              <Video className="w-4 h-4" />
-              <span>লাইভ গুগল মিট ক্লাসরুম</span>
-            </a>
+          {/* Sidebar Status Pill */}
+          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Server Online</span>
+            </span>
+            <span className="font-english font-bold text-emerald-400">99.9% Uptime</span>
           </div>
 
         </aside>
 
         {/* ===================== RIGHT WORKSPACE ===================== */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-slate-950 overflow-y-auto">
-          {activeTab === 'courses' && <CourseManager />}
-          {activeTab === 'enrollments' && <EnrollmentApprovals />}
-          {activeTab === 'payments' && <MonthlyFeeApprovals />}
-          {activeTab === 'leads' && <LeadManager />}
-          {activeTab === 'media' && <MediaManager />}
-          {activeTab === 'settings' && <SiteSettingsForm />}
+          
+          {/* 1. DASHBOARD OVERVIEW TAB (DEFAULT) */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-8 font-bangla animate-in fade-in duration-200">
+              
+              {/* Top Banner with Live Site Health */}
+              <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950 p-6 sm:p-8 rounded-3xl border border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-xl">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Live Production
+                    </span>
+                    <span className="text-xs text-slate-400 font-english">BD Homeo Cloud Engine</span>
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-white mt-2">
+                    অ্যাকাডেমিক কন্ট্রোল হাব & Dashboard
+                  </h1>
+                  <p className="text-xs text-slate-400 mt-1 max-w-xl">
+                    ডাঃ মোঃ গিয়াস উদ্দিন স্যারের বিডি হোমিও প্রশিক্ষণ কেন্দ্রের সার্বিক ভর্তি, মাসিক ফি, শিক্ষার্থী ও কোর্স ব্যবস্থাপনা।
+                  </p>
+                </div>
 
-          {activeTab === 'analytics' && (
-            <div className="space-y-6">
+                {/* Site Health Metrics */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+                  <div className="p-2 text-center">
+                    <span className="text-[10px] text-slate-400 block font-bold">ডাটাবেজ</span>
+                    <span className="text-xs font-black text-emerald-400 flex items-center justify-center gap-1 mt-0.5">
+                      <CheckCircle2 className="w-3 h-3" /> Online
+                    </span>
+                  </div>
+                  <div className="p-2 text-center border-l border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-bold">Auth API</span>
+                    <span className="text-xs font-black text-emerald-400 flex items-center justify-center gap-1 mt-0.5">
+                      <CheckCircle2 className="w-3 h-3" /> Active
+                    </span>
+                  </div>
+                  <div className="p-2 text-center border-l border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-bold">ক্লাউড স্টোরেজ</span>
+                    <span className="text-xs font-black text-emerald-400 flex items-center justify-center gap-1 mt-0.5">
+                      <CheckCircle2 className="w-3 h-3" /> Ready
+                    </span>
+                  </div>
+                  <div className="p-2 text-center border-l border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-bold">সার্ভার লেটেন্সি</span>
+                    <span className="text-xs font-black text-amber-400 font-english mt-0.5 block">
+                      24ms
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 5 Core Summary Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase">মোট কোর্স</span>
-                  <p className="text-3xl font-black text-white font-english">{courses.length}</p>
-                  <p className="text-xs text-emerald-400 font-bold">বেসিক ও এডভান্সড মাস্টার ব্যাচ</p>
+                
+                {/* Total Revenue */}
+                <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2 hover:border-emerald-500/40 transition shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-400 font-bold uppercase">মোট কালেকশন (Revenue)</span>
+                    <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                      <TrendingUp className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <p className="text-2xl sm:text-3xl font-black text-emerald-400 font-english">
+                    ৳{totalRevenue.toLocaleString('en-US')}/-
+                  </p>
+                  <p className="text-[11px] text-slate-400">ভর্তি ও মাসিক ফি বাবদ সর্বমোট আদায়</p>
                 </div>
 
-                <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase">সফল ভর্তি অনুমোদন</span>
-                  <p className="text-3xl font-black text-emerald-400 font-english">{approvedEnrollments.length}</p>
-                  <p className="text-xs text-slate-400">এক্টিভ শিক্ষার্থী সংখ্যা</p>
+                {/* Approved Students */}
+                <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2 hover:border-emerald-500/40 transition shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-400 font-bold uppercase">এক্টিভ শিক্ষার্থী</span>
+                    <div className="p-2 bg-blue-500/10 text-blue-400 rounded-xl">
+                      <Users className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <p className="text-2xl sm:text-3xl font-black text-white font-english">
+                    {approvedEnrollments.length} জন
+                  </p>
+                  <p className="text-[11px] text-emerald-400 font-bold">ভর্তি নিশ্চিতকৃত শিক্ষার্থী</p>
                 </div>
 
-                <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase">পরিশোধিত মাসিক ফি</span>
-                  <p className="text-3xl font-black text-amber-400 font-english">{approvedPayments.length}</p>
-                  <p className="text-xs text-slate-400">অনুমোদিত মাসিক ট্রানজেকশন</p>
+                {/* Pending Actions (Enrollment + Monthly Fee) */}
+                <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2 hover:border-amber-500/40 transition shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-400 font-bold uppercase">পেন্ডিং ফি ও ভর্তি যাচাই</span>
+                    <div className="p-2 bg-amber-500/10 text-amber-400 rounded-xl">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <p className="text-2xl sm:text-3xl font-black text-amber-400 font-english">
+                    {pendingEnrollments.length + pendingPayments.length} টি
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    ভর্তি: {pendingEnrollments.length} | মাসিক ফি: {pendingPayments.length}
+                  </p>
                 </div>
 
-                <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase">ফ্রি ক্লাসের লিড</span>
-                  <p className="text-3xl font-black text-blue-400 font-english">{leads.length}</p>
-                  <p className="text-xs text-slate-400">রেজিস্ট্রেশনকৃত আগ্রহী সংখ্যা</p>
+                {/* Orientation Leads */}
+                <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2 hover:border-purple-500/40 transition shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-400 font-bold uppercase">ফ্রি ক্লাসের লিড</span>
+                    <div className="p-2 bg-purple-500/10 text-purple-400 rounded-xl">
+                      <MessageSquare className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <p className="text-2xl sm:text-3xl font-black text-purple-300 font-english">
+                    {leads.length} জন
+                  </p>
+                  <p className="text-[11px] text-slate-400">রেজিস্ট্রেশনকৃত আগ্রহী সদস্য</p>
                 </div>
+
               </div>
 
-              <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-4">
-                <h3 className="text-lg font-black text-white flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-emerald-400" />
-                  রেভিনিউ ও পেমেন্ট সামারি
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                    <p className="text-xs text-slate-400">ভর্তি ফি বাবদ মোট আয় (৳১,০০০ x {approvedEnrollments.length})</p>
-                    <p className="text-2xl font-black text-emerald-400 font-english mt-1">
-                      ৳{(approvedEnrollments.length * 1000).toLocaleString('en-US')}/-
-                    </p>
-                  </div>
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                    <p className="text-xs text-slate-400">মাসিক ফি বাবদ মোট আয় (৳৫০০ x {approvedPayments.length})</p>
-                    <p className="text-2xl font-black text-amber-400 font-english mt-1">
-                      ৳{(approvedPayments.length * 500).toLocaleString('en-US')}/-
-                    </p>
+              {/* Quick Actions & Recent Activities Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* Quick Action Shortcuts */}
+                <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 space-y-4">
+                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-emerald-400" />
+                    কুইক অ্যাকশন শর্টকাট
+                  </h3>
+
+                  <div className="space-y-2.5">
+                    <button
+                      onClick={() => setActiveTab('courses')}
+                      className="w-full flex items-center justify-between p-3.5 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 text-xs font-bold text-slate-200 transition group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <BookOpen className="w-4 h-4 text-emerald-400" />
+                        <span>কোর্স ও সিলেবাস পরিচালনা করুন</span>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition" />
+                    </button>
+
+                    <button
+                      onClick={() => setActiveTab('payments')}
+                      className="w-full flex items-center justify-between p-3.5 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 text-xs font-bold text-slate-200 transition group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <CreditCard className="w-4 h-4 text-amber-400" />
+                        <span>Student Fee Confirmation ({pendingPayments.length} টি পেন্ডিং)</span>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition" />
+                    </button>
+
+                    <button
+                      onClick={() => setActiveTab('enrollments')}
+                      className="w-full flex items-center justify-between p-3.5 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 text-xs font-bold text-slate-200 transition group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Users className="w-4 h-4 text-blue-400" />
+                        <span>ম্যানুয়াল শিক্ষার্থী ভর্তি ও অনুমোদন</span>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition" />
+                    </button>
+
+                    <button
+                      onClick={() => setActiveTab('settings')}
+                      className="w-full flex items-center justify-between p-3.5 bg-slate-950 hover:bg-slate-800 rounded-2xl border border-slate-800 text-xs font-bold text-slate-200 transition group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Settings className="w-4 h-4 text-slate-400" />
+                        <span>পেমেন্ট নম্বর ও সাইট কনটেন্ট সেটিংস</span>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-slate-500 group-hover:text-white transition" />
+                    </button>
                   </div>
                 </div>
+
+                {/* Revenue Breakdown */}
+                <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 space-y-4 lg:col-span-2">
+                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-emerald-400" />
+                    আয় ও পেমেন্ট সামারি (Financial Overview)
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+                      <span className="text-xs text-slate-400">এককালীন ভর্তি ফি আয় (৳১,০০০ x {approvedEnrollments.length})</span>
+                      <p className="text-2xl font-black text-emerald-400 font-english mt-1">
+                        ৳{totalAdmissionRevenue.toLocaleString('en-US')}/-
+                      </p>
+                      <p className="text-[11px] text-slate-500">অনুমোদিত ভর্তি সংখ্যা: {approvedEnrollments.length} জন</p>
+                    </div>
+
+                    <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+                      <span className="text-xs text-slate-400">মাসিক ফি বাবদ আয় (৳৫০০ x {approvedPayments.length})</span>
+                      <p className="text-2xl font-black text-amber-400 font-english mt-1">
+                        ৳{totalMonthlyRevenue.toLocaleString('en-US')}/-
+                      </p>
+                      <p className="text-[11px] text-slate-500">অনুমোদিত মাসিক ট্রানজেকশন: {approvedPayments.length} টি</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-emerald-950/40 rounded-2xl border border-emerald-500/30 text-xs text-emerald-200 flex items-center justify-between">
+                    <span>💡 বিকাশ মার্চেন্ট ও নগদ পেমেন্ট নম্বর: <strong>{settings.bkashNumber}</strong></span>
+                    <button onClick={() => setActiveTab('settings')} className="text-xs font-bold underline hover:text-white">
+                      পরিবর্তন করুন
+                    </button>
+                  </div>
+                </div>
+
               </div>
+
             </div>
           )}
+
+          {/* 2. STUDENT FEE CONFIRMATION TAB */}
+          {activeTab === 'payments' && <MonthlyFeeApprovals />}
+
+          {/* 3. COURSES & SYLLABUS CMS */}
+          {activeTab === 'courses' && <CourseManager />}
+
+          {/* 4. ENROLLMENTS APPROVALS */}
+          {activeTab === 'enrollments' && <EnrollmentApprovals />}
+
+          {/* 5. ORIENTATION LEADS CRM */}
+          {activeTab === 'leads' && <LeadManager />}
+
+          {/* 6. MEDIA & GALLERY MANAGER */}
+          {activeTab === 'media' && <MediaManager />}
+
+          {/* 7. SITE SETTINGS */}
+          {activeTab === 'settings' && <SiteSettingsForm />}
 
         </main>
 

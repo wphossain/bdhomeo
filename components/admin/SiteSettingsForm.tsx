@@ -7,7 +7,12 @@ import {
   Save, 
   Phone, 
   Megaphone, 
-  CreditCard
+  CreditCard,
+  Globe,
+  Share2,
+  Mail,
+  MapPin,
+  Sparkles
 } from 'lucide-react';
 
 export function SiteSettingsForm() {
@@ -20,7 +25,7 @@ export function SiteSettingsForm() {
     setIsSaving(true);
     await updateSettings(formData);
     setIsSaving(false);
-    showToast('ওয়েবসাইটের কনটেন্ট ও নম্বর সফলভাবে আপডেট হয়েছে!', 'success');
+    showToast('ওয়েবসাইটের কনটেন্ট ও সকল সেটিংস সফলভাবে আপডেট হয়েছে!', 'success');
   };
 
   return (
@@ -31,10 +36,10 @@ export function SiteSettingsForm() {
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
             <Settings className="w-6 h-6 text-emerald-400" />
-            সাইট কনটেন্ট ও নম্বর সেটিংস (Site Settings CMS)
+            সাইট কনটেন্ট ও সার্বিক সেটিংস (Site Settings CMS)
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            বিকাশ মার্চেন্ট নম্বর, হোয়াটসঅ্যাপ নম্বর, হেল্পলাইন, নোটিশ এবং ল্যান্ডিং পেজের বিবরণ পরিবর্তন করুন।
+            পেমেন্ট নম্বর, হেল্পলাইন, সোশ্যাল লিংক, গুগল মিট ক্লাসরুম ও নোটিশ আপডেট করুন।
           </p>
         </div>
 
@@ -133,40 +138,80 @@ export function SiteSettingsForm() {
           </div>
         </div>
 
-        {/* 2. Helpline & Social Media */}
+        {/* 2. Helpline, WhatsApp & Chamber Contacts */}
         <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
           <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
             <Phone className="w-5 h-5 text-emerald-400" />
-            ২. স্যারের মূল হেল্পলাইন, হোয়াটসঅ্যাপ ও সোশ্যাল লিংক
+            ২. অফিসিয়াল হেল্পলাইন, হোয়াটসঅ্যাপ ও যোগাযোগ
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-slate-900 rounded-2xl border border-emerald-500/30 space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 bg-slate-900 rounded-2xl border border-emerald-500/30 space-y-1.5">
               <label className="text-xs font-bold text-emerald-400 block">
-                হোয়াটসঅ্যাপ নম্বর (WhatsApp Floating ও সাপোর্ট)
+                হোয়াটসঅ্যাপ নম্বর (WhatsApp Floating)
               </label>
               <input
                 type="text"
                 value={formData.whatsappNumber}
                 onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
-                className="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-white outline-none focus:border-emerald-500"
+                className="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white outline-none"
               />
-              <p className="text-[11px] text-slate-400">ডিফল্ট: 01811-123993</p>
             </div>
 
-            <div className="p-4 bg-slate-900 rounded-2xl border border-emerald-500/30 space-y-2">
+            <div className="p-4 bg-slate-900 rounded-2xl border border-emerald-500/30 space-y-1.5">
               <label className="text-xs font-bold text-emerald-400 block">
-                সরাসরি ফোন কল ও হেল্পলাইন নম্বর
+                সরাসরি ফোন কল ও প্রধান হেল্পলাইন
               </label>
               <input
                 type="text"
                 value={formData.helplineNumber}
                 onChange={(e) => setFormData({ ...formData, helplineNumber: e.target.value })}
-                className="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-white outline-none focus:border-emerald-500"
+                className="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white outline-none"
               />
-              <p className="text-[11px] text-slate-400">ডিফল্ট: 01811-123993</p>
             </div>
 
+            <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800 space-y-1.5">
+              <label className="text-xs font-bold text-slate-400 block">
+                বিকল্প সাপোর্ট নম্বর (Alternate)
+              </label>
+              <input
+                type="text"
+                value={formData.alternateHelpline || '01815-883101'}
+                onChange={(e) => setFormData({ ...formData, alternateHelpline: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 outline-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-400 block">অফিসিয়াল ইমেইল (Official Email)</label>
+              <input
+                type="email"
+                value={formData.officialEmail || 'bdhomeo@gmail.com'}
+                onChange={(e) => setFormData({ ...formData, officialEmail: e.target.value })}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+              />
+            </div>
+
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-xs font-bold text-slate-400 block">চেম্বার ও প্রধান কার্যালয়ের ঠিকানা</label>
+              <input
+                type="text"
+                value={formData.chamberAddress || 'ঢাকা, বাংলাদেশ'}
+                onChange={(e) => setFormData({ ...formData, chamberAddress: e.target.value })}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Social Media & Community Links */}
+        <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
+          <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+            <Share2 className="w-5 h-5 text-emerald-400" />
+            ৩. সোশ্যাল মিডিয়া ও কমিউনিটি চ্যানেল
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-400 block">ইউটিউব চ্যানেল লিংক (YouTube URL)</label>
               <input
@@ -178,7 +223,7 @@ export function SiteSettingsForm() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 block">স্যারের ফেসবুক প্রোফাইল লিংক (Facebook URL)</label>
+              <label className="text-xs font-bold text-slate-400 block">স্যারের ফেসবুক প্রোফাইল লিংক (Facebook Profile)</label>
               <input
                 type="url"
                 value={formData.facebookUrl}
@@ -186,14 +231,34 @@ export function SiteSettingsForm() {
                 className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500"
               />
             </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-400 block">অফিসিয়াল ফেসবুক গ্রুপ (Facebook Group)</label>
+              <input
+                type="url"
+                value={formData.facebookGroupUrl || 'https://www.facebook.com/groups/bdhomeo'}
+                onChange={(e) => setFormData({ ...formData, facebookGroupUrl: e.target.value })}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-400 block">টেলিগ্রাম চ্যানেল / গ্রুপ (Telegram Channel)</label>
+              <input
+                type="url"
+                value={formData.telegramUrl || 'https://t.me/bdhomeo'}
+                onChange={(e) => setFormData({ ...formData, telegramUrl: e.target.value })}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500"
+              />
+            </div>
           </div>
         </div>
 
-        {/* 3. Live Class Google Meet & Notice Bar */}
+        {/* 4. Live Class Google Meet & Notice Bar */}
         <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
           <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
             <Megaphone className="w-5 h-5 text-emerald-400" />
-            ৩. গুগল মিট লাইভ ক্লাসরুম ও শীর্ষ ঘোষণা নোটিশ
+            ৪. গুগল মিট লাইভ ক্লাসরুম ও শীর্ষ ঘোষণা নোটিশ
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -208,7 +273,7 @@ export function SiteSettingsForm() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 block">ক্লাসের সময়সূচি টেক্সট</label>
+              <label className="text-xs font-bold text-slate-400 block">লাইভ ক্লাসের সময়সূচি টেক্সট</label>
               <input
                 type="text"
                 value={formData.classTime}

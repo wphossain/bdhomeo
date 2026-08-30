@@ -52,6 +52,12 @@ export const initialSiteSettings: SiteSettings = {
   noticeText: 'আগামী নতুন ব্যাচের ভর্তি চলছে! ফ্রি ওরিয়েন্টেশন ক্লাসে অংশ নিতে এখনই রেজিস্ট্রেশন করুন। হেল্পলাইন: 01811-123993',
   youtubeUrl: 'https://www.youtube.com/@bdhomeo/videos',
   facebookUrl: 'https://www.facebook.com/geaus.uddin.81099',
+  facebookGroupUrl: 'https://www.facebook.com/groups/bdhomeo',
+  telegramUrl: 'https://t.me/bdhomeo',
+  officialEmail: 'bdhomeo@gmail.com',
+  chamberAddress: 'ঢাকা, বাংলাদেশ',
+  alternateHelpline: '01815-883101',
+  morningSupportTime: 'সকাল ৮:০০ টা',
 };
 
 export const initialCourses: Course[] = [

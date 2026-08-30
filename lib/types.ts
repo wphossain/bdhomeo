@@ -69,13 +69,20 @@ export interface SiteSettings {
   bkashType: 'Personal' | 'Merchant';
   nagadNumber: string;
   nagadType: 'Personal' | 'Merchant';
+  rocketNumber?: string;
   whatsappNumber: string;
   helplineNumber: string;
+  alternateHelpline?: string;
+  officialEmail?: string;
+  chamberAddress?: string;
   classTime: string;
+  morningSupportTime?: string;
   googleMeetUrl: string;
   noticeText: string;
   youtubeUrl: string;
   facebookUrl: string;
+  facebookGroupUrl?: string;
+  telegramUrl?: string;
 }
 
 export interface Enrollment {
@@ -90,7 +97,7 @@ export interface Enrollment {
   admissionStatus: 'pending' | 'approved' | 'rejected';
   trxId: string;
   senderPhone: string;
-  paymentMethod: 'bkash' | 'nagad';
+  paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash';
   enrolledAt: string;
 }
 
@@ -105,7 +112,7 @@ export interface MonthlyPayment {
   amount: number;
   trxId: string;
   senderPhone: string;
-  paymentMethod: 'bkash' | 'nagad';
+  paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash';
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
 }

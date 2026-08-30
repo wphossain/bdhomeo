@@ -10,7 +10,8 @@ import {
   Search, 
   Filter, 
   Check, 
-  Calendar
+  Calendar,
+  Sparkles
 } from 'lucide-react';
 
 export function MonthlyFeeApprovals() {
@@ -44,10 +45,10 @@ export function MonthlyFeeApprovals() {
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
             <CreditCard className="w-6 h-6 text-emerald-400" />
-            মাসিক ৫০০/- টাকা ফি যাচাই ও অনুমোদন (Monthly Fee Approvals)
+            Student Fee Confirmation (মাসিক ফি অনুমোদন ও ট্রানজেকশন)
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            শিক্ষার্থীদের জমা দেওয়া ট্রানজেকশন আইডি যাচাই করে ফি ভেরিফাই করুন।
+            শিক্ষার্থীদের জমা দেওয়া ট্রানজেকশন আইডি যাচাই করে মাসিক ৫০০/- টাকা ফি ভেরিফাই করুন।
           </p>
         </div>
 

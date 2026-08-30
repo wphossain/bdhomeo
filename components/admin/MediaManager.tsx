@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { useApp } from '@/lib/store';
 import { GalleryItem } from '@/lib/types';
@@ -9,8 +9,11 @@ import {
   Plus, 
   Trash2, 
   Save, 
+  Upload, 
   Sparkles, 
-  User
+  User,
+  FolderOpen,
+  CheckCircle2
 } from 'lucide-react';
 
 export function MediaManager() {
@@ -20,6 +23,35 @@ export function MediaManager() {
   const [ptfImg, setPtfImg] = useState(settings.ptfCertificateImageUrl);
   const [galleryList, setGalleryList] = useState<GalleryItem[]>(settings.galleryImages || []);
   const [isSaving, setIsSaving] = useState(false);
+
+  // File Upload Helper
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setter(reader.result);
+          showToast('ছবি সফলভাবে আপলোড হয়েছে!', 'success');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleGalleryFileUpload = (e: React.ChangeEvent<HTMLInputElement>, itemId: string) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          handleUpdateGalleryItem(itemId, 'src', reader.result);
+          showToast('গ্যালারি ছবি আপলোড হয়েছে!', 'success');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSaveMedia = async () => {
     setIsSaving(true);
@@ -63,7 +95,7 @@ export function MediaManager() {
             ছবি ও মিডিয়া ম্যানেজার (Media & Gallery CMS)
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            হিরো ইমেজ, স্যারের পোর্ট্রেট, PTF সার্টিফিকেট ও ওয়ার্কশপ ফটোগ্যালারি পরিবর্তন করুন।
+            কম্পিউটার থেকে ছবি আপলোড করুন অথবা পাথ পরিবর্তন করে ওয়েবসাইট ব্যানার ও অ্যালবাম সাজান।
           </p>
         </div>
 
@@ -81,55 +113,100 @@ export function MediaManager() {
       <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
         <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
           <User className="w-5 h-5 text-emerald-400" />
-          ১. প্রধান ব্রান্ডিং ইমেজ (Hero, Doctor Bio & PTF Certificate)
+          ১. প্রধান ব্রান্ডিং ইমেজ (Hero Banner, Doctor Bio & PTF Certificate)
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Hero Banner Image */}
-          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
-            <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-              <Image src={heroImg} alt="Hero Banner" fill className="object-cover" />
+          <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-slate-300 block">হিরো ব্যানার ইমেজ</span>
+              <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+                <Image src={heroImg} alt="Hero Banner" fill className="object-cover" />
+              </div>
             </div>
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">হিরো ব্যানার ইমেজ পাথ (URL)</label>
+
+            <div className="space-y-2 pt-2">
+              <label className="w-full flex items-center justify-center gap-2 bg-slate-950 hover:bg-slate-800 text-emerald-400 border border-slate-700/80 rounded-xl py-2.5 text-xs font-bold cursor-pointer transition">
+                <Upload className="w-3.5 h-3.5" />
+                <span>কম্পিউটার থেকে আপলোড</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, setHeroImg)}
+                  className="hidden"
+                />
+              </label>
+
               <input
                 type="text"
                 value={heroImg}
                 onChange={(e) => setHeroImg(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-emerald-300 outline-none focus:border-emerald-500"
+                placeholder="ইমেজ URL বা পাথ"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-[11px] font-mono text-slate-300 outline-none"
               />
             </div>
           </div>
 
           {/* Doctor Portrait Image */}
-          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
-            <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-              <Image src={portraitImg} alt="Doctor Portrait" fill className="object-cover" />
+          <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-slate-300 block">স্যারের প্রোফাইল পোর্ট্রেট</span>
+              <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+                <Image src={portraitImg} alt="Doctor Portrait" fill className="object-cover" />
+              </div>
             </div>
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">স্যারের প্রোফাইল ফটো পাথ (URL)</label>
+
+            <div className="space-y-2 pt-2">
+              <label className="w-full flex items-center justify-center gap-2 bg-slate-950 hover:bg-slate-800 text-emerald-400 border border-slate-700/80 rounded-xl py-2.5 text-xs font-bold cursor-pointer transition">
+                <Upload className="w-3.5 h-3.5" />
+                <span>কম্পিউটার থেকে আপলোড</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, setPortraitImg)}
+                  className="hidden"
+                />
+              </label>
+
               <input
                 type="text"
                 value={portraitImg}
                 onChange={(e) => setPortraitImg(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-emerald-300 outline-none focus:border-emerald-500"
+                placeholder="ইমেজ URL বা পাথ"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-[11px] font-mono text-slate-300 outline-none"
               />
             </div>
           </div>
 
           {/* PTF Certificate Image */}
-          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
-            <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-              <Image src={ptfImg} alt="PTF Certificate" fill className="object-cover" />
+          <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-slate-300 block">PTF সার্টিফিকেট সনদ</span>
+              <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+                <Image src={ptfImg} alt="PTF Certificate" fill className="object-cover" />
+              </div>
             </div>
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">PTF সার্টিফিকেট ইমেজ পাথ (URL)</label>
+
+            <div className="space-y-2 pt-2">
+              <label className="w-full flex items-center justify-center gap-2 bg-slate-950 hover:bg-slate-800 text-emerald-400 border border-slate-700/80 rounded-xl py-2.5 text-xs font-bold cursor-pointer transition">
+                <Upload className="w-3.5 h-3.5" />
+                <span>কম্পিউটার থেকে আপলোড</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e, setPtfImg)}
+                  className="hidden"
+                />
+              </label>
+
               <input
                 type="text"
                 value={ptfImg}
                 onChange={(e) => setPtfImg(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-emerald-300 outline-none focus:border-emerald-500"
+                placeholder="ইমেজ URL বা পাথ"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-[11px] font-mono text-slate-300 outline-none"
               />
             </div>
           </div>
@@ -147,7 +224,7 @@ export function MediaManager() {
               ২. ফটো গ্যালারি ও কর্মশালা অ্যালবাম ({galleryList.length} টি ছবি)
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              ওয়েবসাইটে প্রদর্শিত কর্মশালা, সেমিনার ও সার্টিফিকেট বিতরণী ফটোগুলো আপডেট করুন।
+              কর্মশালা, সেমিনার ও সার্টিফিকেট বিতরণী অ্যালবাম পরিবর্তন করুন।
             </p>
           </div>
 
@@ -167,7 +244,7 @@ export function MediaManager() {
               className="bg-slate-900 rounded-2xl border border-slate-800 p-4 space-y-3 flex flex-col justify-between"
             >
               <div className="flex gap-4">
-                <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0">
+                <div className="relative w-28 h-28 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0">
                   <Image src={item.src} alt={item.title} fill className="object-cover" />
                 </div>
 
@@ -181,22 +258,36 @@ export function MediaManager() {
                   />
 
                   <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
+                    <select
                       value={item.category}
                       onChange={(e) => handleUpdateGalleryItem(item.id, 'category', e.target.value)}
-                      placeholder="ক্যাটাগরি"
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs text-slate-300 outline-none"
-                    />
+                      className="bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs text-slate-300 outline-none"
+                    >
+                      <option value="কর্মশালা">কর্মশালা</option>
+                      <option value="সার্টিফিকেশন">সার্টিফিকেশন</option>
+                      <option value="আলোচনা সভা">আলোচনা সভা</option>
+                      <option value="একাডেমিক সেশন">একাডেমিক সেশন</option>
+                    </select>
 
-                    <input
-                      type="text"
-                      value={item.src}
-                      onChange={(e) => handleUpdateGalleryItem(item.id, 'src', e.target.value)}
-                      placeholder="ইমেজ পাথ (/assets/...)"
-                      className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs font-mono text-emerald-300 outline-none"
-                    />
+                    <label className="flex items-center justify-center gap-1 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 rounded-lg px-2 py-1 text-[11px] font-bold text-emerald-400 cursor-pointer transition">
+                      <Upload className="w-3 h-3" />
+                      <span>ছবি পাল্টান</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleGalleryFileUpload(e, item.id)}
+                        className="hidden"
+                      />
+                    </label>
                   </div>
+
+                  <input
+                    type="text"
+                    value={item.src}
+                    onChange={(e) => handleUpdateGalleryItem(item.id, 'src', e.target.value)}
+                    placeholder="ইমেজ পাথ বা URL"
+                    className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[10px] font-mono text-slate-400 outline-none"
+                  />
                 </div>
               </div>
 
