@@ -49,7 +49,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const syncUserProfile = async (sessionUser: any) => {
     if (!sessionUser) {
       setUser(null);
-      localStorage.removeItem('bdhomeo_user');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('bdhomeo_user');
+      }
       return;
     }
 
@@ -60,7 +62,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     let role: UserRole = 'student';
 
     try {
-      // Fetch role strictly from Supabase 'profiles' table
+      // Query role strictly from Supabase 'profiles' table
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
@@ -85,7 +87,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } catch (err) {
-      console.warn('Supabase profile query note:', err);
+      console.warn('Supabase profile check:', err);
       role = 'student';
     }
 
@@ -99,7 +101,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     setUser(userProfile);
-    localStorage.setItem('bdhomeo_user', JSON.stringify(userProfile));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_user', JSON.stringify(userProfile));
+    }
   };
 
   useEffect(() => {
@@ -109,7 +113,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setCourses(JSON.parse(savedCourses));
       } else {
         setCourses(initialCourses);
-        localStorage.setItem('bdhomeo_courses', JSON.stringify(initialCourses));
       }
 
       const savedSettings = localStorage.getItem('bdhomeo_settings');
@@ -137,7 +140,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
       } else {
         setSettings(initialSiteSettings);
-        localStorage.setItem('bdhomeo_settings', JSON.stringify(initialSiteSettings));
       }
 
       const savedEnrollments = localStorage.getItem('bdhomeo_enrollments');
@@ -148,16 +150,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       const savedLeads = localStorage.getItem('bdhomeo_leads');
       if (savedLeads) setLeads(JSON.parse(savedLeads));
-
-      const savedUser = localStorage.getItem('bdhomeo_user');
-      if (savedUser) setUser(JSON.parse(savedUser));
     } catch (e) {
-      console.warn('LocalStorage error:', e);
+      console.warn('LocalStorage initialization warning:', e);
     }
 
+    // Initialize session directly from Supabase
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         await syncUserProfile(session.user);
+      } else {
+        setUser(null);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('bdhomeo_user');
+        }
       }
       setIsAuthLoading(false);
     });
@@ -167,8 +172,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         await syncUserProfile(session.user);
       } else {
         setUser(null);
-        localStorage.removeItem('bdhomeo_user');
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('bdhomeo_user');
+        }
       }
+      setIsAuthLoading(false);
     });
 
     return () => {
@@ -196,7 +204,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem('bdhomeo_user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('bdhomeo_user');
+    }
     showToast('সফলভাবে লগআউট করা হয়েছে।', 'info');
   };
 
@@ -218,7 +228,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date().toISOString(),
         };
     setUser(demoUser);
-    localStorage.setItem('bdhomeo_user', JSON.stringify(demoUser));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_user', JSON.stringify(demoUser));
+    }
     showToast(`${role === 'admin' ? 'অ্যাডমিন' : 'শিক্ষার্থী'} ডেমো লগইন সফল!`, 'success');
   };
 
@@ -246,7 +258,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updated = [newEnrollment, ...enrollments];
     setEnrollments(updated);
-    localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
+    }
 
     try {
       await supabase.from('enrollments').insert({
@@ -295,7 +309,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updated = [newPayment, ...monthlyPayments];
     setMonthlyPayments(updated);
-    localStorage.setItem('bdhomeo_payments', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_payments', JSON.stringify(updated));
+    }
 
     try {
       await supabase.from('monthly_payments').insert({
@@ -333,7 +349,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updated = [newLead, ...leads];
     setLeads(updated);
-    localStorage.setItem('bdhomeo_leads', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_leads', JSON.stringify(updated));
+    }
 
     try {
       await supabase.from('orientation_leads').insert({
@@ -355,7 +373,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateSettings = async (newSettings: Partial<SiteSettings>) => {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
-    localStorage.setItem('bdhomeo_settings', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_settings', JSON.stringify(updated));
+    }
 
     try {
       await supabase.from('site_settings').upsert({
@@ -373,7 +393,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateCourses = async (updatedCourses: Course[]) => {
     setCourses(updatedCourses);
-    localStorage.setItem('bdhomeo_courses', JSON.stringify(updatedCourses));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_courses', JSON.stringify(updatedCourses));
+    }
     showToast('কোর্স ও সিলেবাস সফলভাবে আপডেট হয়েছে!', 'success');
     return true;
   };
@@ -384,7 +406,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ? courses.map((c) => (c.id === course.id ? course : c))
       : [...courses, course];
     setCourses(updated);
-    localStorage.setItem('bdhomeo_courses', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_courses', JSON.stringify(updated));
+    }
     showToast(`'${course.title}' কোর্স সফলভাবে সেভ হয়েছে!`, 'success');
     return true;
   };
@@ -394,7 +418,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       enr.id === enrollmentId ? { ...enr, admissionStatus: 'approved' as const } : enr
     );
     setEnrollments(updated);
-    localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
+    }
 
     try {
       await supabase
@@ -413,7 +439,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       p.id === paymentId ? { ...p, status: 'approved' as const } : p
     );
     setMonthlyPayments(updated);
-    localStorage.setItem('bdhomeo_payments', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_payments', JSON.stringify(updated));
+    }
 
     try {
       await supabase
@@ -430,7 +458,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateLeadStatus = async (leadId: string, status: 'contacted' | 'joined') => {
     const updated = leads.map((l) => (l.id === leadId ? { ...l, status } : l));
     setLeads(updated);
-    localStorage.setItem('bdhomeo_leads', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bdhomeo_leads', JSON.stringify(updated));
+    }
 
     try {
       await supabase
