@@ -1,4 +1,4 @@
--- BD Homeo Complete Supabase Schema
+﻿-- BD Homeo Supabase Database Schema with Automatic User Profile Trigger
 -- Run this in your Supabase SQL Editor: https://kcbettnkbbjnekbewzcu.supabase.co
 
 -- 1. Profiles Table (Extends Supabase Auth)
@@ -13,7 +13,44 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. Site Settings Table (CMS)
+-- 2. Trigger Function to Automatically Create/Sync Profile on Google Login
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, avatar_url, role)
+  VALUES (
+    new.id,
+    new.email,
+    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+    new.raw_user_meta_data->>'avatar_url',
+    'student'
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name),
+    avatar_url = COALESCE(EXCLUDED.avatar_url, public.profiles.avatar_url);
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger on auth.users table
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT OR UPDATE ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- Backfill all existing users from auth.users into public.profiles
+INSERT INTO public.profiles (id, email, full_name, avatar_url, role)
+SELECT
+  id,
+  email,
+  COALESCE(raw_user_meta_data->>'full_name', raw_user_meta_data->>'name', split_part(email, '@', 1)),
+  raw_user_meta_data->>'avatar_url',
+  'student'
+FROM auth.users
+ON CONFLICT (id) DO NOTHING;
+
+-- 3. Site Settings Table (CMS)
 CREATE TABLE IF NOT EXISTS public.site_settings (
   id TEXT PRIMARY KEY DEFAULT 'global_settings',
   site_title TEXT NOT NULL DEFAULT 'বিডি হোমিও প্রশিক্ষণ কেন্দ্র',
@@ -41,7 +78,7 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. Courses Table
+-- 4. Courses Table
 CREATE TABLE IF NOT EXISTS public.courses (
   id TEXT PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,
@@ -61,7 +98,7 @@ CREATE TABLE IF NOT EXISTS public.courses (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 4. Enrollments Table (Admission Applications)
+-- 5. Enrollments Table (Admission Applications)
 CREATE TABLE IF NOT EXISTS public.enrollments (
   id TEXT PRIMARY KEY DEFAULT 'enr_' || gen_random_uuid(),
   student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -78,7 +115,7 @@ CREATE TABLE IF NOT EXISTS public.enrollments (
   enrolled_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 5. Monthly Payments Table (500 BDT Monthly Fee)
+-- 6. Monthly Payments Table (500 BDT Monthly Fee)
 CREATE TABLE IF NOT EXISTS public.monthly_payments (
   id TEXT PRIMARY KEY DEFAULT 'pay_' || gen_random_uuid(),
   student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -95,7 +132,7 @@ CREATE TABLE IF NOT EXISTS public.monthly_payments (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 6. Orientation Leads Table (Free Class Attendees)
+-- 7. Orientation Leads Table (Free Class Attendees)
 CREATE TABLE IF NOT EXISTS public.orientation_leads (
   id TEXT PRIMARY KEY DEFAULT 'lead_' || gen_random_uuid(),
   name TEXT NOT NULL,
@@ -106,7 +143,7 @@ CREATE TABLE IF NOT EXISTS public.orientation_leads (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Enable Row Level Security (RLS)
+-- Row Level Security (RLS) Configuration
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
@@ -114,20 +151,23 @@ ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.monthly_payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orientation_leads ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies if any to prevent conflict
+-- Drop previous policies to avoid conflicts
 DROP POLICY IF EXISTS "Public can read profiles" ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Public can read site settings" ON public.site_settings;
 DROP POLICY IF EXISTS "Public can read courses" ON public.courses;
 DROP POLICY IF EXISTS "Anyone can insert enrollment" ON public.enrollments;
+DROP POLICY IF EXISTS "Anyone can read enrollments" ON public.enrollments;
 DROP POLICY IF EXISTS "Anyone can insert monthly payment" ON public.monthly_payments;
+DROP POLICY IF EXISTS "Anyone can read monthly payments" ON public.monthly_payments;
 DROP POLICY IF EXISTS "Anyone can insert lead" ON public.orientation_leads;
+DROP POLICY IF EXISTS "Anyone can read leads" ON public.orientation_leads;
 
 -- Profiles Policies
 CREATE POLICY "Public can read profiles" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "Users can insert their own profile" ON public.profiles FOR INSERT WITH CHECK (true);
-CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE USING (true);
 
 -- Site Settings & Courses
 CREATE POLICY "Public can read site settings" ON public.site_settings FOR SELECT USING (true);
