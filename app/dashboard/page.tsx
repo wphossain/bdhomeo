@@ -42,10 +42,10 @@ export default function StudentDashboard() {
           </div>
           <div>
             <h2 className="text-2xl font-black text-slate-900">
-              ?????????? ????????? ?????? ????
+              শিক্ষার্থী ক্লাসরুমে প্রবেশ করুন
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-              ???? ??????? ????, ????????? ???????? ?????? ? ?????? ??? ????? ??????? ??? ???? ???? ???? ?????
+              লাইভ ক্লাসের লিংক, আনলিস্টেড রেকর্ডেড লেকচার ও পিডিএফ নোট দেখতে অনুগ্রহ করে গুগল দিয়ে লগইন করুন।
             </p>
           </div>
 
@@ -56,16 +56,16 @@ export default function StudentDashboard() {
             <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
               <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
             </svg>
-            <span>Google ???? ?-?????? ????</span>
+            <span>Google দিয়ে ১-ক্লিকে লগইন</span>
           </button>
 
           <div className="pt-2 border-t border-slate-100">
-            <p className="text-[11px] text-slate-400 mb-2">???? ???? ??????? ??????? ????:</p>
+            <p className="text-[11px] text-slate-400 mb-2">অথবা ডেমো একাউন্ট ব্যবহার করুন:</p>
             <button
               onClick={() => demoLogin('student')}
               className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 rounded-lg transition"
             >
-              Demo Student ?????? ???? ????
+              Demo Student হিসেবে লগইন করুন
             </button>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function StudentDashboard() {
                   {user.fullName}
                 </h1>
                 <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
-                  {user.role === 'admin' ? '????????' : '?????????? ??????????'}
+                  {user.role === 'admin' ? 'অ্যাডমিন' : 'শিক্ষার্থী ড্যাশবোর্ড'}
                 </span>
               </div>
               <p className="text-xs text-slate-500">{user.email}</p>
@@ -153,7 +153,7 @@ export default function StudentDashboard() {
                     : 'text-slate-600 hover:text-emerald-700'
                 }`}
               >
-                {c.batchType === 'advance' ? '???????? ?????' : '????? ?????'}
+                {c.batchType === 'advance' ? 'এডভান্সড ব্যাচ' : 'বেসিক ব্যাচ'}
               </button>
             ))}
           </div>
@@ -175,13 +175,13 @@ export default function StudentDashboard() {
               <div className="flex items-center gap-2 font-black text-base">
                 <AlertCircle className="w-5 h-5 text-amber-700" />
                 <span>
-                  {isPending ? '?????? ????? ?????????? ????' : '?? ?????? ???? ???? ????? ????'}
+                  {isPending ? 'ভর্তির আবেদন ভেরিফিকেশন চলছে' : 'এই কোর্সে আপনি এখনো ভর্তি হননি'}
                 </span>
               </div>
               <p className="text-xs text-amber-900 leading-relaxed">
                 {isPending
-                  ? '????? ????? ?????/??? TrxID ????? ??? ?????? ????? ??????? ????? ???? ?????? ? ?????? ?????????????? ???? ??? ?????'
-                  : '?????????? ??? ????????? ???????? ????? ? ?????? ??? ???? ???? ????????? ????? ???'}
+                  ? 'আপনার দেওয়া বিকাশ/নগদ TrxID যাচাই করা হচ্ছে। স্যার অনুমোদন দিলেই পেইড লেকচার ও পিডিএফ স্বয়ংক্রিয়ভাবে আনলক হয়ে যাবে।'
+                  : 'ক্লাসরুমের সকল প্রিমিয়াম রেকর্ডেড ক্লাস ও পিডিএফ শিট আনলক করতে কোর্সটিতে ভর্তি হন।'}
               </p>
             </div>
             {!isPending && (
@@ -189,7 +189,7 @@ export default function StudentDashboard() {
                 href={`/courses/${activeCourse.slug}#enroll`}
                 className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl shadow transition shrink-0 text-center"
               >
-                ?????? ????? ?? (?????/-)
+                কোর্সে ভর্তি হন (৳১০০০/-)
               </Link>
             )}
           </div>
@@ -216,16 +216,16 @@ export default function StudentDashboard() {
               <div className="aspect-video w-full bg-slate-900 rounded-3xl flex flex-col items-center justify-center text-slate-300 p-8 text-center space-y-4 border border-slate-800">
                 <Lock className="w-12 h-12 text-amber-400" />
                 <div>
-                  <h3 className="text-lg font-bold text-white">?? ??????? ??? ??? ?????</h3>
+                  <h3 className="text-lg font-bold text-white">এই ক্লাসটি লকড করা রয়েছে</h3>
                   <p className="text-xs text-slate-400 mt-1 max-w-sm">
-                    ?????? ????? ?????? ????? ?? ?? ??????? ????? ????? ? ?????? ?????? ??? ???? ????
+                    কোর্সে ভর্তি এপ্রুভ হওয়ার পর এই ক্লাসের এইচডি ভিডিও ও পিডিএফ লেকচার শিট আনলক হবে।
                   </p>
                 </div>
                 <Link
                   href={`/courses/${activeCourse.slug}#enroll`}
                   className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-5 py-2.5 rounded-xl shadow transition"
                 >
-                  ?????? ????? ????
+                  ভর্তির আবেদন করুন
                 </Link>
               </div>
             )}
@@ -235,10 +235,10 @@ export default function StudentDashboard() {
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-emerald-700" />
-                  ????????????? PDF ?????? ??? ??????? ???????
+                  অধ্যায়ভিত্তিক PDF লেকচার শিট ডাউনলোড সেন্টার
                 </h3>
                 <span className="text-xs font-bold text-slate-500 font-mono">
-                  {allPdfs.length} ?? ????
+                  {allPdfs.length} টি ফাইল
                 </span>
               </div>
               <PDFList items={allPdfs} />
@@ -252,7 +252,7 @@ export default function StudentDashboard() {
             {/* Course Progress */}
             <div className="space-y-2 pb-4 border-b border-slate-100">
               <div className="flex items-center justify-between text-xs font-bold">
-                <span className="text-slate-700">????? ??????? (Progress)</span>
+                <span className="text-slate-700">কোর্স অগ্রগতি (Progress)</span>
                 <span className="text-emerald-700 font-mono font-black">{progressPercentage}%</span>
               </div>
               <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
@@ -268,7 +268,7 @@ export default function StudentDashboard() {
               {activeCourse.curriculum.map((chapter) => (
                 <div key={chapter.id} className="space-y-2">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
-                    ?????? {chapter.chapterNo}
+                    অধ্যায় {chapter.chapterNo}
                   </span>
                   <h4 className="text-xs font-bold text-slate-900 leading-snug">
                     {chapter.title}

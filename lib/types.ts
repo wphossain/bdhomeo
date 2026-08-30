@@ -1,3 +1,33 @@
+export type UserRole = 'student' | 'admin';
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  fullName: string;
+  avatarUrl?: string;
+  phone?: string;
+  role: UserRole;
+  createdAt: string;
+}
+
+export interface Lesson {
+  id: string;
+  title: string;
+  durationMin: number;
+  isFreePreview: boolean;
+  youtubeVideoId?: string;
+  pdfNotesTitle?: string;
+  pdfNotesUrl?: string;
+}
+
+export interface Chapter {
+  id: string;
+  chapterNo: number;
+  title: string;
+  description?: string;
+  lessons: Lesson[];
+}
+
 export interface Course {
   id: string;
   slug: string;
@@ -13,36 +43,18 @@ export interface Course {
   description: string;
   features: string[];
   curriculum: Chapter[];
-  isActive: boolean;
 }
 
-export interface Chapter {
-  id: string;
-  chapterNo: number;
-  title: string;
-  description?: string;
-  lessons: Lesson[];
-}
-
-export interface Lesson {
-  id: string;
-  title: string;
-  durationMin: number;
-  youtubeVideoId?: string;
-  pdfNotesUrl?: string;
-  pdfNotesTitle?: string;
-  isFreePreview: boolean;
-  completed?: boolean;
-}
-
-export interface UserProfile {
-  id: string;
-  email: string;
-  fullName: string;
-  phone?: string;
-  avatarUrl?: string;
-  role: 'student' | 'admin';
-  createdAt: string;
+export interface SiteSettings {
+  bkashNumber: string;
+  bkashType: 'Personal' | 'Merchant';
+  nagadNumber: string;
+  nagadType: 'Personal' | 'Merchant';
+  whatsappNumber: string;
+  helplineNumber: string;
+  classTime: string;
+  googleMeetUrl: string;
+  noticeText: string;
 }
 
 export interface Enrollment {
@@ -53,7 +65,7 @@ export interface Enrollment {
   studentPhone: string;
   courseId: string;
   courseTitle: string;
-  batchType: string;
+  batchType: 'basic' | 'advance' | 'special';
   admissionStatus: 'pending' | 'approved' | 'rejected';
   trxId: string;
   senderPhone: string;
@@ -87,19 +99,17 @@ export interface OrientationLead {
   createdAt: string;
 }
 
-export interface SiteSettings {
-  siteName: string;
-  tagline: string;
-  instructorName: string;
-  instructorDesignation: string;
-  whatsappNumber: string;
-  bkashNumber: string;
-  bkashType: string;
-  nagadNumber: string;
-  nagadType: string;
-  noticeText: string;
-  noticeActive: boolean;
-  googleMeetUrl: string;
-  classTime: string;
-  ptfCertified: boolean;
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface TestimonialItem {
+  id: string;
+  name: string;
+  designation: string;
+  batchName: string;
+  quote: string;
+  avatarUrl?: string;
+  rating?: number;
 }

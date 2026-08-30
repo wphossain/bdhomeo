@@ -13,12 +13,8 @@ import {
   CreditCard, 
   MessageSquare, 
   Settings, 
-  Bell, 
   CheckCircle2, 
-  AlertCircle,
-  Clock,
-  Sparkles,
-  Lock
+  Clock
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -35,10 +31,10 @@ export default function AdminPage() {
           </div>
           <div>
             <h2 className="text-2xl font-black text-slate-900">
-              ???????? ???????? ???????
+              অ্যাডমিন কন্ট্রোল প্যানেল
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-              ?? ???????????? ????????? ??? ??? ????? ?????? ????? ??? ???? ??????????? ???? ?????????
+              এই ড্যাশবোর্ডটি শুধুমাত্র ডাঃ মোঃ গিয়াস উদ্দিন স্যার এবং সাইট অ্যাডমিনদের জন্য সুরক্ষিত।
             </p>
           </div>
 
@@ -49,16 +45,16 @@ export default function AdminPage() {
             <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
               <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
             </svg>
-            <span>Admin Google Account ???? ????-??</span>
+            <span>Admin Google Account দিয়ে সাইন-ইন</span>
           </button>
 
           <div className="pt-2 border-t border-slate-100">
-            <p className="text-[11px] text-slate-400 mb-2">?? ????? ???????? ??? ????? ????:</p>
+            <p className="text-[11px] text-slate-400 mb-2">বা দ্রুত অ্যাডমিন ভিউ টেস্ট করুন:</p>
             <button
               onClick={() => demoLogin('admin')}
               className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 rounded-lg transition"
             >
-              Demo Admin ?????? ???? ????
+              Demo Admin হিসেবে লগইন করুন
             </button>
           </div>
         </div>
@@ -84,14 +80,14 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-black tracking-tight">
-                  ???????? ???????? ???????
+                  অ্যাডমিন কন্ট্রোল সেন্টার
                 </h1>
                 <span className="bg-amber-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full">
                   Super Admin
                 </span>
               </div>
               <p className="text-xs text-emerald-300">
-                ???????, {user.fullName} � ???? ????? ????????? ???????
+                স্বাগতম, {user.fullName} • বিডি হোমিও প্রশিক্ষণ কেন্দ্র
               </p>
             </div>
           </div>
@@ -101,7 +97,7 @@ export default function AdminPage() {
               href="/dashboard"
               className="bg-emerald-800/80 hover:bg-emerald-800 text-xs font-bold px-4 py-2 rounded-xl transition border border-emerald-700"
             >
-              ?????????? ???????? ???
+              শিক্ষার্থী ক্লাসরুম ভিউ
             </Link>
           </div>
         </div>
@@ -114,46 +110,46 @@ export default function AdminPage() {
           
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
             <div className="flex items-center justify-between text-slate-500 text-xs font-bold">
-              <span>??????? ????? ?????</span>
+              <span>পেন্ডিং ভর্তি আবেদন</span>
               <Clock className="w-4 h-4 text-amber-500" />
             </div>
             <p className="text-2xl font-black text-slate-900 font-english">
               {pendingEnrollmentsCount}
             </p>
-            <span className="text-[11px] text-amber-600 font-medium">???????? ????????</span>
+            <span className="text-[11px] text-amber-600 font-medium">যাচাইয়ের অপেক্ষায়</span>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
             <div className="flex items-center justify-between text-slate-500 text-xs font-bold">
-              <span>??????? ????? ??</span>
+              <span>পেন্ডিং মাসিক ফি</span>
               <CreditCard className="w-4 h-4 text-rose-500" />
             </div>
             <p className="text-2xl font-black text-slate-900 font-english">
               {pendingPaymentsCount}
             </p>
-            <span className="text-[11px] text-rose-600 font-medium">?? ?????? ?????????</span>
+            <span className="text-[11px] text-rose-600 font-medium">ফি পরিশোধ রিকোয়েস্ট</span>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
             <div className="flex items-center justify-between text-slate-500 text-xs font-bold">
-              <span>???????? ??????????</span>
+              <span>অনুমোদিত শিক্ষার্থী</span>
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
             </div>
             <p className="text-2xl font-black text-emerald-900 font-english">
               {approvedEnrollmentsCount}
             </p>
-            <span className="text-[11px] text-emerald-600 font-medium">?????? ???????? ??????</span>
+            <span className="text-[11px] text-emerald-600 font-medium">এক্টিভ ক্লাসরুম এক্সেস</span>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-1">
             <div className="flex items-center justify-between text-slate-500 text-xs font-bold">
-              <span>??????????? ???</span>
+              <span>ওরিয়েন্টেশন লিড</span>
               <MessageSquare className="w-4 h-4 text-blue-500" />
             </div>
             <p className="text-2xl font-black text-slate-900 font-english">
               {leads.length}
             </p>
-            <span className="text-[11px] text-blue-600 font-medium">???? ?????? ??????</span>
+            <span className="text-[11px] text-blue-600 font-medium">ফ্রি ক্লাসে আগ্রহী</span>
           </div>
 
         </div>
@@ -170,7 +166,7 @@ export default function AdminPage() {
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>?????? ????? ({pendingEnrollmentsCount})</span>
+            <span>ভর্তির আবেদন ({pendingEnrollmentsCount})</span>
           </button>
 
           <button
@@ -182,7 +178,7 @@ export default function AdminPage() {
             }`}
           >
             <CreditCard className="w-4 h-4" />
-            <span>????? ???/- ?? ({pendingPaymentsCount})</span>
+            <span>মাসিক ৫০০/- ফি ({pendingPaymentsCount})</span>
           </button>
 
           <button
@@ -194,7 +190,7 @@ export default function AdminPage() {
             }`}
           >
             <MessageSquare className="w-4 h-4" />
-            <span>??????????? ??? ({leads.length})</span>
+            <span>ওরিয়েন্টেশন লিড ({leads.length})</span>
           </button>
 
           <button
@@ -206,7 +202,7 @@ export default function AdminPage() {
             }`}
           >
             <Settings className="w-4 h-4" />
-            <span>???? ?????? ? ?????</span>
+            <span>সাইট সেটিংস ও নোটিশ</span>
           </button>
 
         </div>

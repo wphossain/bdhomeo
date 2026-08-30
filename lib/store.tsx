@@ -47,7 +47,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const savedSettings = localStorage.getItem('bdhomeo_settings');
-      if (savedSettings) setSettings(JSON.parse(savedSettings));
+      if (savedSettings) {
+        const parsed = JSON.parse(savedSettings);
+        // If cached settings has corrupted ??? notice, fall back to initial
+        if (parsed.noticeText && parsed.noticeText.includes('???')) {
+          setSettings(initialSiteSettings);
+          localStorage.setItem('bdhomeo_settings', JSON.stringify(initialSiteSettings));
+        } else {
+          setSettings({ ...initialSiteSettings, ...parsed });
+        }
+      }
 
       const savedEnrollments = localStorage.getItem('bdhomeo_enrollments');
       if (savedEnrollments) setEnrollments(JSON.parse(savedEnrollments));
