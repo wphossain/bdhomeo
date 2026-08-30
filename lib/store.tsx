@@ -328,40 +328,82 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return false;
     }
 
+    const cleanPhone = (data.studentPhone || data.senderPhone || '').trim();
+    const cleanTrx = (data.trxId || '').trim().toUpperCase();
+
+    // 1. Bangladeshi Phone Validation (11 digits starting with 013-019)
+    const phoneRegex = /^(?:\+?88|88)?01[3-9]\d{8}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      showToast('সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর লিখুন (যেমন: 017XXXXXXXX)', 'error');
+      return false;
+    }
+
+    // 2. Transaction ID Format Validation (6 to 18 alphanumeric characters)
+    const trxRegex = /^[A-Z0-9]{6,18}$/;
+    if (!trxRegex.test(cleanTrx)) {
+      showToast('সঠিক ট্রানজেকশন আইডি (TrxID) লিখুন (৬-১৮ অক্ষরের)', 'error');
+      return false;
+    }
+
+    // 3. Duplicate TrxID Prevention
+    try {
+      const { data: dupEnr } = await supabase
+        .from('enrollments')
+        .select('id')
+        .eq('trx_id', cleanTrx)
+        .limit(1);
+
+      if (dupEnr && dupEnr.length > 0) {
+        showToast('এই TrxID (' + cleanTrx + ') টি পূর্বে একবার ব্যবহার করা হয়েছে!', 'error');
+        return false;
+      }
+
+      const { data: dupPay } = await supabase
+        .from('monthly_payments')
+        .select('id')
+        .eq('trx_id', cleanTrx)
+        .limit(1);
+
+      if (dupPay && dupPay.length > 0) {
+        showToast('এই TrxID (' + cleanTrx + ') টি ইতিমধ্যে জমা দেওয়া হয়েছে!', 'error');
+        return false;
+      }
+    } catch (err) {
+      console.warn('Duplicate check check:', err);
+    }
+
     const targetCourse = courses.find((c) => c.id === data.courseId);
     const newEnrollment: Enrollment = {
       id: 'enr-' + Date.now(),
       studentId: user.id,
       studentName: user.fullName,
       studentEmail: user.email,
-      studentPhone: data.studentPhone || data.senderPhone || '',
+      studentPhone: cleanPhone,
       courseId: data.courseId,
       courseTitle: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
       batchType: targetCourse?.batchType || 'basic',
       admissionStatus: 'pending',
-      trxId: data.trxId,
-      senderPhone: data.senderPhone,
+      trxId: cleanTrx,
+      senderPhone: data.senderPhone.trim(),
       paymentMethod: data.paymentMethod,
       enrolledAt: new Date().toISOString(),
     };
 
-    // Optimistic UI Update
     setEnrollments((prev) => [newEnrollment, ...prev]);
 
-    // Supabase Insert with strict error handling
     try {
       const { error } = await supabase.from('enrollments').insert({
         id: newEnrollment.id,
         student_id: user.id,
         student_name: user.fullName,
         student_email: user.email,
-        student_phone: data.studentPhone || data.senderPhone || '',
+        student_phone: cleanPhone,
         course_id: data.courseId,
         course_title: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
         batch_type: targetCourse?.batchType || 'basic',
         admission_status: 'pending',
-        trx_id: data.trxId,
-        sender_phone: data.senderPhone,
+        trx_id: cleanTrx,
+        sender_phone: data.senderPhone.trim(),
         payment_method: data.paymentMethod,
         enrolled_at: newEnrollment.enrolledAt,
       });
@@ -396,18 +438,51 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return false;
     }
 
+    const cleanPhone = (data.senderPhone || '').trim();
+    const cleanTrx = (data.trxId || '').trim().toUpperCase();
+
+    // 1. Phone validation
+    const phoneRegex = /^(?:\+?88|88)?01[3-9]\d{8}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      showToast('সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর লিখুন (যেমন: 017XXXXXXXX)', 'error');
+      return false;
+    }
+
+    // 2. TrxID Format validation
+    const trxRegex = /^[A-Z0-9]{6,18}$/;
+    if (!trxRegex.test(cleanTrx)) {
+      showToast('সঠিক ট্রানজেকশন আইডি (TrxID) লিখুন (৬-১৮ অক্ষরের)', 'error');
+      return false;
+    }
+
+    // 3. Duplicate TrxID Prevention
+    try {
+      const { data: dupPay } = await supabase
+        .from('monthly_payments')
+        .select('id')
+        .eq('trx_id', cleanTrx)
+        .limit(1);
+
+      if (dupPay && dupPay.length > 0) {
+        showToast('এই TrxID (' + cleanTrx + ') টি পূর্বে একবার ব্যবহার করা হয়েছে!', 'error');
+        return false;
+      }
+    } catch (err) {
+      console.warn('Duplicate payment check:', err);
+    }
+
     const targetCourse = courses.find((c) => c.id === data.courseId);
     const newPayment: MonthlyPayment = {
       id: 'pay-' + Date.now(),
       studentId: user.id,
       studentName: user.fullName,
-      studentPhone: data.senderPhone,
+      studentPhone: cleanPhone,
       courseId: data.courseId,
       courseTitle: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
       monthName: data.monthName,
       amount: 500,
-      trxId: data.trxId,
-      senderPhone: data.senderPhone,
+      trxId: cleanTrx,
+      senderPhone: cleanPhone,
       paymentMethod: data.paymentMethod,
       status: 'pending',
       createdAt: new Date().toISOString(),
@@ -420,13 +495,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         id: newPayment.id,
         student_id: user.id,
         student_name: user.fullName,
-        student_phone: data.senderPhone,
+        student_phone: cleanPhone,
         course_id: data.courseId,
         course_title: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
         month_name: data.monthName,
         amount: 500,
-        trx_id: data.trxId,
-        sender_phone: data.senderPhone,
+        trx_id: cleanTrx,
+        sender_phone: cleanPhone,
         payment_method: data.paymentMethod,
         status: 'pending',
         created_at: newPayment.createdAt,
@@ -456,11 +531,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     email?: string; 
     homeoBackground: string 
   }): Promise<boolean> => {
+    const cleanPhone = (data.phone || '').trim();
+
+    const phoneRegex = /^(?:\+?88|88)?01[3-9]\d{8}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      showToast('সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর লিখুন (যেমন: 018XXXXXXXX)', 'error');
+      return false;
+    }
+
     const newLead: OrientationLead = {
       id: 'lead-' + Date.now(),
-      name: data.name,
-      phone: data.phone,
-      email: data.email,
+      name: data.name.trim(),
+      phone: cleanPhone,
+      email: data.email?.trim(),
       homeoBackground: data.homeoBackground,
       status: 'new',
       createdAt: new Date().toISOString(),
@@ -471,9 +554,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.from('orientation_leads').insert({
         id: newLead.id,
-        name: data.name,
-        phone: data.phone,
-        email: data.email || null,
+        name: data.name.trim(),
+        phone: cleanPhone,
+        email: data.email?.trim() || null,
         homeo_background: data.homeoBackground,
         status: 'new',
         created_at: newLead.createdAt,

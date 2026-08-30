@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useApp } from '@/lib/store';
@@ -20,9 +20,7 @@ import {
   Video,
   FileText,
   Lock,
-  ChevronDown,
-  ShieldCheck,
-  Phone
+  ChevronDown
 } from 'lucide-react';
 
 export default function CourseDetailPage() {
@@ -31,8 +29,12 @@ export default function CourseDetailPage() {
   const { courses, settings, user, submitEnrollment, signInWithGoogle, showToast } = useApp();
   const slug = params?.slug as string;
 
-  const course = courses.find((c) => c.slug === slug) || courses[0];
-  const isAdvance = course.batchType === 'advance';
+  const course = courses.find((c) => c.slug === slug);
+
+  // If slug is invalid, render official 404 page
+  if (!course) {
+    notFound();
+  }
 
   const [paymentMethod, setPaymentMethod] = useState<'bkash' | 'nagad'>('bkash');
   const [senderPhone, setSenderPhone] = useState('');
@@ -54,10 +56,6 @@ export default function CourseDetailPage() {
     if (!user) {
       showToast('ভর্তি সম্পন্ন করতে প্রথমে সাইন-ইন করুন', 'error');
       signInWithGoogle();
-      return;
-    }
-    if (!trxId || !senderPhone) {
-      showToast('বিকাশ/নগদ নম্বর ও TrxID পূরণ করুন', 'error');
       return;
     }
 

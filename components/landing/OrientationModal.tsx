@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/lib/store';
-import { Sparkles, X, CheckCircle, Send, MessageCircle } from 'lucide-react';
+import { Sparkles, X, CheckCircle2, Send, Phone, User, BookOpen } from 'lucide-react';
 
 interface OrientationModalProps {
   isOpen: boolean;
@@ -10,154 +10,143 @@ interface OrientationModalProps {
 }
 
 export function OrientationModal({ isOpen, onClose }: OrientationModalProps) {
-  const { submitOrientationLead, settings } = useApp();
+  const { submitOrientationLead, showToast } = useApp();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [homeoBackground, setHomeoBackground] = useState('ছাত্র/নতুন শিক্ষার্থী');
+  const [email, setEmail] = useState('');
+  const [homeoBackground, setHomeoBackground] = useState('ডিএইচএমএস শিক্ষার্থী');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDone, setIsDone] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !phone) return;
+
+    const phoneRegex = /^(?:\+?88|88)?01[3-9]\d{8}$/;
+    if (!phoneRegex.test(phone.trim())) {
+      showToast('সঠিক ১১ সংখ্যার মোবাইল নম্বর লিখুন (যেমন: 017XXXXXXXX)', 'error');
+      return;
+    }
 
     setIsSubmitting(true);
-    const success = await submitOrientationLead({
+    const ok = await submitOrientationLead({
       name,
       phone,
+      email,
       homeoBackground,
     });
     setIsSubmitting(false);
 
-    if (success) {
-      setIsDone(true);
+    if (ok) {
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        onClose();
+      }, 3000);
     }
   };
 
-  const cleanWaNumber = settings.whatsappNumber.replace(/[^0-9]/g, '');
-  const waDirectUrl = `https://wa.me/880${cleanWaNumber}?text=${encodeURIComponent(`আসসালামু আলাইকুম স্যার, আমি (${name || 'শিক্ষার্থী'}) ফ্রি ওরিয়েন্টেশন ক্লাসে অংশ নিতে চাই। আমার ফোন নম্বর: ${phone}`)}`;
-
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 font-bangla animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-emerald-100 overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 font-bangla animate-in fade-in">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
         
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Modal Top Ribbon */}
+        <div className="bg-gradient-to-r from-emerald-950 via-brand-900 to-slate-950 text-white p-6 sm:p-7 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
-        {!isDone ? (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <div className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">
-                <Sparkles className="w-4 h-4 text-amber-600" />
-                ফ্রি ওরিয়েন্টেশন ক্লাস রেজিস্ট্রেশন
-              </div>
-              <h3 className="text-2xl font-black text-slate-900">
-                হোমিওপ্যাথি ফ্রি ক্লাসে জয়েন করুন
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600">
-                গুগল মিট লাইভ ক্লাসের লিংক ও সময়সূচি সরাসরি আপনার হোয়াটসঅ্যাপে পেতে নিচের তথ্য দিন:
+          <div className="inline-flex items-center gap-1.5 bg-amber-400/20 text-amber-300 text-xs font-black px-3 py-1 rounded-full border border-amber-400/30 mb-2">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>১০০% ফ্রি লাইভ ওরিয়েন্টেশন ক্লাস</span>
+          </div>
+
+          <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+            হোমিওপ্যাথি ক্লাসিক্যাল মাস্টারক্লাসে যুক্ত হোন
+          </h3>
+          <p className="text-xs text-emerald-100/80 mt-1">
+            ডাঃ মোঃ গিয়াস উদ্দিন স্যারের বিশেষ ফ্রি ক্লাসে অংশ নিয়ে অর্গানন ও মেটেরিয়া মেডিকার নতুন দিগন্ত উন্মোচন করুন।
+          </p>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-6 sm:p-7">
+          {isSuccess ? (
+            <div className="text-center py-8 space-y-3">
+              <CheckCircle2 className="w-14 h-14 text-emerald-600 mx-auto animate-bounce" />
+              <h4 className="text-xl font-bold text-slate-900">রেজিস্ট্রেশন সফল হয়েছে!</h4>
+              <p className="text-xs text-slate-600">
+                আমাদের প্রতিনিধি শীঘ্রই আপনার সাথে হোয়াটসঅ্যাপে গুগল মিট লিংক শেয়ার করবেন।
               </p>
             </div>
-
+          ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  আপনার পূর্ণ নাম <span className="text-rose-500">*</span>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  আপনার নাম (Full Name) *
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="ডাঃ / মোঃ ..."
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 text-sm outline-none transition"
-                />
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="যেমন: ডাঃ মোঃ আশরাফুল ইসলাম"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-emerald-600 focus:bg-white"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  হোয়াটসঅ্যাপ / মোবাইল নম্বর <span className="text-rose-500">*</span>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  হোয়াটসঅ্যাপ / মোবাইল নম্বর *
                 </label>
-                <input
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="017XXXXXXXX"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 text-sm outline-none transition"
-                />
+                <div className="relative">
+                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="01XXXXXXXXX"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-emerald-600 focus:bg-white font-mono"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  আপনার বর্তমান হোমিওপ্যাথিক অভিজ্ঞতা
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  আপনার হোমিওপ্যাথিক ব্যাকগ্রাউন্ড
                 </label>
                 <select
                   value={homeoBackground}
                   onChange={(e) => setHomeoBackground(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-600 text-sm outline-none bg-white transition"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
                 >
-                  <option value="ছাত্র/নতুন শিক্ষার্থী">হোমিওপ্যাথি শিক্ষার্থী / ডিপ্লোমা বা ডিএইচএমএস</option>
-                  <option value="রানিং প্র্যাকটিশনার (১-৩ বছর)">রানিং প্র্যাকটিশনার (১-৩ বছর)</option>
-                  <option value="অভিজ্ঞ চিকিৎসক (৪+ বছর)">অভিজ্ঞ চিকিৎসক (৪+ বছর)</option>
-                  <option value="সাধারণ অনুরাগী">হোমিওপ্যাথি অনুরাগী ও নতুন শিখতে আগ্রহী</option>
+                  <option value="ডিএইচএমএস শিক্ষার্থী">ডিএইচএমএস শিক্ষার্থী (DHMS Student)</option>
+                  <option value="ডিএইচএমএস চিকিৎসক">ডিএইচএমএস চিকিৎসক (DHMS Doctor)</option>
+                  <option value="বিএইচএমএস শিক্ষার্থী/চিকিৎসক">বিএইচএমএস শিক্ষার্থী / চিকিৎসক (BHMS)</option>
+                  <option value="নতুন প্র্যাকটিশনার">নতুন চেম্বার প্র্যাকটিশনার</option>
+                  <option value="হোমিওপ্যাথি অনুরাগী">হোমিওপ্যাথি অনুরাগী ও সাধারণ শিক্ষার্থী</option>
                 </select>
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-bold text-sm py-4 rounded-xl shadow-lg transition"
+                className="w-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-950 font-black text-xs py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 mt-2"
               >
                 <Send className="w-4 h-4" />
-                <span>{isSubmitting ? 'জমা হচ্ছে...' : 'ফ্রি ক্লাসের জন্য কনফার্ম করুন'}</span>
+                <span>{isSubmitting ? 'জমা হচ্ছে...' : 'ফ্রি ক্লাসে আসন বুক করুন'}</span>
               </button>
             </form>
-          </div>
-        ) : (
-          <div className="text-center py-6 space-y-5">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
-              <CheckCircle className="w-8 h-8" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-black text-slate-900">
-                রেজিস্ট্রেশন সফল হয়েছে!
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto">
-                ধন্যবাদ {name}, ক্লাসের গুগল মিট লিংক সরাসরি স্যারের হেল্পলাইন হোয়াটসঅ্যাপে এখনই পেতে নিচের বাটনে ক্লিক করুন:
-              </p>
-            </div>
-
-            <a
-              href={waDirectUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm px-6 py-3.5 rounded-2xl shadow-lg transition"
-            >
-              <MessageCircle className="w-5 h-5 fill-white" />
-              <span>হোয়াটসঅ্যাপে গুগল মিট লিংক গ্রহণ করুন</span>
-            </a>
-
-            <div className="pt-2">
-              <button
-                onClick={() => {
-                  setIsDone(false);
-                  onClose();
-                }}
-                className="text-xs text-slate-500 hover:text-slate-800 font-semibold"
-              >
-                উইন্ডো বন্ধ করুন
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
 
       </div>
     </div>

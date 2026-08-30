@@ -1,14 +1,18 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabase, isAdminEmail } from '@/lib/supabase';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
 
+  let targetRedirect = '/dashboard';
+
   if (code) {
-    await supabase.auth.exchangeCodeForSession(code);
+    const { data } = await supabase.auth.exchangeCodeForSession(code);
+    if (data?.user?.email && isAdminEmail(data.user.email)) {
+      targetRedirect = '/admin';
+    }
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
+  return NextResponse.redirect(new URL(targetRedirect, requestUrl.origin));
 }
