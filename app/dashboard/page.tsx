@@ -23,10 +23,6 @@ import {
   PlayCircle, 
   FileText, 
   Lock, 
-  Menu, 
-  X, 
-  CheckCircle, 
-  Home, 
   LogOut, 
   ShieldCheck, 
   Download, 
@@ -38,7 +34,8 @@ import {
   FileDown,
   Play,
   Share2,
-  Truck
+  Truck,
+  Phone
 } from 'lucide-react';
 
 type StudentTab = 'classroom' | 'lectures' | 'notes' | 'monthly-fee' | 'id-card' | 'certificate' | 'support';
@@ -46,12 +43,10 @@ type StudentTab = 'classroom' | 'lectures' | 'notes' | 'monthly-fee' | 'id-card'
 export default function DashboardPage() {
   const { user, courses, enrollments, monthlyPayments, settings, submitCertificateRequest, certificateRequests, signInWithGoogle, signOut, showToast } = useApp();
   const [activeTab, setActiveTab] = useState<StudentTab>('classroom');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // FOCUSED LEARNING / PLAYER MODE (When entering a course classroom)
+  // CINEMA PLAYER / VIDEO LEARNING MODE
   const [learningCourseId, setLearningCourseId] = useState<string | null>(null);
   
-  // Track active playing lesson in Learning Mode
   const learningCourse = courses.find((c) => c.id === learningCourseId) || courses[0];
   const allLearningLessons = learningCourse?.curriculum.flatMap((c) => c.lessons) || [];
   
@@ -68,7 +63,7 @@ export default function DashboardPage() {
     }
   );
 
-  // Persistent Lesson Progress
+  // Lesson Completion Tracking
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -98,10 +93,11 @@ export default function DashboardPage() {
     });
   };
 
-  // Certificate Courier Form State
+  // PTF Certificate Courier State
   const existingCertReq = certificateRequests.find(
     (r) => r.studentId === user?.id || (user?.email && r.studentEmail?.toLowerCase() === user.email.toLowerCase())
   );
+  const [courierName, setCourierName] = useState(user?.fullName || '');
   const [courierPhone, setCourierPhone] = useState(user?.phone || '');
   const [courierAddress, setCourierAddress] = useState('');
   const [isCourierSubmitting, setIsCourierSubmitting] = useState(false);
@@ -109,7 +105,7 @@ export default function DashboardPage() {
   const handleCourierSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!courierPhone || !courierAddress) {
-      showToast('মোবাইল নম্বর ও সম্পূর্ণ ঠিকানা প্রদান করুন', 'error');
+      showToast('মোবাইল নম্বর ও সম্পূর্ণ সুন্দরবন কুরিয়ার শাখা ঠিকানা প্রদান করুন', 'error');
       return;
     }
 
@@ -127,7 +123,7 @@ export default function DashboardPage() {
     }
   };
 
-  // If user is not logged in, show student portal sign in card
+  // Sign In Screen if logged out
   if (!user) {
     return (
       <div className="min-h-[85vh] flex items-center justify-center p-4 font-bangla bg-slate-950 text-white">
@@ -156,7 +152,7 @@ export default function DashboardPage() {
   }
 
   // =========================================================================
-  // FOCUSED LEARNING / VIDEO PLAYER CLASSROOM VIEW
+  // CINEMA PLAYER / VIDEO CLASSROOM VIEW
   // =========================================================================
   if (learningCourseId) {
     const course = courses.find((c) => c.id === learningCourseId) || courses[0];
@@ -306,7 +302,7 @@ export default function DashboardPage() {
   }
 
   // =========================================================================
-  // MAIN STUDENT DASHBOARD PORTAL (SIDEBAR + TABS)
+  // MAIN STUDENT DASHBOARD (7 DISTINCT TABS)
   // =========================================================================
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-bangla pb-20">
@@ -318,7 +314,12 @@ export default function DashboardPage() {
             {user.fullName.charAt(0)}
           </div>
           <div>
-            <h1 className="text-base font-black text-white">{user.fullName}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-black text-white">{user.fullName}</h1>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded border border-emerald-500/30">
+                ভেরিফায়েড শিক্ষার্থী
+              </span>
+            </div>
             <p className="text-[11px] text-emerald-400 font-mono">আইডি: BDH-{user.id.substring(0, 6).toUpperCase()}</p>
           </div>
         </div>
@@ -344,11 +345,13 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Student Portal Grid */}
+      {/* Main Student Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Navigation Sidebar */}
+        {/* Left Navigation Sidebar (7 TABS) */}
         <aside className="lg:col-span-3 bg-slate-900 rounded-3xl p-3 border border-slate-800 space-y-1.5 sticky top-20">
+          
+          {/* TAB 1 */}
           <button
             onClick={() => setActiveTab('classroom')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
@@ -358,9 +361,10 @@ export default function DashboardPage() {
             }`}
           >
             <GraduationCap className="w-4 h-4" />
-            <span>লাইভ ক্লাসরুম ও শিডিউল</span>
+            <span>১. লাইভ ক্লাসরুম ও শিডিউল</span>
           </button>
 
+          {/* TAB 2 */}
           <button
             onClick={() => setActiveTab('lectures')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
@@ -370,9 +374,10 @@ export default function DashboardPage() {
             }`}
           >
             <Video className="w-4 h-4" />
-            <span>ভিডিও লেকচার লাইব্রেরি</span>
+            <span>২. ভিডিও লেকচার লাইব্রেরি</span>
           </button>
 
+          {/* TAB 3 */}
           <button
             onClick={() => setActiveTab('notes')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
@@ -382,9 +387,10 @@ export default function DashboardPage() {
             }`}
           >
             <BookOpen className="w-4 h-4" />
-            <span>অধ্যায়ভিত্তিক PDF নোটস</span>
+            <span>৩. অধ্যায়ভিত্তিক PDF নোটস</span>
           </button>
 
+          {/* TAB 4 */}
           <button
             onClick={() => setActiveTab('monthly-fee')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
@@ -394,9 +400,10 @@ export default function DashboardPage() {
             }`}
           >
             <CreditCard className="w-4 h-4" />
-            <span>মাসিক ফি ও পেমেন্ট</span>
+            <span>৪. মাসিক ফি ও পেমেন্ট</span>
           </button>
 
+          {/* TAB 5 */}
           <button
             onClick={() => setActiveTab('id-card')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
@@ -406,9 +413,10 @@ export default function DashboardPage() {
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>ভার্চুয়াল আইডি কার্ড</span>
+            <span>৫. ভার্চুয়াল আইডি কার্ড</span>
           </button>
 
+          {/* TAB 6 */}
           <button
             onClick={() => setActiveTab('certificate')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
@@ -418,8 +426,22 @@ export default function DashboardPage() {
             }`}
           >
             <Award className="w-4 h-4" />
-            <span>সনদপত্র ও কুরিয়ার ডেলিভারি</span>
+            <span>৬. PTF সনদ ও কুরিয়ার</span>
           </button>
+
+          {/* TAB 7 */}
+          <button
+            onClick={() => setActiveTab('support')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
+              activeTab === 'support'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>৭. একাডেমিক হেল্পলাইন</span>
+          </button>
+
         </aside>
 
         {/* Right Main Content Tabs */}
@@ -435,12 +457,12 @@ export default function DashboardPage() {
               {/* Morning Case Support Box */}
               <MorningSupportBox />
 
-              {/* Enrolled Courses Quick Cards */}
+              {/* Course Cards */}
               <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <div>
                     <h3 className="text-lg font-black text-white">আমার কোর্স ও ভিডিও ক্লাসরুম</h3>
-                    <p className="text-xs text-slate-400">আপনার নথিভুক্ত কোর্সসমূহ থেকে ভিডিও ক্লাসে প্রবেশ করুন</p>
+                    <p className="text-xs text-slate-400">আপনার কোর্স নির্বাচন করে সরাসরি ক্লাসরুমে প্রবেশ করুন</p>
                   </div>
                 </div>
 
@@ -448,7 +470,7 @@ export default function DashboardPage() {
                   {courses.map((course) => (
                     <div
                       key={course.id}
-                      className="bg-slate-950 rounded-2xl p-5 border border-slate-800 space-y-4 hover:border-emerald-500/40 transition"
+                      className="bg-slate-950 rounded-2xl p-5 border border-slate-800 space-y-4 hover:border-emerald-500/40 transition shadow-lg"
                     >
                       <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900">
                         <Image src={course.thumbnailUrl} alt={course.title} fill sizes="400px" className="object-cover" />
@@ -512,7 +534,10 @@ export default function DashboardPage() {
           {/* TAB 5: STUDENT ID CARD */}
           {activeTab === 'id-card' && (
             <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 text-center">
-              <h3 className="text-lg font-black text-white">ভার্চুয়াল স্টুডেন্ট আইডি কার্ড</h3>
+              <div className="space-y-1">
+                <h3 className="text-lg font-black text-white">ভার্চুয়াল স্টুডেন্ট আইডি কার্ড</h3>
+                <p className="text-xs text-slate-400">বিডি হোমিও প্রশিক্ষণ কেন্দ্র কর্তৃক অনুমোদিত ডিজিটাল স্টুডেন্ট কার্ড</p>
+              </div>
               
               <div className="max-w-sm mx-auto bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 rounded-3xl p-6 border-2 border-emerald-500/40 shadow-2xl text-left space-y-5">
                 <div className="flex items-center justify-between border-b border-emerald-800/60 pb-3">
@@ -535,7 +560,8 @@ export default function DashboardPage() {
 
                 <div className="text-[11px] text-slate-300 space-y-1 pt-2 border-t border-emerald-800/40">
                   <p>কোর্স: বেসিক ও ক্লিনিক্যাল হোমিওপ্যাথি</p>
-                  <p>ট্রেইনার: ডাঃ মোঃ গিয়াস উদ্দিন</p>
+                  <p>প্রশিক্ষক: ডাঃ মোঃ গিয়াস উদ্দিন</p>
+                  <p>মেয়াদ: ২০২৬ ব্যাচ</p>
                 </div>
               </div>
             </div>
@@ -545,10 +571,12 @@ export default function DashboardPage() {
           {activeTab === 'certificate' && (
             <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
               <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-                <Award className="w-6 h-6 text-amber-400" />
+                <div className="p-3 bg-amber-500/20 text-amber-400 rounded-2xl">
+                  <Award className="w-6 h-6" />
+                </div>
                 <div>
-                  <h3 className="text-lg font-black text-white">PTF প্রফেশনাল সার্টিফিকেট ও কুরিয়ার ডেলিভারি</h3>
-                  <p className="text-xs text-slate-400">৬ মাসের কোর্স সমাপনী সনদপত্র সরাসরি আপনার চেম্বার বা ঠিকানায় কুরিয়ারে পেতে ফর্ম পূরণ করুন</p>
+                  <h3 className="text-lg font-black text-white">প্যারামেডিকেল টেকনোলজি ফাউন্ডেশন (PTF) সার্টিফিকেট</h3>
+                  <p className="text-xs text-slate-400">গভর্নমেন্ট রেজিস্টার্ড প্রফেশনাল হোমিওপ্যাথিক প্র্যাকটিশনার সার্টিফিকেট</p>
                 </div>
               </div>
 
@@ -556,7 +584,7 @@ export default function DashboardPage() {
                 <div className="bg-emerald-950/60 border border-emerald-800 rounded-2xl p-6 space-y-3">
                   <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
                     <CheckCircle2 className="w-5 h-5" />
-                    <span>আপনার সার্টিফিকেট কুরিয়ার রিকোয়েস্ট জমা আছে!</span>
+                    <span>আপনার সার্টিফিকেট কুরিয়ার ডেলিভারি রিকোয়েস্ট জমা আছে!</span>
                   </div>
                   <div className="text-xs text-slate-300 space-y-1">
                     <p><strong>প্রাপকের ঠিকানা:</strong> {existingCertReq.courierAddress}</p>
@@ -594,14 +622,14 @@ export default function DashboardPage() {
 
                   <div>
                     <label className="text-xs font-bold text-slate-300 block mb-1">
-                      সম্পূর্ণ কুরিয়ার ডেলিভারি ঠিকানা (চেম্বার / বাড়ি) *
+                      সম্পূর্ণ কুরিয়ার ডেলিভারি ঠিকানা (জেলা, থানা ও সুন্দরবন কুরিয়ার শাখা) *
                     </label>
                     <textarea
                       required
                       rows={3}
                       value={courierAddress}
                       onChange={(e) => setCourierAddress(e.target.value)}
-                      placeholder="যেমন: ডাঃ আশরাফুল চেম্বার, মেইন রোড, সদর..."
+                      placeholder="যেমন: ডাঃ আশরাফুল চেম্বার, সুন্দরবন কুরিয়ার সার্ভিস, সদর ব্রাঞ্চ, বগুড়া..."
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs text-white outline-none focus:border-emerald-500"
                     />
                   </div>
@@ -616,6 +644,42 @@ export default function DashboardPage() {
                   </button>
                 </form>
               )}
+            </div>
+          )}
+
+          {/* TAB 7: SUPPORT */}
+          {activeTab === 'support' && (
+            <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-6">
+              <h3 className="text-xl font-black text-white flex items-center gap-2">
+                <MessageCircle className="w-6 h-6 text-emerald-400" />
+                একাডেমিক হেল্পলাইন ও স্যারের সাপোর্ট
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <span className="text-xs text-slate-400 font-bold">সরাসরি ফোন হেল্পলাইন</span>
+                  <p className="text-xl font-black text-white font-mono">{settings.helplineNumber}</p>
+                  <a
+                    href={`tel:${settings.helplineNumber.replace(/[^0-9]/g, '')}`}
+                    className="inline-block text-xs font-bold text-emerald-400 hover:underline pt-1"
+                  >
+                    সরাসরি কল করুন →
+                  </a>
+                </div>
+
+                <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                  <span className="text-xs text-slate-400 font-bold">অফিসিয়াল হোয়াটসঅ্যাপ সাপোর্ট</span>
+                  <p className="text-xl font-black text-[#25D366] font-mono">{settings.whatsappNumber}</p>
+                  <a
+                    href={`https://wa.me/880${settings.whatsappNumber.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-xs font-bold text-[#25D366] hover:underline pt-1"
+                  >
+                    হোয়াটসঅ্যাপে মেসেজ পাঠান →
+                  </a>
+                </div>
+              </div>
             </div>
           )}
 

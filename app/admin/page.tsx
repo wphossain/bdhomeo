@@ -5,7 +5,6 @@ import { useApp } from '@/lib/store';
 import { 
   BarChart3, 
   Users, 
-  CheckCircle2, 
   Clock, 
   DollarSign, 
   BookOpen, 
@@ -47,12 +46,12 @@ export default function AdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<string>('overview');
 
-  // Trigger Supabase Live Sync on Admin Mount
+  // Trigger Live Sync on Admin Mount
   useEffect(() => {
     refreshData();
   }, [refreshData]);
 
-  // Loading State while verifying session
+  // Loading State
   if (isAuthLoading) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4 font-bangla bg-slate-900 text-white">
@@ -64,7 +63,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // Auth Protection: If user is not logged in or is not an admin
+  // Auth Guard
   if (!user || user.role !== 'admin') {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4 font-bangla bg-slate-900">
@@ -166,7 +165,7 @@ export default function AdminDashboardPage() {
         </div>
       </header>
 
-      {/* Main Admin Content with Sidebar */}
+      {/* Main Admin Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Navigation Sidebar */}
@@ -301,7 +300,7 @@ export default function AdminDashboardPage() {
 
         </aside>
 
-        {/* Right Main Tab Content */}
+        {/* Right Main Content Tabs */}
         <main className="lg:col-span-9 space-y-6">
           
           {/* TAB 1: OVERVIEW */}
