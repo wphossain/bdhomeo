@@ -250,19 +250,22 @@ export default function CourseDetailPage() {
               {/* Payment Instructions & Number copy */}
               <div className="space-y-3">
                 <p className="text-xs font-bold text-slate-800">
-                  💳 নিচের যেকোনো নম্বরে ভর্তি ফি ১,০০০/- টাকা Send Money করুন:
+                  💳 নিচের নম্বরে ভর্তি ফি ১,০০০/- টাকা <strong>বিকাশ পেমেন্ট (Payment)</strong> বা নগদ করুন:
                 </p>
 
                 {/* bKash */}
                 <div className="p-3.5 rounded-2xl bg-pink-50 border border-pink-200 flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-bold text-pink-700 uppercase">বিকাশ ({settings.bkashType})</span>
+                    <span className="text-[11px] font-bold text-pink-700 uppercase">
+                      বিকাশ ({settings.bkashType === 'Merchant' ? 'মার্চেন্ট পেমেন্ট' : settings.bkashType})
+                    </span>
                     <p className="text-sm font-black font-mono text-pink-950">{settings.bkashNumber}</p>
+                    <p className="text-[10px] text-pink-800 mt-0.5">* বিকাশ অ্যাপে <strong>Payment</strong> অপশন সিলেক্ট করুন</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleCopy(settings.bkashNumber)}
-                    className="text-xs font-bold text-pink-700 bg-white hover:bg-pink-100 px-3 py-1.5 rounded-xl border border-pink-300 transition flex items-center gap-1.5"
+                    className="text-xs font-bold text-pink-700 bg-white hover:bg-pink-100 px-3 py-1.5 rounded-xl border border-pink-300 transition flex items-center gap-1.5 shrink-0"
                   >
                     {copiedNumber === settings.bkashNumber ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedNumber === settings.bkashNumber ? 'কপি হয়েছে' : 'কপি করুন'}</span>
@@ -272,13 +275,15 @@ export default function CourseDetailPage() {
                 {/* Nagad */}
                 <div className="p-3.5 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-bold text-orange-700 uppercase">নগদ ({settings.nagadType})</span>
+                    <span className="text-[11px] font-bold text-orange-700 uppercase">
+                      নগদ ({settings.nagadType})
+                    </span>
                     <p className="text-sm font-black font-mono text-orange-950">{settings.nagadNumber}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleCopy(settings.nagadNumber)}
-                    className="text-xs font-bold text-orange-700 bg-white hover:bg-orange-100 px-3 py-1.5 rounded-xl border border-orange-300 transition flex items-center gap-1.5"
+                    className="text-xs font-bold text-orange-700 bg-white hover:bg-orange-100 px-3 py-1.5 rounded-xl border border-orange-300 transition flex items-center gap-1.5 shrink-0"
                   >
                     {copiedNumber === settings.nagadNumber ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedNumber === settings.nagadNumber ? 'কপি হয়েছে' : 'কপি করুন'}</span>

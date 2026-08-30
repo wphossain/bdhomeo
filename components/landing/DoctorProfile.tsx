@@ -33,7 +33,7 @@ export function DoctorProfile() {
           <div className="lg:col-span-5 relative">
             <div className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-100 bg-emerald-950">
               <Image
-                src="/assets/sir/sir-portrait.jpg"
+                src={settings.doctorPortraitUrl || '/assets/sir/sir-portrait.jpg'}
                 alt="ডাঃ মোঃ গিয়াস উদ্দিন - অভিজ্ঞ হোমিওপ্যাথিক চিকিৎসক ও গবেষক"
                 fill
                 className="object-cover"

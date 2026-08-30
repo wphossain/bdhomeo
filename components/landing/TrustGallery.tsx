@@ -2,35 +2,43 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Camera, Award, Sparkles, Users } from 'lucide-react';
+import { useApp } from '@/lib/store';
+import { Camera } from 'lucide-react';
 
 export function TrustGallery() {
-  const galleryItems = [
-    {
-      src: '/assets/gallery/certificate-ptf-1.jpg',
-      title: 'কৃতি শিক্ষার্থীদের PTF সার্টিফিকেট বিতরণী',
-      category: 'সার্টিফিকেশন',
-      desc: 'কোর্স সমাপনী ব্যাচের শিক্ষার্থীদের সম্মাননা ও সনদ প্রদান'
-    },
-    {
-      src: '/assets/gallery/workshop-practical.jpg',
-      title: 'হোমিওপ্যাথিক কেস স্টাডি ও বাস্তব কর্মশালা',
-      category: 'কর্মশালা',
-      desc: 'ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি ক্লিনিক্যাল ক্লাস'
-    },
-    {
-      src: '/assets/gallery/seminar-session.jpg',
-      title: 'চিকিৎসকদের সাথে মতবিনিময় ও গ্রুপ স্টাডি',
-      category: 'আলোচনা সভা',
-      desc: 'বিভিন্ন জেলা থেকে আগত চিকিৎসকদের মতবিনিময় ও অভিজ্ঞতা শেয়ার'
-    },
-    {
-      src: '/assets/gallery/clinical-books.jpg',
-      title: 'হ্যানিম্যানের মূলগ্রন্থ ও রেপার্টরি গবেষণা',
-      category: 'একাডেমিক সেশন',
-      desc: 'ক্লাসিক্যাল নীতিমালার প্র্যাকটিক্যাল ব্যবহার'
-    }
-  ];
+  const { settings } = useApp();
+  const galleryItems = settings.galleryImages && settings.galleryImages.length > 0
+    ? settings.galleryImages
+    : [
+        {
+          id: 'g1',
+          src: '/assets/gallery/certificate-ptf-1.jpg',
+          title: 'কৃতি শিক্ষার্থীদের PTF সার্টিফিকেট বিতরণী',
+          category: 'সার্টিফিকেশন',
+          desc: 'কোর্স সমাপনী ব্যাচের শিক্ষার্থীদের সম্মাননা ও সনদ প্রদান'
+        },
+        {
+          id: 'g2',
+          src: '/assets/gallery/workshop-practical.jpg',
+          title: 'হোমিওপ্যাথিক কেস স্টাডি ও বাস্তব কর্মশালা',
+          category: 'কর্মশালা',
+          desc: 'ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি ক্লিনিক্যাল ক্লাস'
+        },
+        {
+          id: 'g3',
+          src: '/assets/gallery/seminar-session.jpg',
+          title: 'চিকিৎসকদের সাথে মতবিনিময় ও গ্রুপ স্টাডি',
+          category: 'আলোচনা সভা',
+          desc: 'বিভিন্ন জেলা থেকে আগত চিকিৎসকদের মতবিনিময় ও অভিজ্ঞতা শেয়ার'
+        },
+        {
+          id: 'g4',
+          src: '/assets/gallery/clinical-books.jpg',
+          title: 'হ্যানিম্যানের মূলগ্রন্থ ও রেপার্টরি গবেষণা',
+          category: 'একাডেমিক সেশন',
+          desc: 'ক্লাসিক্যাল নীতিমালার প্র্যাকটিক্যাল ব্যবহার'
+        }
+      ];
 
   return (
     <section className="py-16 lg:py-24 bg-slate-50 font-bangla">
@@ -52,7 +60,7 @@ export function TrustGallery() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {galleryItems.map((item, idx) => (
             <div
-              key={idx}
+              key={item.id || idx}
               className="group bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 hover:shadow-xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col"
             >
               <div className="relative w-full aspect-[4/3] bg-slate-900 overflow-hidden">

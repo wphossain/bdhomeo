@@ -45,6 +45,14 @@ export interface Course {
   curriculum: Chapter[];
 }
 
+export interface GalleryItem {
+  id: string;
+  src: string;
+  title: string;
+  category: string;
+  desc: string;
+}
+
 export interface SiteSettings {
   siteTitle: string;
   slogan: string;
@@ -53,6 +61,10 @@ export interface SiteSettings {
   doctorName: string;
   doctorTitle: string;
   doctorMessage: string;
+  heroImageUrl: string;
+  doctorPortraitUrl: string;
+  ptfCertificateImageUrl: string;
+  galleryImages: GalleryItem[];
   bkashNumber: string;
   bkashType: 'Personal' | 'Merchant';
   nagadNumber: string;

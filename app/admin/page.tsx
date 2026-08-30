@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/lib/store';
 import { CourseManager } from '@/components/admin/CourseManager';
+import { MediaManager } from '@/components/admin/MediaManager';
 import { SiteSettingsForm } from '@/components/admin/SiteSettingsForm';
 import { EnrollmentApprovals } from '@/components/admin/EnrollmentApprovals';
 import { MonthlyFeeApprovals } from '@/components/admin/MonthlyFeeApprovals';
@@ -17,14 +18,13 @@ import {
   CheckCircle2, 
   Clock,
   BookOpen,
-  Globe,
-  Layers,
+  Image as ImageIcon,
   Sparkles
 } from 'lucide-react';
 
 export default function AdminPage() {
   const { user, enrollments, monthlyPayments, leads, demoLogin, signInWithGoogle } = useApp();
-  const [activeTab, setActiveTab] = useState<'courses' | 'settings' | 'enrollments' | 'payments' | 'leads'>('courses');
+  const [activeTab, setActiveTab] = useState<'courses' | 'media' | 'settings' | 'enrollments' | 'payments' | 'leads'>('courses');
 
   // Check if Admin
   if (!user || user.role !== 'admin') {
@@ -175,6 +175,18 @@ export default function AdminPage() {
           </button>
 
           <button
+            onClick={() => setActiveTab('media')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition ${
+              activeTab === 'media'
+                ? 'bg-emerald-800 text-white shadow-md'
+                : 'bg-white text-slate-700 hover:bg-slate-200/70 border border-slate-200'
+            }`}
+          >
+            <ImageIcon className="w-4 h-4" />
+            <span>ছবি ও মিডিয়া ম্যানেজার</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('settings')}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition ${
               activeTab === 'settings'
@@ -183,7 +195,7 @@ export default function AdminPage() {
             }`}
           >
             <Settings className="w-4 h-4" />
-            <span>সাইট কনটেন্ট, নম্বর ও লিংকস</span>
+            <span>সাইট কনটেন্ট ও নম্বর</span>
           </button>
 
           <button
@@ -226,6 +238,7 @@ export default function AdminPage() {
 
         {/* Tab Content */}
         {activeTab === 'courses' && <CourseManager />}
+        {activeTab === 'media' && <MediaManager />}
         {activeTab === 'settings' && <SiteSettingsForm />}
         {activeTab === 'enrollments' && <EnrollmentApprovals />}
         {activeTab === 'payments' && <MonthlyFeeApprovals />}

@@ -21,26 +21,26 @@ export function Hero({ onOpenOrientation }: HeroProps) {
   const { settings } = useApp();
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-brand-900 to-slate-950 text-white font-bangla pt-10 pb-20 lg:pt-16 lg:pb-28">
+    <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-brand-900 to-slate-950 text-white font-bangla min-h-[calc(100vh-80px)] flex items-center py-12 lg:py-16">
       
       {/* Decorative Background Glows */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-10 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-10 w-[500px] h-[500px] bg-amber-400/15 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Text & CTA Content */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             
             {/* Top Badge */}
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400/20 via-emerald-500/20 to-teal-500/20 border border-amber-400/40 px-4 py-1.5 rounded-full text-xs font-bold text-amber-300 backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400/20 via-emerald-500/20 to-teal-500/20 border border-amber-400/40 px-4 py-1.5 rounded-full text-xs font-bold text-amber-300 backdrop-blur-md shadow-lg">
               <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
               <span>{settings.slogan || 'Right Homeopath, Right Homeopathy'} • বিডি হোমিও</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-[1.2] text-white">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-[1.18] text-white">
               {settings.heroHeadline || 'হোমিওপ্যাথির খাঁটি দর্শনে আত্মবিশ্বাসী প্র্যাকটিশনার হওয়ার ৬ মাসের মাস্টার একাডেমি'}
             </h1>
 
@@ -50,26 +50,26 @@ export function Hero({ onOpenOrientation }: HeroProps) {
             </p>
 
             {/* Key USPs / Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 max-w-xl mx-auto lg:mx-0 text-left">
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 p-2.5 rounded-xl">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1 max-w-xl mx-auto lg:mx-0 text-left">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 p-3 rounded-2xl shadow-sm">
                 <CheckCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="text-xs font-semibold">PTF সার্টিফিকেট সহ</span>
+                <span className="text-xs font-bold">PTF সার্টিফিকেট সহ</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 p-2.5 rounded-xl">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 p-3 rounded-2xl shadow-sm">
                 <Flame className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="text-xs font-semibold">সাপ্তাহিক লাইভ ক্লাস</span>
+                <span className="text-xs font-bold">সাপ্তাহিক লাইভ ক্লাস</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 p-2.5 rounded-xl col-span-2 sm:col-span-1">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 p-3 rounded-2xl shadow-sm col-span-2 sm:col-span-1">
                 <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="text-xs font-semibold">অধ্যায়ভিত্তিক PDF নোট</span>
+                <span className="text-xs font-bold">অধ্যায়ভিত্তিক PDF নোট</span>
               </div>
             </div>
 
             {/* Conversion CTA Group */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-3">
               <button
                 onClick={onOpenOrientation}
-                className="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-950 font-black text-sm sm:text-base px-8 py-4 rounded-2xl shadow-xl hover:shadow-amber-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-950 font-black text-sm sm:text-base px-8 py-4 rounded-2xl shadow-2xl hover:shadow-amber-500/30 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
               >
                 <span>ফ্রি ওরিয়েন্টেশন ক্লাসে জয়েন করুন</span>
                 <ArrowRight className="w-4 h-4" />
@@ -77,7 +77,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
 
               <Link
                 href="/courses"
-                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base px-7 py-4 rounded-2xl border border-white/20 transition flex items-center justify-center gap-2"
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base px-7 py-4 rounded-2xl border border-white/20 transition flex items-center justify-center gap-2 backdrop-blur-md"
               >
                 <BookOpen className="w-4 h-4 text-emerald-400" />
                 <span>কোর্স সিলেবাস ও ফি</span>
@@ -91,9 +91,9 @@ export function Hero({ onOpenOrientation }: HeroProps) {
             <div className="relative w-full max-w-md">
               
               {/* Outer Glow & Gradient Frame */}
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-600/40 bg-emerald-950 aspect-[4/5]">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-500/40 bg-emerald-950 aspect-[4/5] hover:border-amber-400/60 transition-colors duration-500">
                 <Image
-                  src="/assets/sir/sir-hero.jpg"
+                  src={settings.heroImageUrl || '/assets/sir/sir-hero.jpg'}
                   alt="ডাঃ মোঃ গিয়াস উদ্দিন - বিডি হোমিও"
                   fill
                   className="object-cover"
@@ -104,14 +104,14 @@ export function Hero({ onOpenOrientation }: HeroProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
 
                 {/* Floating Instructor Tag */}
-                <div className="absolute bottom-5 left-5 right-5 bg-slate-950/85 backdrop-blur-md p-4 rounded-2xl border border-white/15 text-left">
+                <div className="absolute bottom-4 left-4 right-4 bg-slate-950/85 backdrop-blur-md p-4 rounded-2xl border border-white/15 text-left shadow-lg">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-amber-400 text-xs font-bold uppercase tracking-wider">প্রধান প্রশিক্ষক ও গবেষক</p>
                       <h3 className="text-base sm:text-lg font-black text-white leading-tight">{settings.doctorName || 'ডাঃ মোঃ গিয়াস উদ্দিন'}</h3>
                       <p className="text-slate-300 text-xs mt-0.5">{settings.doctorTitle || 'বিডি হোমিও প্রশিক্ষণ কেন্দ্র'}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center border border-amber-400/40">
+                    <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center border border-amber-400/40 shadow-inner">
                       <Award className="w-5 h-5" />
                     </div>
                   </div>
@@ -119,8 +119,8 @@ export function Hero({ onOpenOrientation }: HeroProps) {
               </div>
 
               {/* Floating Batch Admission Indicator */}
-              <div className="absolute -bottom-4 -right-2 sm:-right-4 bg-emerald-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-xl border-2 border-white flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-300 animate-ping" />
+              <div className="absolute -bottom-3 -right-2 sm:-right-3 bg-emerald-600 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-xl border-2 border-white flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-300 animate-ping" />
                 <span>নতুন ব্যাচে ভর্তি চলছে</span>
               </div>
 

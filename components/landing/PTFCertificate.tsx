@@ -2,9 +2,12 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Award, Truck, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { useApp } from '@/lib/store';
+import { Award, Truck, CheckCircle2 } from 'lucide-react';
 
 export function PTFCertificate() {
+  const { settings } = useApp();
+
   return (
     <section className="py-16 lg:py-24 bg-gradient-to-b from-slate-900 to-emerald-950 text-white font-bangla relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -14,7 +17,7 @@ export function PTFCertificate() {
           <div className="lg:col-span-6 relative">
             <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-400/40 bg-slate-950">
               <Image
-                src="/assets/gallery/certificate-ptf-1.jpg"
+                src={settings.ptfCertificateImageUrl || '/assets/gallery/certificate-ptf-1.jpg'}
                 alt="PTF সার্টিফিকেট বিতরণী অনুষ্ঠান"
                 fill
                 className="object-cover"
