@@ -12,7 +12,48 @@ export function TrustGallery() {
   // Filter only items marked for homepage (or first 4 items)
   const homeGalleryItems = settings.galleryImages && settings.galleryImages.length > 0
     ? settings.galleryImages.filter((item) => item.showOnHome !== false).slice(0, 4)
-    : [];
+    : [
+        {
+          id: 'g1',
+          src: '/assets/gallery/ptf-certificate-distribution.jpg',
+          title: 'PTF অনুমোদিত প্রফেশনাল সনদপত্র বিতরণ অনুষ্ঠান',
+          subtitle: 'সফলভাবে ৬ মাসের কোর্স সম্পন্নকারী চিকিৎসকদের মাঝে সার্টিফিকেট প্রদান',
+          category: 'সনদপত্র বিতরণ',
+          desc: 'বিডি হোমিও প্রশিক্ষণ কেন্দ্রের সমাপনী অনুষ্ঠানে কৃতী শিক্ষার্থীদের মাঝে সার্টিফিকেট তুলে দিচ্ছেন ডাঃ মোঃ গিয়াস উদ্দিন স্যার।',
+          date: '২০২৬ ব্যাচ',
+          showOnHome: true,
+        },
+        {
+          id: 'g2',
+          src: '/assets/gallery/real-workshop-seminar.jpg',
+          title: 'দেশব্যাপী প্র্যাকটিশনারদের নিয়ে লাইভ ক্লিনিক্যাল কর্মশালা',
+          subtitle: 'জটিল ও ক্রনিক রোগের কেস টেকিং এবং সদৃশ ওষুধ নির্বাচন পদ্ধতি',
+          category: 'কর্মশালা ও সেমিনার',
+          desc: 'অর্গাননের আলোকে বাস্তব ক্লিনিক্যাল রোগী বিশ্লেষণ ও রেপার্টরাইজেশন ওয়ার্কশপ।',
+          date: 'একাডেমিক সেমিনার',
+          showOnHome: true,
+        },
+        {
+          id: 'g3',
+          src: '/assets/gallery/clinical-book-session.jpg',
+          title: 'ক্লিনিক্যাল মেটেরিয়া মেডিকা ও রেফারেন্স বুক স্টাডি সেশন',
+          subtitle: 'বোগার, বোরিক ও কেন্স রেপার্টরির তুলনামূলক পাঠ',
+          category: 'অধ্যয়ন সেশন',
+          desc: 'বই ও বাস্তব কেস স্টাডির সমন্বয়ে ড্রাগ পিকচার অনুধাবন ক্লাস।',
+          date: 'স্টাডি সার্কেল',
+          showOnHome: true,
+        },
+        {
+          id: 'g4',
+          src: '/assets/gallery/workshop-practical.jpg',
+          title: 'হাতে-কলমে কেস টেকিং ও রোগী পর্যবেক্ষণ ক্লাস',
+          subtitle: 'মানসিক ও শারীরিক লক্ষণের গুরুত্ব নির্ধারণ ও মায়াজমেটিক এনালাইসিস',
+          category: 'প্র্যাকটিক্যাল কেস',
+          desc: 'চিকিৎসকদের সরাসরি অংশগ্রহণে লাইভ ক্লিনিক্যাল অনুশীলন।',
+          date: 'প্র্যাকটিক্যাল ব্যাচ',
+          showOnHome: true,
+        },
+      ];
 
   return (
     <section className="py-16 lg:py-24 bg-slate-50 font-bangla border-b border-emerald-100">
@@ -21,13 +62,13 @@ export function TrustGallery() {
         <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
           <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 text-xs font-bold px-4 py-1.5 rounded-full">
             <Camera className="w-4 h-4 text-emerald-700" />
-            <span>বাস্তব অভিজ্ঞতা ও ফটো গ্যালারি</span>
+            <span>স্মৃতি ও সাফল্যের অ্যালবাম</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
             আমাদের কর্মশালা ও সফল ব্যাচসমূহের খণ্ডচিত্র
           </h2>
           <p className="text-sm sm:text-base text-slate-600">
-            বিডি হোমিও প্রশিক্ষণ কেন্দ্র থেকে সহস্রাধিক শিক্ষার্থী প্রশিক্ষণ নিয়ে দেশের বিভিন্ন প্রান্তে সফলভাবে চিকিৎসা সেবা প্রদান করছেন।
+            বিডি হোমিও প্রশিক্ষণ কেন্দ্রের বিভিন্ন ব্যাচের শিক্ষার্থী ও একাডেমিক সেমিনারের চিত্র
           </p>
         </div>
 
@@ -84,7 +125,7 @@ export function TrustGallery() {
             href="/gallery"
             className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-6 py-3.5 rounded-xl shadow transition"
           >
-            <span>সম্পূর্ণ ফটো গ্যালারি ও কর্মশালা অ্যালবাম দেখুন</span>
+            <span>সম্পূর্ণ ফটো গ্যালারি ও কর্মশালার অ্যালবাম দেখুন</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
