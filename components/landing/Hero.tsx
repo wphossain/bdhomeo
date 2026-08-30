@@ -95,7 +95,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-500/40 bg-emerald-950 aspect-[4/5] hover:border-amber-400/60 transition-colors duration-500">
                 <Image
                   src={settings.heroImageUrl || '/assets/sir/sir-hero.jpg'}
-                  alt="ডাঃ মোঃ গিয়াস উদ্দিন - বিডি হোমিও"
+                  alt={`${settings.doctorName || 'ডাঃ মোঃ গিয়াস উদ্দিন'} - ${settings.siteTitle || 'বিডি হোমিও'}`}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 450px"
                   className="object-cover"

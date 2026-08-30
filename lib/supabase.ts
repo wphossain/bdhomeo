@@ -6,6 +6,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOi
 export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
 export const ADMIN_EMAILS = [
+  'mcdanielnehemiah12@gmail.com',
   'mikailhossain3747@gmail.com',
   'geaus.uddin.81099@gmail.com',
   'bdhomeo@gmail.com',

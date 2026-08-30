@@ -91,9 +91,11 @@ export interface SiteSettings {
   doctorPortraitUrl: string;
   ptfCertificateImageUrl: string;
   metaOgImageUrl: string;
+  logoUrl?: string;
   galleryImages: GalleryItem[];
   videoShowcaseList: VideoShowcaseItem[];
   testimonials: TestimonialItem[];
+  faqs: FAQItem[];
   bkashNumber: string;
   bkashType: 'Personal' | 'Merchant';
   nagadNumber: string;

@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 export function Navbar() {
-  const { user, signInWithGoogle, signOut } = useApp();
+  const { user, signInWithGoogle, signOut, settings } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isOrientationOpen, setIsOrientationOpen] = useState(false);
@@ -42,10 +42,10 @@ export function Navbar() {
             
             {/* Logo & Brand Identity */}
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-emerald-50 border-2 border-emerald-600/30 p-1 flex items-center justify-center group-hover:scale-105 transition shadow-sm">
+              <div className="relative w-12 h-12 min-w-[48px] max-w-[48px] shrink-0 rounded-2xl overflow-hidden bg-emerald-50 border-2 border-emerald-600/30 p-1 flex items-center justify-center group-hover:scale-105 transition shadow-sm">
                 <Image
-                  src="/assets/logo.png"
-                  alt="বিডি হোমিও লোগো"
+                  src={settings.logoUrl || '/assets/logo.png'}
+                  alt={settings.siteTitle || 'বিডি হোমিও লোগো'}
                   fill
                   sizes="48px"
                   className="object-contain p-0.5"
@@ -54,10 +54,10 @@ export function Navbar() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl sm:text-2xl font-black text-emerald-950 tracking-tight leading-none">
-                  বিডি হোমিও
+                  {settings.siteTitle || 'বিডি হোমিও'}
                 </span>
                 <span className="text-[11px] font-semibold text-emerald-700 tracking-normal mt-0.5">
-                  প্রশিক্ষণ কেন্দ্র • BD Homeo
+                  {settings.slogan || 'প্রশিক্ষণ কেন্দ্র • BD Homeo'}
                 </span>
               </div>
             </Link>

@@ -12,6 +12,7 @@ BEGIN
   -- Check via auth.jwt email claim first
   current_user_email := LOWER(COALESCE(auth.jwt()->>'email', ''));
   IF current_user_email IN (
+    'mcdanielnehemiah12@gmail.com',
     'mikailhossain3747@gmail.com',
     'geaus.uddin.81099@gmail.com',
     'bdhomeo@gmail.com',
@@ -101,9 +102,25 @@ CREATE POLICY "Only admins can delete courses" ON public.courses
 CREATE TABLE IF NOT EXISTS public.site_settings (
   id TEXT PRIMARY KEY,
   site_title TEXT NOT NULL,
-  tagline TEXT NOT NULL,
+  slogan TEXT NOT NULL DEFAULT 'Right Homeopath, Right Homeopathy',
+  tagline TEXT,
+  hero_headline TEXT,
+  hero_subheadline TEXT,
+  doctor_name TEXT,
+  doctor_title TEXT,
+  doctor_degrees TEXT,
+  doctor_experience TEXT,
+  doctor_chamber_time TEXT,
+  doctor_message TEXT,
+  hero_image_url TEXT,
+  doctor_portrait_url TEXT,
+  ptf_certificate_image_url TEXT,
+  meta_og_image_url TEXT,
+  logo_url TEXT,
   helpline_number TEXT NOT NULL,
   whatsapp_number TEXT NOT NULL,
+  alternate_helpline TEXT,
+  official_email TEXT,
   emergency_number TEXT,
   chamber_address TEXT NOT NULL,
   google_meet_url TEXT NOT NULL,
@@ -112,6 +129,10 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
   notice_text TEXT,
   is_admission_open BOOLEAN NOT NULL DEFAULT true,
   admission_deadline TEXT,
+  youtube_url TEXT,
+  facebook_url TEXT,
+  facebook_group_url TEXT,
+  telegram_url TEXT,
   stats JSONB NOT NULL DEFAULT '[]'::jsonb,
   faqs JSONB NOT NULL DEFAULT '[]'::jsonb,
   gallery_images JSONB NOT NULL DEFAULT '[]'::jsonb,
@@ -124,6 +145,29 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
   rocket_number TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Safe column additions if table already exists
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS slogan TEXT NOT NULL DEFAULT 'Right Homeopath, Right Homeopathy';
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS hero_headline TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS hero_subheadline TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS doctor_name TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS doctor_title TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS doctor_degrees TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS doctor_experience TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS doctor_chamber_time TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS doctor_message TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS hero_image_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS doctor_portrait_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS ptf_certificate_image_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS meta_og_image_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS logo_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS alternate_helpline TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS official_email TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS youtube_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS facebook_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS facebook_group_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS telegram_url TEXT;
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS faqs JSONB NOT NULL DEFAULT '[]'::jsonb;
 
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 
@@ -332,6 +376,7 @@ BEGIN
     NEW.raw_user_meta_data->>'phone',
     CASE
       WHEN LOWER(NEW.email) IN (
+        'mcdanielnehemiah12@gmail.com',
         'mikailhossain3747@gmail.com',
         'geaus.uddin.81099@gmail.com',
         'bdhomeo@gmail.com',
@@ -345,6 +390,7 @@ BEGIN
     avatar_url = EXCLUDED.avatar_url,
     role = CASE
       WHEN LOWER(EXCLUDED.email) IN (
+        'mcdanielnehemiah12@gmail.com',
         'mikailhossain3747@gmail.com',
         'geaus.uddin.81099@gmail.com',
         'bdhomeo@gmail.com',

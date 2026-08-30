@@ -1,11 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useApp } from '@/lib/store';
 import { initialFaqs } from '@/lib/data';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 
 export function FaqSection() {
+  const { settings } = useApp();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const faqs = settings.faqs && settings.faqs.length > 0 ? settings.faqs : initialFaqs;
 
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
@@ -29,7 +33,7 @@ export function FaqSection() {
         </div>
 
         <div className="space-y-3">
-          {initialFaqs.map((faq, idx) => {
+          {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
 
             return (

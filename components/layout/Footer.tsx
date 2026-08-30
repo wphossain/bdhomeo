@@ -42,10 +42,10 @@ export function Footer() {
           {/* Col 1: Brand & Sir's Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-white p-1 border border-emerald-500/30">
+              <div className="relative w-12 h-12 min-w-[48px] max-w-[48px] shrink-0 rounded-2xl overflow-hidden bg-white p-1 border border-emerald-500/30">
                 <Image
-                  src="/assets/logo.png"
-                  alt="বিডি হোমিও লোগো"
+                  src={settings.logoUrl || '/assets/logo.png'}
+                  alt={settings.siteTitle || 'বিডি হোমিও লোগো'}
                   fill
                   sizes="48px"
                   className="object-contain"

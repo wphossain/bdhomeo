@@ -27,7 +27,7 @@ function LoginContent() {
       <div className="max-w-md w-full bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-2xl text-center space-y-6">
         
         {/* Logo */}
-        <div className="relative w-16 h-16 rounded-2xl overflow-hidden mx-auto shadow-md border-2 border-emerald-500/30 p-1 bg-emerald-50">
+        <div className="relative w-16 h-16 min-w-[64px] max-w-[64px] shrink-0 rounded-2xl overflow-hidden mx-auto shadow-md border-2 border-emerald-500/30 p-1 bg-emerald-50">
           <Image src="/assets/logo.png" alt="বিডি হোমিও" fill sizes="64px" className="object-contain p-0.5" />
         </div>
 

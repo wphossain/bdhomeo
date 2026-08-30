@@ -561,6 +561,24 @@ export function CourseManager() {
               );
             })}
           </div>
+
+          {/* Bottom Save Bar */}
+          <div className="pt-6 border-t border-slate-800 flex items-center justify-between">
+            <button
+              onClick={() => setEditingCourseId(null)}
+              className="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition"
+            >
+              ← কোর্সে ফিরে যান
+            </button>
+
+            <button
+              onClick={handleSaveCourses}
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg transition"
+            >
+              <Save className="w-4 h-4" />
+              <span>সকল পরিবর্তন সংরক্ষণ করুন</span>
+            </button>
+          </div>
         </div>
 
       </div>

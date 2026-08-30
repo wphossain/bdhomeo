@@ -129,7 +129,7 @@ export function DoctorProfile() {
               </Link>
 
               <a
-                href={`https://wa.me/880${settings.whatsappNumber.replace(/[^0-9]/g, '')}`}
+                href={`https://wa.me/880${(settings.whatsappNumber || '01811123993').replace(/[^0-9]/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm px-5 py-3.5 rounded-xl border border-slate-200 transition"
