@@ -8,6 +8,7 @@ import {
   Enrollment, 
   MonthlyPayment, 
   OrientationLead,
+  CertificateRequest,
   ToastNotification 
 } from './types';
 import { initialCourses, initialSiteSettings } from './data';
@@ -25,6 +26,9 @@ interface AppContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshData: () => Promise<void>;
+  certificateRequests: CertificateRequest[];
+  submitCertificateRequest: (data: { phone: string; courierAddress: string; district?: string; courseId: string; courseTitle: string }) => Promise<boolean>;
+  updateCertificateStatus: (id: string, status: 'pending' | 'dispatched' | 'delivered') => Promise<void>;
   submitEnrollment: (data: { courseId: string; trxId: string; senderPhone: string; studentPhone?: string; paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' }) => Promise<boolean>;
   submitMonthlyPayment: (data: { courseId: string; monthName: string; trxId: string; senderPhone: string; paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' }) => Promise<boolean>;
   submitOrientationLead: (data: { name: string; phone: string; email?: string; homeoBackground: string }) => Promise<boolean>;
@@ -50,6 +54,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment[]>([]);
   const [leads, setLeads] = useState<OrientationLead[]>([]);
   const [toast, setToast] = useState<ToastNotification | null>(null);
+  const [certificateRequests, setCertificateRequests] = useState<CertificateRequest[]>([]);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     const newToast: ToastNotification = { id: Date.now().toString(), message, type };
@@ -578,7 +583,86 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   // =========================================================================
-  // 6. SITE SETTINGS UPDATE (Supabase Upsert)
+  // 6. CERTIFICATE REQUEST SUBMISSION (PTF Courier Delivery)
+  // =========================================================================
+  const submitCertificateRequest = async (data: {
+    phone: string;
+    courierAddress: string;
+    district?: string;
+    courseId: string;
+    courseTitle: string;
+  }): Promise<boolean> => {
+    if (!user) {
+      showToast('ঠিকানা সাবমিট করতে লগইন করুন', 'error');
+      return false;
+    }
+
+    const cleanPhone = (data.phone || '').trim();
+    if (!cleanPhone || !data.courierAddress.trim()) {
+      showToast('ফোন নম্বর ও সম্পূর্ণ কুরিয়ার ঠিকানা লিখুন', 'error');
+      return false;
+    }
+
+    const newReq: CertificateRequest = {
+      id: 'cert-' + Date.now(),
+      studentId: user.id,
+      studentName: user.fullName,
+      studentEmail: user.email,
+      phone: cleanPhone,
+      courierAddress: data.courierAddress.trim(),
+      district: data.district?.trim() || '',
+      courseId: data.courseId,
+      courseTitle: data.courseTitle,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+
+    setCertificateRequests((prev) => [newReq, ...prev]);
+
+    try {
+      const { error } = await supabase.from('certificate_requests').insert({
+        id: newReq.id,
+        student_id: user.id,
+        student_name: user.fullName,
+        student_email: user.email,
+        phone: cleanPhone,
+        courier_address: data.courierAddress.trim(),
+        district: data.district?.trim() || null,
+        course_id: data.courseId,
+        course_title: data.courseTitle,
+        status: 'pending',
+        created_at: newReq.createdAt,
+      });
+
+      if (error) {
+        console.error('Certificate request insert error:', error);
+        showToast('ঠিকানা সংরক্ষণে সমস্যা: ' + error.message, 'error');
+        return false;
+      }
+    } catch (e: any) {
+      console.error('Certificate exception:', e);
+      showToast('কানেকশন ত্রুটি: ' + (e?.message || 'পুনরায় চেষ্টা করুন'), 'error');
+      return false;
+    }
+
+    showToast('সার্টিফিকেট কুরিয়ার ঠিকানা সফলভাবে সংরক্ষিত হয়েছে!', 'success');
+    return true;
+  };
+
+  const updateCertificateStatus = async (id: string, status: 'pending' | 'dispatched' | 'delivered') => {
+    setCertificateRequests((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, status } : c))
+    );
+
+    try {
+      await supabase.from('certificate_requests').update({ status }).eq('id', id);
+    } catch (err) {
+      console.warn('Update cert status error:', err);
+    }
+  };
+
+  // =========================================================================
+  // 7. SITE SETTINGS UPDATE (Supabase Upsert)
   // =========================================================================
   const updateSettings = async (newSettings: Partial<SiteSettings>): Promise<boolean> => {
     const updated = { ...settings, ...newSettings };
@@ -814,6 +898,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         updateLeadStatus,
         toast,
         showToast,
+        certificateRequests,
+        submitCertificateRequest,
+        updateCertificateStatus,
       }}
     >
       {children}

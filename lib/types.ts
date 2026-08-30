@@ -166,3 +166,17 @@ export interface ToastNotification {
   message: string;
   type: 'success' | 'error' | 'info';
 }
+
+export interface CertificateRequest {
+  id: string;
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  phone: string;
+  courierAddress: string;
+  district?: string;
+  courseId: string;
+  courseTitle: string;
+  status: 'pending' | 'dispatched' | 'delivered';
+  createdAt: string;
+}

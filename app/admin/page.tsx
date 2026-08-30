@@ -30,6 +30,8 @@ import { MonthlyFeeApprovals } from '@/components/admin/MonthlyFeeApprovals';
 import { LeadManager } from '@/components/admin/LeadManager';
 import { MediaManager } from '@/components/admin/MediaManager';
 import { SiteSettingsForm } from '@/components/admin/SiteSettingsForm';
+import { CertificateManager } from '@/components/admin/CertificateManager';
+import { Truck } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboardPage() {
@@ -451,6 +453,7 @@ export default function AdminDashboardPage() {
           {activeTab === 'courses' && <CourseManager />}
 
           {/* TAB 5: LEAD MANAGER */}
+          {activeTab === 'certificates' && <CertificateManager />}
           {activeTab === 'leads' && <LeadManager />}
 
           {/* TAB 6: MEDIA & GALLERY */}

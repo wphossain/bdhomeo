@@ -253,7 +253,44 @@ DROP POLICY IF EXISTS "Only admins can delete orientation leads" ON public.orien
 CREATE POLICY "Only admins can delete orientation leads" ON public.orientation_leads
   FOR DELETE USING (public.is_admin());
 
--- 8. Automatic PostgreSQL Auth Trigger for New Google Logins
+
+-- 8. Create CERTIFICATE_REQUESTS Table & Secure RLS (PTF Delivery)
+CREATE TABLE IF NOT EXISTS public.certificate_requests (
+  id TEXT PRIMARY KEY,
+  student_id TEXT NOT NULL,
+  student_name TEXT NOT NULL,
+  student_email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  courier_address TEXT NOT NULL,
+  district TEXT,
+  course_id TEXT NOT NULL,
+  course_title TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'dispatched', 'delivered')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.certificate_requests ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Students can see their own certificate requests" ON public.certificate_requests;
+CREATE POLICY "Students can see their own certificate requests" ON public.certificate_requests
+  FOR SELECT USING (public.is_admin() OR auth.uid()::text = student_id);
+
+DROP POLICY IF EXISTS "Students can insert certificate request" ON public.certificate_requests;
+CREATE POLICY "Students can insert certificate request" ON public.certificate_requests
+  FOR INSERT WITH CHECK (
+    (auth.uid()::text = student_id OR public.is_admin()) AND
+    (status = 'pending' OR public.is_admin())
+  );
+
+DROP POLICY IF EXISTS "Admins can update certificate requests" ON public.certificate_requests;
+CREATE POLICY "Admins can update certificate requests" ON public.certificate_requests
+  FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Admins can delete certificate requests" ON public.certificate_requests;
+CREATE POLICY "Admins can delete certificate requests" ON public.certificate_requests
+  FOR DELETE USING (public.is_admin());
+
+-- 9. Automatic PostgreSQL Auth Trigger for New Google Logins
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
