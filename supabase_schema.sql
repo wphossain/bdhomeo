@@ -1,35 +1,35 @@
 -- =========================================================================
--- BD HOMEO (বিডি হোমিও প্রশিক্ষণ কেন্দ্র) - MASTER SUPABASE DATABASE SCHEMA
+-- BD HOMEO (বিডি হোমিও প্রশিক্ষণ কেন্দ্র) - SECURE ENTERPRISE RLS SCHEMA
 -- Run this complete SQL script in your Supabase Dashboard -> SQL Editor
 -- =========================================================================
 
--- STEP 1: FIX EXISTING TABLE SCHEMAS & REMOVE STRICT FOREIGN KEY BLOCKS
-ALTER TABLE IF EXISTS public.enrollments DROP CONSTRAINT IF EXISTS enrollments_student_id_fkey;
-ALTER TABLE IF EXISTS public.enrollments DROP CONSTRAINT IF EXISTS enrollments_course_id_fkey;
-ALTER TABLE IF EXISTS public.enrollments ALTER COLUMN student_id TYPE TEXT USING student_id::text;
-ALTER TABLE IF EXISTS public.enrollments ALTER COLUMN course_id TYPE TEXT USING course_id::text;
+-- 1. Helper function to check if current authenticated user is an Admin
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+DECLARE
+  current_user_email TEXT;
+BEGIN
+  -- Check via auth.jwt email claim first
+  current_user_email := LOWER(COALESCE(auth.jwt()->>'email', ''));
+  IF current_user_email IN (
+    'mikailhossain3747@gmail.com',
+    'geaus.uddin.81099@gmail.com',
+    'bdhomeo@gmail.com',
+    'homoeobangla.bd@gmail.com'
+  ) THEN
+    RETURN TRUE;
+  END IF;
 
-ALTER TABLE IF EXISTS public.monthly_payments DROP CONSTRAINT IF EXISTS monthly_payments_student_id_fkey;
-ALTER TABLE IF EXISTS public.monthly_payments DROP CONSTRAINT IF EXISTS monthly_payments_course_id_fkey;
-ALTER TABLE IF EXISTS public.monthly_payments ALTER COLUMN student_id TYPE TEXT USING student_id::text;
-ALTER TABLE IF EXISTS public.monthly_payments ALTER COLUMN course_id TYPE TEXT USING course_id::text;
+  -- Fallback check via profiles table
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid()
+    AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- STEP 2: ADD ALL REQUIRED CMS COLUMNS TO SITE_SETTINGS
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS doctor_degrees TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS doctor_experience TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS doctor_chamber_time TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS meta_og_image_url TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS video_showcase_list JSONB DEFAULT '[]'::jsonb;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS testimonials JSONB DEFAULT '[]'::jsonb;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS rocket_number TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS alternate_helpline TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS official_email TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS chamber_address TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS morning_support_time TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS facebook_group_url TEXT;
-ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS telegram_url TEXT;
-
--- 1. Create PROFILES Table
+-- 2. Create PROFILES Table & Secure RLS
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL UNIQUE,
@@ -43,18 +43,25 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
-CREATE POLICY "Public profiles are viewable by everyone" ON public.profiles
-  FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Profiles viewable by owner or admin" ON public.profiles;
+CREATE POLICY "Profiles viewable by owner or admin" ON public.profiles
+  FOR SELECT USING (public.is_admin() OR auth.uid() = id);
 
 DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 CREATE POLICY "Users can insert their own profile" ON public.profiles
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (auth.uid() = id);
 
 DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile" ON public.profiles
-  FOR UPDATE USING (true);
+  FOR UPDATE USING (auth.uid() = id)
+  WITH CHECK (
+    auth.uid() = id AND (
+      public.is_admin() OR 
+      role = (SELECT p.role FROM public.profiles p WHERE p.id = auth.uid())
+    )
+  );
 
--- 2. Create COURSES Table
+-- 3. Create COURSES Table & Secure RLS
 CREATE TABLE IF NOT EXISTS public.courses (
   id TEXT PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,
@@ -80,109 +87,11 @@ CREATE POLICY "Courses are readable by everyone" ON public.courses
   FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Anyone or admins can modify courses" ON public.courses;
-CREATE POLICY "Anyone or admins can modify courses" ON public.courses
-  FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Only admins can modify courses" ON public.courses;
+CREATE POLICY "Only admins can modify courses" ON public.courses
+  FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- 3. Create ENROLLMENTS Table
-CREATE TABLE IF NOT EXISTS public.enrollments (
-  id TEXT PRIMARY KEY,
-  student_id TEXT NOT NULL,
-  student_name TEXT NOT NULL,
-  student_email TEXT NOT NULL,
-  student_phone TEXT NOT NULL,
-  course_id TEXT NOT NULL,
-  course_title TEXT NOT NULL,
-  batch_type TEXT NOT NULL,
-  admission_status TEXT NOT NULL DEFAULT 'pending' CHECK (admission_status IN ('pending', 'approved', 'rejected')),
-  trx_id TEXT NOT NULL,
-  sender_phone TEXT NOT NULL,
-  payment_method TEXT NOT NULL,
-  enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Enrollments viewable by all" ON public.enrollments;
-CREATE POLICY "Enrollments viewable by all" ON public.enrollments
-  FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Students can insert their enrollment" ON public.enrollments;
-CREATE POLICY "Students can insert their enrollment" ON public.enrollments
-  FOR INSERT WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admins can update enrollments" ON public.enrollments;
-CREATE POLICY "Admins can update enrollments" ON public.enrollments
-  FOR UPDATE USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admins can delete enrollments" ON public.enrollments;
-CREATE POLICY "Admins can delete enrollments" ON public.enrollments
-  FOR DELETE USING (true);
-
--- 4. Create MONTHLY_PAYMENTS Table
-CREATE TABLE IF NOT EXISTS public.monthly_payments (
-  id TEXT PRIMARY KEY,
-  student_id TEXT NOT NULL,
-  student_name TEXT NOT NULL,
-  student_phone TEXT NOT NULL,
-  course_id TEXT NOT NULL,
-  course_title TEXT NOT NULL,
-  month_name TEXT NOT NULL,
-  amount INT NOT NULL DEFAULT 500,
-  trx_id TEXT NOT NULL,
-  sender_phone TEXT NOT NULL,
-  payment_method TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-ALTER TABLE public.monthly_payments ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Monthly payments viewable by all" ON public.monthly_payments;
-CREATE POLICY "Monthly payments viewable by all" ON public.monthly_payments
-  FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Insert monthly payment" ON public.monthly_payments;
-CREATE POLICY "Insert monthly payment" ON public.monthly_payments
-  FOR INSERT WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Update monthly payment" ON public.monthly_payments;
-CREATE POLICY "Update monthly payment" ON public.monthly_payments
-  FOR UPDATE USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Delete monthly payment" ON public.monthly_payments;
-CREATE POLICY "Delete monthly payment" ON public.monthly_payments
-  FOR DELETE USING (true);
-
--- 5. Create ORIENTATION_LEADS Table
-CREATE TABLE IF NOT EXISTS public.orientation_leads (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  email TEXT,
-  homeo_background TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'joined')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-ALTER TABLE public.orientation_leads ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Anyone can submit orientation lead" ON public.orientation_leads;
-CREATE POLICY "Anyone can submit orientation lead" ON public.orientation_leads
-  FOR INSERT WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Anyone can view orientation leads" ON public.orientation_leads;
-CREATE POLICY "Anyone can view orientation leads" ON public.orientation_leads
-  FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Anyone can update orientation leads" ON public.orientation_leads;
-CREATE POLICY "Anyone can update orientation leads" ON public.orientation_leads
-  FOR UPDATE USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Anyone can delete orientation leads" ON public.orientation_leads;
-CREATE POLICY "Anyone can delete orientation leads" ON public.orientation_leads
-  FOR DELETE USING (true);
-
--- 6. Create SITE_SETTINGS Table
+-- 4. Create SITE_SETTINGS Table & Secure RLS
 CREATE TABLE IF NOT EXISTS public.site_settings (
   id TEXT PRIMARY KEY DEFAULT 'global_settings',
   site_title TEXT,
@@ -230,10 +139,121 @@ CREATE POLICY "Site settings are viewable by everyone" ON public.site_settings
   FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Site settings can be updated by all" ON public.site_settings;
-CREATE POLICY "Site settings can be updated by all" ON public.site_settings
-  FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Site settings can only be updated by admins" ON public.site_settings;
+CREATE POLICY "Site settings can only be updated by admins" ON public.site_settings
+  FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- 7. Automatic PostgreSQL Auth Trigger for New Google Logins
+-- 5. Create ENROLLMENTS Table & Secure RLS
+CREATE TABLE IF NOT EXISTS public.enrollments (
+  id TEXT PRIMARY KEY,
+  student_id TEXT NOT NULL,
+  student_name TEXT NOT NULL,
+  student_email TEXT NOT NULL,
+  student_phone TEXT NOT NULL,
+  course_id TEXT NOT NULL,
+  course_title TEXT NOT NULL,
+  batch_type TEXT NOT NULL,
+  admission_status TEXT NOT NULL DEFAULT 'pending' CHECK (admission_status IN ('pending', 'approved', 'rejected')),
+  trx_id TEXT NOT NULL,
+  sender_phone TEXT NOT NULL,
+  payment_method TEXT NOT NULL,
+  enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Enrollments viewable by all" ON public.enrollments;
+DROP POLICY IF EXISTS "Enrollments viewable by owner or admin" ON public.enrollments;
+CREATE POLICY "Enrollments viewable by owner or admin" ON public.enrollments
+  FOR SELECT USING (public.is_admin() OR auth.uid()::text = student_id);
+
+DROP POLICY IF EXISTS "Students can insert their enrollment" ON public.enrollments;
+CREATE POLICY "Students can insert their enrollment" ON public.enrollments
+  FOR INSERT WITH CHECK (
+    (auth.uid()::text = student_id OR public.is_admin()) AND
+    (admission_status = 'pending' OR public.is_admin())
+  );
+
+DROP POLICY IF EXISTS "Admins can update enrollments" ON public.enrollments;
+CREATE POLICY "Admins can update enrollments" ON public.enrollments
+  FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Admins can delete enrollments" ON public.enrollments;
+CREATE POLICY "Admins can delete enrollments" ON public.enrollments
+  FOR DELETE USING (public.is_admin());
+
+-- 6. Create MONTHLY_PAYMENTS Table & Secure RLS
+CREATE TABLE IF NOT EXISTS public.monthly_payments (
+  id TEXT PRIMARY KEY,
+  student_id TEXT NOT NULL,
+  student_name TEXT NOT NULL,
+  student_phone TEXT NOT NULL,
+  course_id TEXT NOT NULL,
+  course_title TEXT NOT NULL,
+  month_name TEXT NOT NULL,
+  amount INT NOT NULL DEFAULT 500,
+  trx_id TEXT NOT NULL,
+  sender_phone TEXT NOT NULL,
+  payment_method TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.monthly_payments ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Monthly payments viewable by all" ON public.monthly_payments;
+DROP POLICY IF EXISTS "Monthly payments viewable by owner or admin" ON public.monthly_payments;
+CREATE POLICY "Monthly payments viewable by owner or admin" ON public.monthly_payments
+  FOR SELECT USING (public.is_admin() OR auth.uid()::text = student_id);
+
+DROP POLICY IF EXISTS "Insert monthly payment" ON public.monthly_payments;
+CREATE POLICY "Insert monthly payment" ON public.monthly_payments
+  FOR INSERT WITH CHECK (
+    (auth.uid()::text = student_id OR public.is_admin()) AND
+    (status = 'pending' OR public.is_admin())
+  );
+
+DROP POLICY IF EXISTS "Update monthly payment" ON public.monthly_payments;
+CREATE POLICY "Update monthly payment" ON public.monthly_payments
+  FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Delete monthly payment" ON public.monthly_payments;
+CREATE POLICY "Delete monthly payment" ON public.monthly_payments
+  FOR DELETE USING (public.is_admin());
+
+-- 7. Create ORIENTATION_LEADS Table & Secure RLS (Anti-PII Leak)
+CREATE TABLE IF NOT EXISTS public.orientation_leads (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  email TEXT,
+  homeo_background TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'joined')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.orientation_leads ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can submit orientation lead" ON public.orientation_leads;
+CREATE POLICY "Anyone can submit orientation lead" ON public.orientation_leads
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Anyone can view orientation leads" ON public.orientation_leads;
+DROP POLICY IF EXISTS "Only admins can view orientation leads" ON public.orientation_leads;
+CREATE POLICY "Only admins can view orientation leads" ON public.orientation_leads
+  FOR SELECT USING (public.is_admin());
+
+DROP POLICY IF EXISTS "Anyone can update orientation leads" ON public.orientation_leads;
+DROP POLICY IF EXISTS "Only admins can update orientation leads" ON public.orientation_leads;
+CREATE POLICY "Only admins can update orientation leads" ON public.orientation_leads
+  FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Anyone can delete orientation leads" ON public.orientation_leads;
+DROP POLICY IF EXISTS "Only admins can delete orientation leads" ON public.orientation_leads;
+CREATE POLICY "Only admins can delete orientation leads" ON public.orientation_leads
+  FOR DELETE USING (public.is_admin());
+
+-- 8. Automatic PostgreSQL Auth Trigger for New Google Logins
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -273,7 +293,7 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- Backfill existing users
+-- Backfill existing profiles
 INSERT INTO public.profiles (id, email, full_name, avatar_url, role)
 SELECT 
   id,
