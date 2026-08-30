@@ -154,7 +154,8 @@ CREATE TABLE IF NOT EXISTS public.enrollments (
   course_title TEXT NOT NULL,
   batch_type TEXT NOT NULL,
   admission_status TEXT NOT NULL DEFAULT 'pending' CHECK (admission_status IN ('pending', 'approved', 'rejected')),
-  trx_id TEXT NOT NULL,
+  amount INT NOT NULL DEFAULT 1000,
+  trx_id TEXT NOT NULL UNIQUE,
   sender_phone TEXT NOT NULL,
   payment_method TEXT NOT NULL,
   enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -195,6 +196,7 @@ CREATE TABLE IF NOT EXISTS public.monthly_payments (
   trx_id TEXT NOT NULL,
   sender_phone TEXT NOT NULL,
   payment_method TEXT NOT NULL,
+  trx_id TEXT NOT NULL UNIQUE,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

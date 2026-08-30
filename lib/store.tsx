@@ -30,14 +30,19 @@ interface AppContextType {
   submitCertificateRequest: (data: { phone: string; courierAddress: string; district?: string; courseId: string; courseTitle: string }) => Promise<boolean>;
   updateCertificateStatus: (id: string, status: 'pending' | 'dispatched' | 'delivered') => Promise<void>;
   submitEnrollment: (data: { courseId: string; trxId: string; senderPhone: string; studentPhone?: string; paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' }) => Promise<boolean>;
+  addManualEnrollment: (data: { studentName: string; studentEmail: string; studentPhone: string; courseId: string; batchType?: 'basic' | 'advance' | 'special'; paymentMethod: 'bkash' | 'nagad' | 'cash' | 'rocket'; senderPhone: string; trxId: string; admissionStatus?: 'approved' | 'pending'; amount?: number }) => Promise<boolean>;
+  approveEnrollment: (enrollmentId: string) => Promise<void>;
+  rejectEnrollment: (enrollmentId: string) => Promise<void>;
   submitMonthlyPayment: (data: { courseId: string; monthName: string; trxId: string; senderPhone: string; paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' }) => Promise<boolean>;
+  addManualMonthlyPayment: (data: { studentName: string; studentPhone: string; courseId: string; monthName: string; amount: number; paymentMethod: 'bkash' | 'nagad' | 'cash' | 'rocket'; senderPhone: string; trxId: string; status?: 'approved' | 'pending' }) => Promise<boolean>;
+  approveMonthlyPayment: (paymentId: string) => Promise<void>;
+  rejectMonthlyPayment: (paymentId: string) => Promise<void>;
   submitOrientationLead: (data: { name: string; phone: string; email?: string; homeoBackground: string }) => Promise<boolean>;
+  updateLeadStatus: (leadId: string, status: 'contacted' | 'joined') => Promise<void>;
   updateSettings: (newSettings: Partial<SiteSettings>) => Promise<boolean>;
   updateCourses: (updatedCourses: Course[]) => Promise<boolean>;
   saveCourse: (course: Course) => Promise<boolean>;
-  approveEnrollment: (enrollmentId: string) => Promise<void>;
-  approveMonthlyPayment: (paymentId: string) => Promise<void>;
-  updateLeadStatus: (leadId: string, status: 'contacted' | 'joined') => Promise<void>;
+  deleteCourse: (courseId: string) => Promise<boolean>;
   toast: ToastNotification | null;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
@@ -161,6 +166,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           courseTitle: e.course_title,
           batchType: e.batch_type,
           admissionStatus: e.admission_status,
+            amount: e.amount || 1000,
           trxId: e.trx_id,
           senderPhone: e.sender_phone,
           paymentMethod: e.payment_method,
@@ -388,6 +394,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       courseTitle: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
       batchType: targetCourse?.batchType || 'basic',
       admissionStatus: 'pending',
+      amount: targetCourse?.admissionFee || 1000,
       trxId: cleanTrx,
       senderPhone: data.senderPhone.trim(),
       paymentMethod: data.paymentMethod,
@@ -407,6 +414,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         course_title: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
         batch_type: targetCourse?.batchType || 'basic',
         admission_status: 'pending',
+        amount: targetCourse?.admissionFee || 1000,
         trx_id: cleanTrx,
         sender_phone: data.senderPhone.trim(),
         payment_method: data.paymentMethod,
@@ -425,6 +433,197 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     showToast('ভর্তি আবেদন ও ট্রানজেকশন সফলভাবে জমা হয়েছে! অ্যাডমিন ভেরিফিকেশন সাপেক্ষে ক্লাস আনলক হবে।', 'success');
+    return true;
+  };
+
+  const rejectEnrollment = async (id: string) => {
+    setEnrollments((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, admissionStatus: 'rejected' } : e))
+    );
+
+    try {
+      const { error } = await supabase
+        .from('enrollments')
+        .update({ admission_status: 'rejected' })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Supabase reject enrollment error:', error);
+        showToast('ভর্তি বাতিলের তথ্য ডাটাবেজে আপডেট হয়নি: ' + error.message, 'error');
+      } else {
+        showToast('ভর্তি আবেদন বাতিল করা হয়েছে!', 'info');
+      }
+    } catch (e: any) {
+      console.warn('Reject enrollment exception:', e);
+    }
+  };
+
+  const addManualEnrollment = async (data: {
+    studentName: string;
+    studentEmail: string;
+    studentPhone: string;
+    courseId: string;
+    batchType?: 'basic' | 'advance' | 'special';
+    paymentMethod: 'bkash' | 'nagad' | 'cash' | 'rocket';
+    senderPhone: string;
+    trxId: string;
+    admissionStatus?: 'approved' | 'pending';
+    amount?: number;
+  }): Promise<boolean> => {
+    const targetCourse = courses.find((c) => c.id === data.courseId);
+    const newEnr: Enrollment = {
+      id: 'enr-' + Date.now(),
+      studentId: 'manual-' + Date.now(),
+      studentName: data.studentName.trim(),
+      studentEmail: data.studentEmail.trim().toLowerCase(),
+      studentPhone: data.studentPhone.trim(),
+      courseId: data.courseId,
+      courseTitle: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
+      batchType: data.batchType || targetCourse?.batchType || 'basic',
+      admissionStatus: data.admissionStatus || 'approved',
+      amount: data.amount || targetCourse?.admissionFee || 1000,
+      trxId: data.trxId.trim().toUpperCase() || ('CASH-' + Date.now().toString().substring(6)),
+      senderPhone: data.senderPhone.trim() || data.studentPhone.trim(),
+      paymentMethod: data.paymentMethod,
+      enrolledAt: new Date().toISOString(),
+    };
+
+    setEnrollments((prev) => [newEnr, ...prev]);
+
+    try {
+      const { error } = await supabase.from('enrollments').insert({
+        id: newEnr.id,
+        student_id: newEnr.studentId,
+        student_name: newEnr.studentName,
+        student_email: newEnr.studentEmail,
+        student_phone: newEnr.studentPhone,
+        course_id: newEnr.courseId,
+        course_title: newEnr.courseTitle,
+        batch_type: newEnr.batchType,
+        admission_status: newEnr.admissionStatus,
+        amount: newEnr.amount,
+        trx_id: newEnr.trxId,
+        sender_phone: newEnr.senderPhone,
+        payment_method: newEnr.paymentMethod,
+        enrolled_at: newEnr.enrolledAt,
+      });
+
+      if (error) {
+        console.error('Manual enrollment error:', error);
+        showToast('ডাটাবেজে সেভ হতে সমস্যা: ' + error.message, 'error');
+        return false;
+      }
+    } catch (err: any) {
+      console.error('Manual enrollment exception:', err);
+      showToast('কানেকশন ত্রুটি: ' + (err?.message || 'পুনরায় চেষ্টা করুন'), 'error');
+      return false;
+    }
+
+    showToast('শিক্ষার্থী সফলভাবে ডাটাবেজে ম্যানুয়ালি ভর্তি করা হয়েছে!', 'success');
+    return true;
+  };
+
+  const rejectMonthlyPayment = async (id: string) => {
+    setMonthlyPayments((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, status: 'rejected' } : p))
+    );
+
+    try {
+      const { error } = await supabase
+        .from('monthly_payments')
+        .update({ status: 'rejected' })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Supabase reject payment error:', error);
+        showToast('ফি বাতিলের তথ্য ডাটাবেজে আপডেট হয়নি: ' + error.message, 'error');
+      } else {
+        showToast('মাসিক ফি পেমেন্ট বাতিল করা হয়েছে!', 'info');
+      }
+    } catch (e: any) {
+      console.warn('Reject payment exception:', e);
+    }
+  };
+
+  const addManualMonthlyPayment = async (data: {
+    studentName: string;
+    studentPhone: string;
+    courseId: string;
+    monthName: string;
+    amount: number;
+    paymentMethod: 'bkash' | 'nagad' | 'cash' | 'rocket';
+    senderPhone: string;
+    trxId: string;
+    status?: 'approved' | 'pending';
+  }): Promise<boolean> => {
+    const targetCourse = courses.find((c) => c.id === data.courseId);
+    const newPay: MonthlyPayment = {
+      id: 'pay-' + Date.now(),
+      studentId: 'manual-' + Date.now(),
+      studentName: data.studentName.trim(),
+      studentPhone: data.studentPhone.trim(),
+      courseId: data.courseId,
+      courseTitle: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
+      monthName: data.monthName,
+      amount: data.amount || 500,
+      trxId: data.trxId.trim().toUpperCase() || ('CASH-' + Date.now().toString().substring(6)),
+      senderPhone: data.senderPhone.trim() || data.studentPhone.trim(),
+      paymentMethod: data.paymentMethod,
+      status: data.status || 'approved',
+      createdAt: new Date().toISOString(),
+    };
+
+    setMonthlyPayments((prev) => [newPay, ...prev]);
+
+    try {
+      const { error } = await supabase.from('monthly_payments').insert({
+        id: newPay.id,
+        student_id: newPay.studentId,
+        student_name: newPay.studentName,
+        student_phone: newPay.studentPhone,
+        course_id: newPay.courseId,
+        course_title: newPay.courseTitle,
+        month_name: newPay.monthName,
+        amount: newPay.amount,
+        trx_id: newPay.trxId,
+        sender_phone: newPay.senderPhone,
+        payment_method: newPay.paymentMethod,
+        status: newPay.status,
+        created_at: newPay.createdAt,
+      });
+
+      if (error) {
+        console.error('Manual monthly payment error:', error);
+        showToast('ডাটাবেজে সেভ হতে সমস্যা: ' + error.message, 'error');
+        return false;
+      }
+    } catch (err: any) {
+      console.error('Manual payment exception:', err);
+      showToast('কানেকশন ত্রুটি: ' + (err?.message || 'পুনরায় চেষ্টা করুন'), 'error');
+      return false;
+    }
+
+    showToast(data.monthName + ' মাসের ফি ডাটাবেজে ম্যানুয়ালি রেকর্ড করা হয়েছে!', 'success');
+    return true;
+  };
+
+  const deleteCourse = async (id: string): Promise<boolean> => {
+    setCourses((prev) => prev.filter((c) => c.id !== id));
+
+    try {
+      const { error } = await supabase.from('courses').delete().eq('id', id);
+      if (error) {
+        console.error('Supabase delete course error:', error);
+        showToast('ডাটাবেজ থেকে কোর্স ডিলিট হতে সমস্যা: ' + error.message, 'error');
+        return false;
+      }
+    } catch (e: any) {
+      console.error('Delete course exception:', e);
+      showToast('কানেকশন ত্রুটি: ' + (e?.message || 'পুনরায় চেষ্টা করুন'), 'error');
+      return false;
+    }
+
+    showToast('কোর্সটি ডাটাবেজ থেকে স্থায়ীভাবে মুছে ফেলা হয়েছে!', 'info');
     return true;
   };
 
@@ -894,7 +1093,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         updateCourses,
         saveCourse,
         approveEnrollment,
+        rejectEnrollment,
+        addManualEnrollment,
         approveMonthlyPayment,
+        rejectMonthlyPayment,
+        addManualMonthlyPayment,
+        deleteCourse,
         updateLeadStatus,
         toast,
         showToast,

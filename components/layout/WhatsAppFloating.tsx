@@ -6,7 +6,8 @@ import { useApp } from '@/lib/store';
 export function WhatsAppFloating() {
   const { settings } = useApp();
   const rawNumber = settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '01811123993';
-  const waLink = `https://wa.me/880${rawNumber.startsWith('0') ? rawNumber.slice(1) : rawNumber}?text=${encodeURIComponent('আসসালামু আলাইকুম স্যার, আমি বিডি হোমিও প্রশিক্ষণ কেন্দ্রের কোর্স সম্পর্কে জানতে চাই।')}`;
+  const cleanPhone = rawNumber.startsWith('88') ? rawNumber : `88${rawNumber.startsWith('0') ? rawNumber : '0' + rawNumber}`;
+  const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('আসসালামু আলাইকুম, আমি বিডি হোমিও প্রশিক্ষণ কেন্দ্রের কোর্স সম্পর্কে জানতে চাই।')}`;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 font-bangla">

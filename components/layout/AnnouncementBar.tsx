@@ -14,9 +14,9 @@ export function AnnouncementBar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         
         <div className="flex items-center gap-2 overflow-hidden">
-          <span className="bg-slate-950 text-amber-300 text-[10px] uppercase font-black px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 shadow-sm">
+          <span className="bg-slate-950 text-amber-300 text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full shrink-0 flex items-center gap-1 shadow-sm">
             <Megaphone className="w-3 h-3 text-amber-300" />
-            জরুরি নোটিশ
+            জরুরী নোটিশ
           </span>
           <p className="truncate text-xs sm:text-[13px] font-bold text-slate-950">
             {settings.noticeText}

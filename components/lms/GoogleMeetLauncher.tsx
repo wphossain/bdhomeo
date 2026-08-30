@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useApp } from '@/lib/store';
-import { Video, Clock, ExternalLink, Calendar, ShieldAlert } from 'lucide-react';
+import { Video, Clock, ExternalLink, Calendar } from 'lucide-react';
 
 interface GoogleMeetLauncherProps {
   batchType?: 'basic' | 'advance' | 'special';
@@ -11,7 +11,7 @@ interface GoogleMeetLauncherProps {
 export function GoogleMeetLauncher({ batchType }: GoogleMeetLauncherProps) {
   const { settings, user } = useApp();
 
-  const meetUrl = settings.googleMeetUrl || 'https://meet.google.com/bdhomeo-live';
+  const meetUrl = settings.googleMeetUrl || 'https://meet.google.com/bdhomeo-live-class';
 
   return (
     <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-emerald-500/30 relative overflow-hidden font-bangla">
@@ -22,21 +22,21 @@ export function GoogleMeetLauncher({ batchType }: GoogleMeetLauncherProps) {
         <div className="space-y-3 max-w-xl">
           <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3.5 py-1.5 rounded-full border border-emerald-500/40">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>গুগল মিট লাইভ ক্লাসরুম</span>
+            <span>লাইভ মিট ক্লাসরুম</span>
           </div>
 
-          <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-            আজকের লাইভ ক্লাস শুরু হবে রাত ৯:৩০ টায়
+          <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+            আজকের লাইভ ক্লাস শুরু হবে {settings.classTime}-এ
           </h3>
 
           <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-emerald-200">
             <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
               <Calendar className="w-4 h-4 text-amber-400" />
-              <span>সাপ্তাহিক ২টি নির্ধারিত ক্লাস</span>
+              <span>সপ্তাহে ২ দিন লাইভ ক্লাস</span>
             </div>
             <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
               <Clock className="w-4 h-4 text-amber-400" />
-              <span>সময়: {settings.classTime}</span>
+              <span>নির্ধারিত সময়: {settings.classTime}</span>
             </div>
           </div>
         </div>
@@ -46,14 +46,14 @@ export function GoogleMeetLauncher({ batchType }: GoogleMeetLauncherProps) {
             href={meetUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm sm:text-base px-8 py-4 rounded-2xl shadow-xl transition-all hover:scale-105"
+            className="flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-2xl shadow-xl transition-all hover:scale-105"
           >
-            <Video className="w-5 h-5" />
-            <span>গুগল মিট ক্লাসে যোগ দিন</span>
-            <ExternalLink className="w-4 h-4" />
+            <Video className="w-4 h-4" />
+            <span>লাইভ ক্লাসে যুক্ত হোন</span>
+            <ExternalLink className="w-3.5 h-3.5" />
           </a>
-          <span className="text-[11px] text-emerald-200/80 text-center sm:text-right">
-            * মিটে যোগ দেওয়ার সময় আপনার নাম লিখুন
+          <span className="text-[10px] text-emerald-200/80 text-center sm:text-right">
+            * গুগল মিটে যুক্ত হওয়ার সময় আপনার নাম লিখুন
           </span>
         </div>
 

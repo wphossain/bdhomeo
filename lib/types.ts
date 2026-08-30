@@ -124,6 +124,7 @@ export interface Enrollment {
   courseTitle: string;
   batchType: 'basic' | 'advance' | 'special';
   admissionStatus: 'pending' | 'approved' | 'rejected';
+  amount: number;
   trxId: string;
   senderPhone: string;
   paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash';
