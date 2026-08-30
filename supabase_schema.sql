@@ -3,6 +3,32 @@
 -- Run this complete SQL script in your Supabase Dashboard -> SQL Editor
 -- =========================================================================
 
+-- STEP 1: FIX EXISTING TABLE SCHEMAS & REMOVE STRICT FOREIGN KEY BLOCKS
+ALTER TABLE IF EXISTS public.enrollments DROP CONSTRAINT IF EXISTS enrollments_student_id_fkey;
+ALTER TABLE IF EXISTS public.enrollments DROP CONSTRAINT IF EXISTS enrollments_course_id_fkey;
+ALTER TABLE IF EXISTS public.enrollments ALTER COLUMN student_id TYPE TEXT USING student_id::text;
+ALTER TABLE IF EXISTS public.enrollments ALTER COLUMN course_id TYPE TEXT USING course_id::text;
+
+ALTER TABLE IF EXISTS public.monthly_payments DROP CONSTRAINT IF EXISTS monthly_payments_student_id_fkey;
+ALTER TABLE IF EXISTS public.monthly_payments DROP CONSTRAINT IF EXISTS monthly_payments_course_id_fkey;
+ALTER TABLE IF EXISTS public.monthly_payments ALTER COLUMN student_id TYPE TEXT USING student_id::text;
+ALTER TABLE IF EXISTS public.monthly_payments ALTER COLUMN course_id TYPE TEXT USING course_id::text;
+
+-- STEP 2: ADD ALL REQUIRED CMS COLUMNS TO SITE_SETTINGS
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS doctor_degrees TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS doctor_experience TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS doctor_chamber_time TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS meta_og_image_url TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS video_showcase_list JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS testimonials JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS rocket_number TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS alternate_helpline TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS official_email TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS chamber_address TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS morning_support_time TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS facebook_group_url TEXT;
+ALTER TABLE IF EXISTS public.site_settings ADD COLUMN IF NOT EXISTS telegram_url TEXT;
+
 -- 1. Create PROFILES Table
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
