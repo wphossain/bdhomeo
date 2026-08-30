@@ -1,0 +1,56 @@
+{
+  "mcpServers": {
+    "memory": {
+      "command": "node",
+      "args": ["./node_modules/@modelcontextprotocol/server-memory/dist/index.js"],
+      "_package": "@modelcontextprotocol/server-memory@2026.7.4",
+      "_description": "Persistent knowledge graph for entities, relations, and cross-session context memory."
+    },
+    "filesystem": {
+      "command": "node",
+      "args": [
+        "./node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "c:/Users/Developer/Desktop/Hello"
+      ],
+      "_package": "@modelcontextprotocol/server-filesystem@2026.7.10",
+      "_description": "Read/write/list files in the workspace. Scoped to the project root."
+    },
+    "puppeteer": {
+      "command": "node",
+      "args": ["./node_modules/puppeteer-mcp-server/dist/index.js"],
+      "_package": "puppeteer-mcp-server@0.7.2",
+      "_description": "Headless browser for UI screenshots, scraping, and visual testing."
+    },
+    "playwright": {
+      "command": "node",
+      "args": ["./node_modules/@playwright/mcp/cli.js"],
+      "_package": "@playwright/mcp@0.0.79",
+      "_description": "Official Playwright MCP. Controls a real browser for E2E testing, a11y audits, and visual debugging."
+    },
+    "context7": {
+      "command": "node",
+      "args": ["./node_modules/@upstash/context7-mcp/dist/index.js"],
+      "_package": "@upstash/context7-mcp@4.0.3",
+      "_description": "Pulls live, version-specific library docs (GSAP, Three.js, React, etc.) to prevent AI hallucinations."
+    },
+    "magic-ui": {
+      "command": "node",
+      "args": ["./node_modules/@magicuidesign/mcp/dist/server.js"],
+      "_package": "@magicuidesign/mcp@2.0.0",
+      "_description": "Magic UI component library MCP. Generate premium animated UI components via prompt."
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github@2025.4.8"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_PAT_HERE"
+      },
+      "_description": "GitHub: repos, issues, PRs, branches, file operations. Add your PAT in the field above."
+    },
+    "figma": {
+      "serverUrl": "https://mcp.figma.com/mcp",
+      "_description": "Official Figma remote MCP. Reads design files, components, tokens. Requires Figma login via browser."
+    }
+  }
+}
+

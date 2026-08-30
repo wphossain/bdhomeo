@@ -1,0 +1,18 @@
+# node_modules
+node_modules/
+.next/
+dist/
+build/
+out/
+
+# Agent IDE & Temp files
+.ideavo/
+.playwright-mcp/
+*.log
+*.tsbuildinfo
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+!.env.example
