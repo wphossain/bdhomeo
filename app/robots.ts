@@ -5,7 +5,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/auth/callback'],
+      disallow: [
+        '/admin',
+        '/admin/*',
+        '/dashboard',
+        '/dashboard/*',
+        '/auth/callback',
+      ],
     },
     sitemap: 'https://bdhomeo.com/sitemap.xml',
   };

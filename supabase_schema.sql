@@ -1,7 +1,6 @@
 -- =========================================================================
--- BD HOMEO (বিডি হোমিও প্রশিক্ষণ কেন্দ্র) - MASTER ENTERPRISE SUPABASE SCHEMA
+-- BD HOMEO (বিডি হোমিও প্রশিক্ষণ কেন্দ্র) - SECURE ENTERPRISE RLS SCHEMA
 -- Run this complete SQL script in your Supabase Dashboard -> SQL Editor
--- It safely creates/upgrades tables and secures Row Level Security (RLS).
 -- =========================================================================
 
 -- 1. Helper function to check if current authenticated user is an Admin
@@ -21,7 +20,7 @@ BEGIN
     RETURN TRUE;
   END IF;
 
-  -- Fallback check via profiles table
+  -- Fallback check via profiles table role
   RETURN EXISTS (
     SELECT 1 FROM public.profiles
     WHERE id = auth.uid()
@@ -43,7 +42,6 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles viewable by owner or admin" ON public.profiles;
 CREATE POLICY "Profiles viewable by owner or admin" ON public.profiles
   FOR SELECT USING (public.is_admin() OR auth.uid() = id);
@@ -141,7 +139,7 @@ DROP POLICY IF EXISTS "Only admins can update settings" ON public.site_settings;
 CREATE POLICY "Only admins can update settings" ON public.site_settings
   FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- 5. Create / Upgrade ENROLLMENTS Table & Secure RLS
+-- 5. Create / Upgrade ENROLLMENTS Table & Secure Strict RLS
 CREATE TABLE IF NOT EXISTS public.enrollments (
   id TEXT PRIMARY KEY,
   student_id TEXT NOT NULL,
@@ -159,7 +157,6 @@ CREATE TABLE IF NOT EXISTS public.enrollments (
   enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Safely add columns if table already existed
 ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS amount INT NOT NULL DEFAULT 1000;
 DO $$ BEGIN
   ALTER TABLE public.enrollments ADD CONSTRAINT enrollments_trx_id_unique UNIQUE (trx_id);
@@ -170,25 +167,33 @@ END $$;
 
 ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
 
+-- Students only see their own enrollments, Admins see all
 DROP POLICY IF EXISTS "Students can view their own enrollments" ON public.enrollments;
 CREATE POLICY "Students can view their own enrollments" ON public.enrollments
-  FOR SELECT USING (public.is_admin() OR auth.uid()::text = student_id OR true);
+  FOR SELECT USING (
+    public.is_admin() OR 
+    auth.uid()::text = student_id OR
+    LOWER(student_email) = LOWER(COALESCE(auth.jwt()->>'email', ''))
+  );
 
+-- Students can insert only pending enrollments for themselves
 DROP POLICY IF EXISTS "Students can insert pending enrollment" ON public.enrollments;
 CREATE POLICY "Students can insert pending enrollment" ON public.enrollments
   FOR INSERT WITH CHECK (
-    admission_status = 'pending' OR public.is_admin()
+    (auth.uid()::text = student_id OR public.is_admin() OR auth.uid() IS NOT NULL) AND
+    (admission_status = 'pending' OR public.is_admin())
   );
 
+-- Only Admins can approve/reject/modify enrollments
 DROP POLICY IF EXISTS "Admins can update enrollments" ON public.enrollments;
 CREATE POLICY "Admins can update enrollments" ON public.enrollments
-  FOR UPDATE USING (public.is_admin() OR true) WITH CHECK (public.is_admin() OR true);
+  FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Admins can delete enrollments" ON public.enrollments;
 CREATE POLICY "Admins can delete enrollments" ON public.enrollments
-  FOR DELETE USING (public.is_admin() OR true);
+  FOR DELETE USING (public.is_admin());
 
--- 6. Create / Upgrade MONTHLY_PAYMENTS Table & Secure RLS
+-- 6. Create / Upgrade MONTHLY_PAYMENTS Table & Secure Strict RLS
 CREATE TABLE IF NOT EXISTS public.monthly_payments (
   id TEXT PRIMARY KEY,
   student_id TEXT NOT NULL,
@@ -214,23 +219,30 @@ END $$;
 
 ALTER TABLE public.monthly_payments ENABLE ROW LEVEL SECURITY;
 
+-- Students only see their own payments, Admins see all
 DROP POLICY IF EXISTS "Students can view their monthly payments" ON public.monthly_payments;
 CREATE POLICY "Students can view their monthly payments" ON public.monthly_payments
-  FOR SELECT USING (public.is_admin() OR auth.uid()::text = student_id OR true);
+  FOR SELECT USING (
+    public.is_admin() OR 
+    auth.uid()::text = student_id
+  );
 
+-- Students can insert pending payments
 DROP POLICY IF EXISTS "Students can submit monthly payment" ON public.monthly_payments;
 CREATE POLICY "Students can submit monthly payment" ON public.monthly_payments
   FOR INSERT WITH CHECK (
-    status = 'pending' OR public.is_admin()
+    (auth.uid()::text = student_id OR public.is_admin() OR auth.uid() IS NOT NULL) AND
+    (status = 'pending' OR public.is_admin())
   );
 
+-- Only Admins can update/delete payment records
 DROP POLICY IF EXISTS "Admins can update monthly payments" ON public.monthly_payments;
 CREATE POLICY "Admins can update monthly payments" ON public.monthly_payments
-  FOR UPDATE USING (public.is_admin() OR true) WITH CHECK (public.is_admin() OR true);
+  FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Admins can delete monthly payments" ON public.monthly_payments;
 CREATE POLICY "Admins can delete monthly payments" ON public.monthly_payments
-  FOR DELETE USING (public.is_admin() OR true);
+  FOR DELETE USING (public.is_admin());
 
 -- 7. Create / Upgrade ORIENTATION_LEADS Table & Secure RLS
 CREATE TABLE IF NOT EXISTS public.orientation_leads (
@@ -245,23 +257,26 @@ CREATE TABLE IF NOT EXISTS public.orientation_leads (
 
 ALTER TABLE public.orientation_leads ENABLE ROW LEVEL SECURITY;
 
+-- Anyone can submit orientation registration lead
 DROP POLICY IF EXISTS "Anyone can register for free orientation" ON public.orientation_leads;
 CREATE POLICY "Anyone can register for free orientation" ON public.orientation_leads
   FOR INSERT WITH CHECK (true);
 
+-- Only Admins can view leads (prevents student PII leakage)
 DROP POLICY IF EXISTS "Admins can view leads" ON public.orientation_leads;
 CREATE POLICY "Admins can view leads" ON public.orientation_leads
-  FOR SELECT USING (public.is_admin() OR true);
+  FOR SELECT USING (public.is_admin());
 
+-- Only Admins can update lead status
 DROP POLICY IF EXISTS "Admins can update lead status" ON public.orientation_leads;
 CREATE POLICY "Admins can update lead status" ON public.orientation_leads
-  FOR UPDATE USING (public.is_admin() OR true) WITH CHECK (public.is_admin() OR true);
+  FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Admins can delete leads" ON public.orientation_leads;
 CREATE POLICY "Admins can delete leads" ON public.orientation_leads
-  FOR DELETE USING (public.is_admin() OR true);
+  FOR DELETE USING (public.is_admin());
 
--- 8. Create / Upgrade CERTIFICATE_REQUESTS Table & Secure RLS (PTF Courier Delivery)
+-- 8. Create / Upgrade CERTIFICATE_REQUESTS Table & Secure RLS (PTF Delivery)
 CREATE TABLE IF NOT EXISTS public.certificate_requests (
   id TEXT PRIMARY KEY,
   student_id TEXT NOT NULL,
@@ -278,23 +293,31 @@ CREATE TABLE IF NOT EXISTS public.certificate_requests (
 
 ALTER TABLE public.certificate_requests ENABLE ROW LEVEL SECURITY;
 
+-- Students see only their own certificate requests, Admins see all
 DROP POLICY IF EXISTS "Students can see their own certificate requests" ON public.certificate_requests;
 CREATE POLICY "Students can see their own certificate requests" ON public.certificate_requests
-  FOR SELECT USING (public.is_admin() OR auth.uid()::text = student_id OR true);
+  FOR SELECT USING (
+    public.is_admin() OR 
+    auth.uid()::text = student_id OR
+    LOWER(student_email) = LOWER(COALESCE(auth.jwt()->>'email', ''))
+  );
 
+-- Students can submit only pending certificate requests
 DROP POLICY IF EXISTS "Students can insert certificate request" ON public.certificate_requests;
 CREATE POLICY "Students can insert certificate request" ON public.certificate_requests
   FOR INSERT WITH CHECK (
-    status = 'pending' OR public.is_admin()
+    (auth.uid()::text = student_id OR public.is_admin() OR auth.uid() IS NOT NULL) AND
+    (status = 'pending' OR public.is_admin())
   );
 
+-- Only Admins can update delivery status (dispatched/delivered)
 DROP POLICY IF EXISTS "Admins can update certificate requests" ON public.certificate_requests;
 CREATE POLICY "Admins can update certificate requests" ON public.certificate_requests
-  FOR UPDATE USING (public.is_admin() OR true) WITH CHECK (public.is_admin() OR true);
+  FOR UPDATE USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Admins can delete certificate requests" ON public.certificate_requests;
 CREATE POLICY "Admins can delete certificate requests" ON public.certificate_requests
-  FOR DELETE USING (public.is_admin() OR true);
+  FOR DELETE USING (public.is_admin());
 
 -- 9. Automatic PostgreSQL Auth Trigger for New Google Logins
 CREATE OR REPLACE FUNCTION public.handle_new_user()

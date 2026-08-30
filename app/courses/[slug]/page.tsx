@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { CourseDetailClient } from '@/components/courses/CourseDetailClient';
 import { initialCourses } from '@/lib/data';
+import { supabase } from '@/lib/supabase';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -9,12 +10,23 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   
-  const course = initialCourses.find(
-    (c) =>
-      c.slug === slug ||
-      (slug === 'advance-clinical-repertory' && c.slug === 'advanced-clinical-repertory') ||
-      (slug === 'advanced-clinical-repertory' && c.slug === 'advance-clinical-repertory')
-  );
+  let course: any = null;
+
+  try {
+    const { data } = await supabase.from('courses').select('*').eq('slug', slug).single();
+    if (data) course = data;
+  } catch (err) {
+    // fallback
+  }
+
+  if (!course) {
+    course = initialCourses.find(
+      (c) =>
+        c.slug === slug ||
+        (slug === 'advance-clinical-repertory' && c.slug === 'advanced-clinical-repertory') ||
+        (slug === 'advanced-clinical-repertory' && c.slug === 'advance-clinical-repertory')
+    );
+  }
 
   if (!course) {
     return {
@@ -24,7 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = `${course.title} | বিডি হোমিও প্রশিক্ষণ কেন্দ্র`;
-  const description = `${course.subtitle} - ভর্তি ফি ${course.admissionFee} টাকা। ${course.liveSchedule}।`;
+  const description = `${course.subtitle} - ভর্তি ফি ${course.admission_fee || course.admissionFee || 1000} টাকা। ${course.live_schedule || course.liveSchedule || 'সাপ্তাহিক লাইভ ক্লাস'}।`;
+  const imgUrl = course.thumbnail_url || course.thumbnailUrl || '/assets/sir/sir-portrait.jpg';
 
   return {
     title,
@@ -35,9 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `https://bdhomeo.com/courses/${course.slug}`,
       images: [
         {
-          url: course.thumbnailUrl.startsWith('http')
-            ? course.thumbnailUrl
-            : `https://bdhomeo.com${course.thumbnailUrl}`,
+          url: imgUrl.startsWith('http') ? imgUrl : `https://bdhomeo.com${imgUrl}`,
           width: 1200,
           height: 630,
           alt: course.title,
@@ -48,12 +59,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: [course.thumbnailUrl],
+      images: [imgUrl],
     },
   };
 }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  try {
+    const { data: courses } = await supabase.from('courses').select('slug');
+    if (courses && courses.length > 0) {
+      return courses.map((c) => ({ slug: c.slug }));
+    }
+  } catch (e) {
+    // fallback
+  }
+
   return [
     { slug: 'basic-homeopathy-foundation' },
     { slug: 'advanced-clinical-repertory' },
