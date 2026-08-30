@@ -69,7 +69,7 @@ export function EnrollmentApprovals() {
       courseId: manualCourseId,
       paymentMethod: manualPaymentMethod,
       senderPhone: manualSenderPhone || manualPhone,
-      trxId: manualTrxId,
+      trxId: manualTrxId || `MANUAL-${Date.now().toString().slice(-6)}`,
       amount: parseInt(manualAmount, 10) || 1000,
       admissionStatus: manualStatus,
     });
@@ -86,313 +86,277 @@ export function EnrollmentApprovals() {
   };
 
   return (
-    <div className="space-y-6 font-bangla">
+    <div className="space-y-6 font-bangla text-slate-100">
       
       {/* Top Banner Stats & Manual Add Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Users className="w-6 h-6 text-emerald-600" />
-            <h2 className="text-xl font-black text-slate-900">
-              ভর্তি আবেদন ও শিক্ষার্থী এনরোলমেন্ট
+            <Users className="w-6 h-6 text-emerald-400" />
+            <h2 className="text-xl font-black text-white">
+              ভর্তি আবেদন ও শিক্ষার্থী এনরোলমেন্ট (Enrollment Approvals)
             </h2>
           </div>
-          <p className="text-xs text-slate-500">
-            নতুন শিক্ষার্থীদের ভর্তি যাচাই, TrxID নিশ্চিতকরণ এবং ম্যানুয়াল ভর্তি
+          <p className="text-xs text-slate-400">
+            শিক্ষার্থীদের কোর্স ভর্তির আবেদন পর্যালোচনা, অনুমোদন এবং সরাসরি শিক্ষার্থী ভর্তি করান।
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-xs font-bold">
-            <span className="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-xl border border-amber-200">
-              অপেক্ষমান: {pendingCount}
-            </span>
-            <span className="bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-200">
-              অনুমোদিত: {approvedCount}
-            </span>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-xs">
+            <span className="text-slate-400">পেন্ডিং আবেদন:</span>
+            <span className="font-bold text-blue-400 font-mono">{pendingCount} টি</span>
+          </div>
+
+          <div className="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-xs">
+            <span className="text-slate-400">অনুমোদিত ভর্তি:</span>
+            <span className="font-bold text-emerald-400 font-mono">{approvedCount} জন</span>
           </div>
 
           <button
             onClick={() => setIsManualModalOpen(true)}
-            className="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition"
+            className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition"
           >
             <Plus className="w-4 h-4" />
-            <span>ম্যানুয়ালি ভর্তি করুন</span>
+            <span>ম্যানুয়ালি শিক্ষার্থী ভর্তি করুন</span>
           </button>
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="relative sm:col-span-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+      {/* Search & Filter Controls */}
+      <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="নাম / ফোন / TrxID খুঁজুন..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-800 outline-none focus:border-emerald-600 focus:bg-white"
+            placeholder="নাম, ইমেইল, মোবাইল বা TrxID..."
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3.5 py-2 text-xs text-white outline-none focus:border-emerald-500"
           />
         </div>
 
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as any)}
-          className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none focus:border-emerald-600"
-        >
-          <option value="all">সকল স্ট্যাটাস</option>
-          <option value="pending">অপেক্ষমান (Pending)</option>
-          <option value="approved">অনুমোদিত (Approved)</option>
-          <option value="rejected">বাতিলকৃত (Rejected)</option>
-        </select>
-
-        <select
-          value={courseFilter}
-          onChange={(e) => setCourseFilter(e.target.value)}
-          className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none focus:border-emerald-600"
-        >
-          <option value="all">সকল কোর্স</option>
-          {courses.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.title}
-            </option>
+        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+          {(['all', 'pending', 'approved', 'rejected'] as const).map((st) => (
+            <button
+              key={st}
+              onClick={() => setStatusFilter(st)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
+                statusFilter === st
+                  ? 'bg-emerald-600 text-white shadow'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              {st === 'all' && 'সকল আবেদন'}
+              {st === 'pending' && `অপেক্ষমান (${pendingCount})`}
+              {st === 'approved' && 'অনুমোদিত'}
+              {st === 'rejected' && 'বাতিল'}
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
       {/* Enrollment Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        {filteredEnrollments.length === 0 ? (
-          <div className="p-12 text-center space-y-2">
-            <Users className="w-8 h-8 text-slate-300 mx-auto" />
-            <p className="text-sm font-bold text-slate-600">কোনো ভর্তি আবেদন পাওয়া যায়নি</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-black text-slate-500 uppercase tracking-wider">
-                  <th className="p-4">শিক্ষার্থী</th>
-                  <th className="p-4">কোর্স</th>
-                  <th className="p-4">ফি ও ট্রানজেকশন (TrxID)</th>
-                  <th className="p-4">স্ট্যাটাস</th>
-                  <th className="p-4 text-right">পদক্ষেপ</th>
+      <div className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold">
+                <th className="p-4">শিক্ষার্থীর বিবরণ</th>
+                <th className="p-4">কোর্স</th>
+                <th className="p-4">পেমেন্ট মেথড ও TrxID</th>
+                <th className="p-4">পরিমাণ</th>
+                <th className="p-4">তারিখ</th>
+                <th className="p-4">স্ট্যাটাস</th>
+                <th className="p-4 text-right">অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {filteredEnrollments.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-slate-500">
+                    কোনো ভর্তি আবেদন পাওয়া যায়নি।
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
-                {filteredEnrollments.map((enr) => (
-                  <tr key={enr.id} className="hover:bg-slate-50/80 transition">
-                    <td className="p-4 space-y-1">
-                      <p className="font-bold text-slate-900">{enr.studentName}</p>
-                      <p className="text-[11px] text-slate-500 font-mono">{enr.studentPhone}</p>
-                      <p className="text-[10px] text-slate-400 font-mono">{enr.studentEmail}</p>
-                    </td>
-
-                    <td className="p-4">
-                      <span className="font-semibold text-slate-800 block">{enr.courseTitle}</span>
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        {new Date(enr.enrolledAt).toLocaleDateString('bn-BD')}
-                      </span>
-                    </td>
-
-                    <td className="p-4 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                          {formatTaka(enr.amount || 1000)}
-                        </span>
-                        <span className="uppercase text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
-                          {enr.paymentMethod}
-                        </span>
-                      </div>
-                      <div className="font-mono text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                        <span className="text-slate-400 font-normal">TrxID:</span>
-                        <span className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">{enr.trxId}</span>
-                      </div>
-                    </td>
-
-                    <td className="p-4">
-                      <span
-                        className={`inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full ${
-                          enr.admissionStatus === 'approved'
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                            : enr.admissionStatus === 'rejected'
-                            ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                            : 'bg-amber-100 text-amber-800 border border-amber-300'
-                        }`}
-                      >
-                        {enr.admissionStatus === 'approved' && <CheckCircle2 className="w-3 h-3" />}
-                        {enr.admissionStatus === 'rejected' && <XCircle className="w-3 h-3" />}
-                        {enr.admissionStatus === 'pending' && <Clock className="w-3 h-3" />}
-                        <span>
-                          {enr.admissionStatus === 'approved'
-                            ? 'অনুমোদিত'
-                            : enr.admissionStatus === 'rejected'
-                            ? 'বাতিলকৃত'
-                            : 'অপেক্ষমান'}
-                        </span>
-                      </span>
-                    </td>
-
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+              ) : (
+                filteredEnrollments.map((enr) => {
+                  const course = courses.find((c) => c.id === enr.courseId);
+                  return (
+                    <tr key={enr.id} className="hover:bg-slate-950/40 transition">
+                      <td className="p-4">
+                        <div className="font-bold text-white">{enr.studentName}</div>
+                        <div className="text-[11px] text-slate-400 font-mono">{enr.studentEmail}</div>
+                        <div className="text-[11px] text-slate-400 font-mono">{enr.studentPhone}</div>
+                      </td>
+                      <td className="p-4">
+                        <div className="font-bold text-slate-200">{course?.title || 'কোর্স'}</div>
+                        <div className="text-[11px] text-slate-400">{course?.batchType || 'অনলাইন ব্যাচ'}</div>
+                      </td>
+                      <td className="p-4">
+                        <span className="capitalize font-bold text-slate-300">{enr.paymentMethod}</span>
+                        <div className="text-[11px] text-emerald-400 font-mono font-bold">{enr.trxId}</div>
+                      </td>
+                      <td className="p-4 font-mono font-bold text-white">
+                        {formatTaka(enr.amount || 1000)}
+                      </td>
+                      <td className="p-4 text-slate-400 text-[11px] font-mono">
+                        {enr.enrolledAt ? new Date(enr.enrolledAt).toLocaleDateString('bn-BD') : '২০২৬'}
+                      </td>
+                      <td className="p-4">
+                        {enr.admissionStatus === 'approved' && (
+                          <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-1 rounded-full text-[10px] border border-emerald-500/30">
+                            <CheckCircle2 className="w-3 h-3" />
+                            অনুমোদিত
+                          </span>
+                        )}
                         {enr.admissionStatus === 'pending' && (
-                          <>
+                          <span className="inline-flex items-center gap-1 bg-blue-500/20 text-blue-300 font-bold px-2.5 py-1 rounded-full text-[10px] border border-blue-500/30 animate-pulse">
+                            <Clock className="w-3 h-3" />
+                            পেন্ডিং
+                          </span>
+                        )}
+                        {enr.admissionStatus === 'rejected' && (
+                          <span className="inline-flex items-center gap-1 bg-rose-500/20 text-rose-300 font-bold px-2.5 py-1 rounded-full text-[10px] border border-rose-500/30">
+                            <XCircle className="w-3 h-3" />
+                            বাতিল
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {enr.admissionStatus !== 'approved' && (
                             <button
                               onClick={() => approveEnrollment(enr.id)}
-                              className="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow transition"
+                              className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition shadow"
                               title="ভর্তি অনুমোদন করুন"
                             >
                               <Check className="w-3.5 h-3.5" />
                               <span>অনুমোদন</span>
                             </button>
-
+                          )}
+                          {enr.admissionStatus !== 'rejected' && (
                             <button
                               onClick={() => rejectEnrollment(enr.id)}
-                              className="inline-flex items-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-xs px-3 py-1.5 rounded-xl border border-rose-300 transition"
-                              title="ভর্তি বাতিল করুন"
+                              className="inline-flex items-center gap-1 bg-rose-950 hover:bg-rose-900 text-rose-300 font-bold px-3 py-1.5 rounded-lg text-xs transition border border-rose-800/40"
+                              title="আবেদন বাতিল করুন"
                             >
                               <X className="w-3.5 h-3.5" />
                               <span>বাতিল</span>
                             </button>
-                          </>
-                        )}
-
-                        {enr.admissionStatus === 'approved' && (
-                          <button
-                            onClick={() => rejectEnrollment(enr.id)}
-                            className="text-[11px] text-rose-600 hover:underline font-semibold"
-                          >
-                            বাতিল করুন
-                          </button>
-                        )}
-
-                        {enr.admissionStatus === 'rejected' && (
-                          <button
-                            onClick={() => approveEnrollment(enr.id)}
-                            className="text-[11px] text-emerald-700 hover:underline font-semibold"
-                          >
-                            পুনরায় অনুমোদন
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Manual Enrollment Modal */}
       {isManualModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200 space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <UserCheck className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-base font-black text-slate-900">ম্যানুয়ালি শিক্ষার্থী ভর্তি করুন</h3>
-              </div>
-              <button onClick={() => setIsManualModalOpen(false)} className="text-slate-400 hover:text-slate-700 p-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-black text-white flex items-center gap-2">
+                <UserCheck className="w-5 h-5 text-emerald-400" />
+                <span>ম্যানুয়ালি শিক্ষার্থী ভর্তি করান</span>
+              </h3>
+              <button
+                onClick={() => setIsManualModalOpen(false)}
+                className="p-1 text-slate-400 hover:text-white rounded-lg"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleManualEnrollSubmit} className="space-y-4">
+            <form onSubmit={handleManualEnrollSubmit} className="space-y-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">শিক্ষার্থীর নাম *</label>
+                <label className="text-xs font-bold text-slate-300 block mb-1">শিক্ষার্থীর পূর্ণ নাম *</label>
                 <input
                   type="text"
                   required
                   value={manualName}
                   onChange={(e) => setManualName(e.target.value)}
-                  placeholder="ডাঃ মোঃ আশরাফুল ইসলাম"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600"
+                  placeholder="যেমন: ডাঃ আশরাফুল ইসলাম"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-emerald-500"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">মোবাইল নম্বর *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={manualPhone}
-                    onChange={(e) => setManualPhone(e.target.value)}
-                    placeholder="01XXXXXXXXX"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600 font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">ইমেইল (ঐচ্ছিক)</label>
-                  <input
-                    type="email"
-                    value={manualEmail}
-                    onChange={(e) => setManualEmail(e.target.value)}
-                    placeholder="student@example.com"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600 font-mono"
-                  />
-                </div>
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1">মোবাইল নম্বর *</label>
+                <input
+                  type="tel"
+                  required
+                  value={manualPhone}
+                  onChange={(e) => setManualPhone(e.target.value)}
+                  placeholder="01XXXXXXXXX"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white font-mono outline-none focus:border-emerald-500"
+                />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">কোর্স নির্বাচন করুন *</label>
+                <label className="text-xs font-bold text-slate-300 block mb-1">ইমেইল ঠিকানা (ঐচ্ছিক)</label>
+                <input
+                  type="email"
+                  value={manualEmail}
+                  onChange={(e) => setManualEmail(e.target.value)}
+                  placeholder="student@gmail.com"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white font-mono outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1">কোর্স নির্বাচন করুন *</label>
                 <select
                   value={manualCourseId}
                   onChange={(e) => setManualCourseId(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none"
                 >
                   {courses.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.title} ({formatTaka(c.admissionFee)})
+                      {c.title}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">পেমেন্ট মেথড</label>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">পেমেন্ট মেথড</label>
                   <select
                     value={manualPaymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value as any)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none"
                   >
-                    <option value="cash">ক্যাশ / হাতে হাতে</option>
-                    <option value="bkash">বিকাশ</option>
-                    <option value="nagad">নগদ</option>
+                    <option value="cash">সরাসরি ক্যাশ (Cash)</option>
+                    <option value="bkash">বিকাশ (bKash)</option>
+                    <option value="nagad">নগদ (Nagad)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">ভর্তি ফি (টাকা)</label>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">ফি পরিমাণ (৳)</label>
                   <input
                     type="number"
                     value={manualAmount}
                     onChange={(e) => setManualAmount(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600 font-mono font-bold"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">TrxID / ভাউচার</label>
-                  <input
-                    type="text"
-                    value={manualTrxId}
-                    onChange={(e) => setManualTrxId(e.target.value)}
-                    placeholder="যেমন: CASH-101"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600 font-mono uppercase"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white font-mono outline-none"
                   />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs py-3.5 rounded-xl shadow-lg transition"
-              >
-                {isSubmitting ? 'ডাটাবেজে সেভ হচ্ছে...' : 'ভর্তি নিশ্চিত করুন ও ডাটাবেজে সংরক্ষণ করুন'}
-              </button>
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3.5 rounded-xl shadow-lg transition"
+                >
+                  {isSubmitting ? 'ভর্তি সম্পন্ন হচ্ছে...' : 'সরাসরি ভর্তি কনফার্ম করুন'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

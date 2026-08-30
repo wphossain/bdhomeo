@@ -27,11 +27,26 @@ export function MonthlyFeeApprovals() {
   const [manualName, setManualName] = useState('');
   const [manualPhone, setManualPhone] = useState('');
   const [manualCourseId, setManualCourseId] = useState(courses[0]?.id || 'course-basic-foundation');
-  const [manualMonth, setManualMonth] = useState('সেপ্টেম্বর ২০২৬');
+  const [manualMonth, setManualMonth] = useState('জানুয়ারি ২০২৬');
   const [manualAmount, setManualAmount] = useState('500');
   const [manualMethod, setManualMethod] = useState<'bkash' | 'nagad' | 'cash'>('cash');
   const [manualTrxId, setManualTrxId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const monthsList = [
+    'জানুয়ারি ২০২৬',
+    'ফেব্রুয়ারি ২০২৬',
+    'মার্চ ২০২৬',
+    'এপ্রিল ২০২৬',
+    'মে ২০২৬',
+    'জুন ২০২৬',
+    'জুলাই ২০২৬',
+    'আগস্ট ২০২৬',
+    'সেপ্টেম্বর ২০২৬',
+    'অক্টোবর ২০২৬',
+    'নভেম্বর ২০২৬',
+    'ডিসেম্বর ২০২৬'
+  ];
 
   const filteredPayments = monthlyPayments.filter((pay) => {
     const matchesSearch =
@@ -50,7 +65,7 @@ export function MonthlyFeeApprovals() {
   const handleManualFeeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!manualName || !manualPhone) {
-      showToast('শিক্ষার্থীর নাম ও ফোন নম্বর পূরণ করুন', 'error');
+      showToast('শিক্ষার্থীর নাম ও ফোন নম্বর প্রদান করুন', 'error');
       return;
     }
 
@@ -58,12 +73,12 @@ export function MonthlyFeeApprovals() {
     const ok = await addManualMonthlyPayment({
       studentName: manualName,
       studentPhone: manualPhone,
+      senderPhone: manualPhone,
       courseId: manualCourseId,
       monthName: manualMonth,
       amount: parseInt(manualAmount, 10) || 500,
       paymentMethod: manualMethod,
-      senderPhone: manualPhone,
-      trxId: manualTrxId,
+      trxId: manualTrxId || `CASH-${Date.now().toString().slice(-6)}`,
       status: 'approved',
     });
     setIsSubmitting(false);
@@ -77,234 +92,223 @@ export function MonthlyFeeApprovals() {
   };
 
   return (
-    <div className="space-y-6 font-bangla">
+    <div className="space-y-6 font-bangla text-slate-100">
       
-      {/* Top Banner Stats */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+      {/* Top Banner Stats & Manual Add Button */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <CreditCard className="w-6 h-6 text-emerald-600" />
-            <h2 className="text-xl font-black text-slate-900">
-              মাসিক ফি কনফার্মেশন (Student Fee Confirmation)
+            <CreditCard className="w-6 h-6 text-amber-400" />
+            <h2 className="text-xl font-black text-white">
+              ছাত্র মাসিক ফি অনুমোদন ও রেকর্ড (Monthly Fee Confirmation)
             </h2>
           </div>
-          <p className="text-xs text-slate-500">
-            শিক্ষার্থীদের ৫০০/- টাকার মাসিক ফি অনুমোদন, TrxID যাচাই ও ম্যানুয়াল ফি এন্ট্রি
+          <p className="text-xs text-slate-400">
+            শিক্ষার্থীদের পাঠানো মাসিক ফি যাচাই, অনুমোদন এবং নতুন ফি ম্যানুয়ালি এন্ট্রি করুন।
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-xs font-bold">
-            <span className="bg-amber-100 text-amber-800 px-3 py-1.5 rounded-xl border border-amber-200">
-              অপেক্ষমান ফি: {pendingCount}
-            </span>
-            <span className="bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-200">
-              অনুমোদিত: {approvedCount}
-            </span>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-xs">
+            <span className="text-slate-400">পেন্ডিং:</span>
+            <span className="font-bold text-amber-400 font-mono">{pendingCount} টি</span>
+          </div>
+
+          <div className="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-xs">
+            <span className="text-slate-400">অনুমোদিত:</span>
+            <span className="font-bold text-emerald-400 font-mono">{approvedCount} টি</span>
           </div>
 
           <button
             onClick={() => setIsManualModalOpen(true)}
-            className="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition"
+            className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition"
           >
             <Plus className="w-4 h-4" />
-            <span>ম্যানুয়ালি ফি রেকর্ড করুন</span>
+            <span>ম্যানুয়ালি ফি যোগ করুন</span>
           </button>
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+      {/* Search & Filter Controls */}
+      <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="নাম / ফোন / TrxID / মাস খুঁজুন..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-800 outline-none focus:border-emerald-600 focus:bg-white"
+            placeholder="নাম, ফোন নম্বর, TrxID বা মাস দিয়ে খুঁজুন..."
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3.5 py-2 text-xs text-white outline-none focus:border-emerald-500"
           />
         </div>
 
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as any)}
-          className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none focus:border-emerald-600"
-        >
-          <option value="all">সকল স্ট্যাটাস</option>
-          <option value="pending">অপেক্ষমান (Pending)</option>
-          <option value="approved">অনুমোদিত (Approved)</option>
-          <option value="rejected">বাতিলকৃত (Rejected)</option>
-        </select>
+        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+          {(['all', 'pending', 'approved', 'rejected'] as const).map((st) => (
+            <button
+              key={st}
+              onClick={() => setStatusFilter(st)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
+                statusFilter === st
+                  ? 'bg-emerald-600 text-white shadow'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              {st === 'all' && 'সকল পেমেন্ট'}
+              {st === 'pending' && `অপেক্ষমান (${pendingCount})`}
+              {st === 'approved' && 'অনুমোদিত'}
+              {st === 'rejected' && 'বাতিল'}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Fee Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        {filteredPayments.length === 0 ? (
-          <div className="p-12 text-center space-y-2">
-            <CreditCard className="w-8 h-8 text-slate-300 mx-auto" />
-            <p className="text-sm font-bold text-slate-600">কোনো মাসিক ফি রেকর্ড পাওয়া যায়নি</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-black text-slate-500 uppercase tracking-wider">
-                  <th className="p-4">শিক্ষার্থী</th>
-                  <th className="p-4">কোর্স ও মাস</th>
-                  <th className="p-4">পরিমাণ ও TrxID</th>
-                  <th className="p-4">স্ট্যাটাস</th>
-                  <th className="p-4 text-right">পদক্ষেপ</th>
+      {/* Payment Records Table */}
+      <div className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold">
+                <th className="p-4">শিক্ষার্থীর নাম ও ফোন</th>
+                <th className="p-4">কোর্স ও মাস</th>
+                <th className="p-4">পেমেন্ট মেথড ও TrxID</th>
+                <th className="p-4">পরিমাণ</th>
+                <th className="p-4">তারিখ</th>
+                <th className="p-4">স্ট্যাটাস</th>
+                <th className="p-4 text-right">অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {filteredPayments.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-slate-500">
+                    কোনো মাসিক ফি রেকর্ড পাওয়া যায়নি।
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
-                {filteredPayments.map((pay) => (
-                  <tr key={pay.id} className="hover:bg-slate-50/80 transition">
-                    <td className="p-4 space-y-0.5">
-                      <p className="font-bold text-slate-900">{pay.studentName}</p>
-                      <p className="text-[11px] text-slate-500 font-mono">{pay.studentPhone}</p>
-                    </td>
-
-                    <td className="p-4 space-y-0.5">
-                      <span className="font-semibold text-slate-800 block">{pay.courseTitle}</span>
-                      <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded inline-block border border-emerald-200">
-                        {pay.monthName}
-                      </span>
-                    </td>
-
-                    <td className="p-4 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-slate-900">{formatTaka(pay.amount)}</span>
-                        <span className="uppercase text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
-                          {pay.paymentMethod}
-                        </span>
-                      </div>
-                      <div className="font-mono text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                        <span className="text-slate-400 font-normal">TrxID:</span>
-                        <span className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">{pay.trxId}</span>
-                      </div>
-                    </td>
-
-                    <td className="p-4">
-                      <span
-                        className={`inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full ${
-                          pay.status === 'approved'
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                            : pay.status === 'rejected'
-                            ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                            : 'bg-amber-100 text-amber-800 border border-amber-300'
-                        }`}
-                      >
-                        {pay.status === 'approved' && <CheckCircle2 className="w-3 h-3" />}
-                        {pay.status === 'rejected' && <XCircle className="w-3 h-3" />}
-                        {pay.status === 'pending' && <Clock className="w-3 h-3" />}
-                        <span>
-                          {pay.status === 'approved'
-                            ? 'অনুমোদিত'
-                            : pay.status === 'rejected'
-                            ? 'বাতিলকৃত'
-                            : 'অপেক্ষমান'}
-                        </span>
-                      </span>
-                    </td>
-
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+              ) : (
+                filteredPayments.map((pay) => {
+                  const course = courses.find((c) => c.id === pay.courseId);
+                  return (
+                    <tr key={pay.id} className="hover:bg-slate-950/40 transition">
+                      <td className="p-4">
+                        <div className="font-bold text-white">{pay.studentName}</div>
+                        <div className="text-[11px] text-slate-400 font-mono">{pay.studentPhone}</div>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-slate-300 font-medium">{course?.title || 'কোর্স'}</div>
+                        <div className="text-[11px] text-amber-400 font-bold">{pay.monthName}</div>
+                      </td>
+                      <td className="p-4">
+                        <span className="capitalize font-bold text-slate-300">{pay.paymentMethod}</span>
+                        <div className="text-[11px] text-emerald-400 font-mono font-bold">{pay.trxId}</div>
+                      </td>
+                      <td className="p-4 font-mono font-bold text-white">
+                        {formatTaka(pay.amount || 500)}
+                      </td>
+                      <td className="p-4 text-slate-400 text-[11px] font-mono">
+                        {pay.createdAt ? new Date(pay.createdAt).toLocaleDateString('bn-BD') : '২০২৬'}
+                      </td>
+                      <td className="p-4">
+                        {pay.status === 'approved' && (
+                          <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-1 rounded-full text-[10px] border border-emerald-500/30">
+                            <CheckCircle2 className="w-3 h-3" />
+                            অনুমোদিত
+                          </span>
+                        )}
                         {pay.status === 'pending' && (
-                          <>
+                          <span className="inline-flex items-center gap-1 bg-amber-500/20 text-amber-300 font-bold px-2.5 py-1 rounded-full text-[10px] border border-amber-500/30 animate-pulse">
+                            <Clock className="w-3 h-3" />
+                            পেন্ডিং
+                          </span>
+                        )}
+                        {pay.status === 'rejected' && (
+                          <span className="inline-flex items-center gap-1 bg-rose-500/20 text-rose-300 font-bold px-2.5 py-1 rounded-full text-[10px] border border-rose-500/30">
+                            <XCircle className="w-3 h-3" />
+                            বাতিল
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {pay.status !== 'approved' && (
                             <button
                               onClick={() => approveMonthlyPayment(pay.id)}
-                              className="inline-flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow transition"
-                              title="ফি অনুমোদন করুন"
+                              className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition shadow"
+                              title="অনুমোদন করুন"
                             >
                               <Check className="w-3.5 h-3.5" />
                               <span>অনুমোদন</span>
                             </button>
-
+                          )}
+                          {pay.status !== 'rejected' && (
                             <button
                               onClick={() => rejectMonthlyPayment(pay.id)}
-                              className="inline-flex items-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-xs px-3 py-1.5 rounded-xl border border-rose-300 transition"
-                              title="ফি বাতিল করুন"
+                              className="inline-flex items-center gap-1 bg-rose-950 hover:bg-rose-900 text-rose-300 font-bold px-3 py-1.5 rounded-lg text-xs transition border border-rose-800/40"
+                              title="বাতিল করুন"
                             >
                               <X className="w-3.5 h-3.5" />
                               <span>বাতিল</span>
                             </button>
-                          </>
-                        )}
-
-                        {pay.status === 'approved' && (
-                          <button
-                            onClick={() => rejectMonthlyPayment(pay.id)}
-                            className="text-[11px] text-rose-600 hover:underline font-semibold"
-                          >
-                            বাতিল করুন
-                          </button>
-                        )}
-
-                        {pay.status === 'rejected' && (
-                          <button
-                            onClick={() => approveMonthlyPayment(pay.id)}
-                            className="text-[11px] text-emerald-700 hover:underline font-semibold"
-                          >
-                            পুনরায় অনুমোদন
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Manual Monthly Fee Modal */}
       {isManualModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200 space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-base font-black text-slate-900">ম্যানুয়ালি মাসিক ফি রেকর্ড করুন</h3>
-              </div>
-              <button onClick={() => setIsManualModalOpen(false)} className="text-slate-400 hover:text-slate-700 p-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-black text-white flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-amber-400" />
+                <span>ম্যানুয়ালি মাসিক ফি যোগ করুন</span>
+              </h3>
+              <button
+                onClick={() => setIsManualModalOpen(false)}
+                className="p-1 text-slate-400 hover:text-white rounded-lg"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleManualFeeSubmit} className="space-y-4">
+            <form onSubmit={handleManualFeeSubmit} className="space-y-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">শিক্ষার্থীর নাম *</label>
+                <label className="text-xs font-bold text-slate-300 block mb-1">শিক্ষার্থীর পূর্ণ নাম *</label>
                 <input
                   type="text"
                   required
                   value={manualName}
                   onChange={(e) => setManualName(e.target.value)}
-                  placeholder="ডাঃ মোঃ আশরাফুল ইসলাম"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600"
+                  placeholder="যেমন: ডাঃ মোঃ আশরাফুল ইসলাম"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">মোবাইল নম্বর *</label>
+                <label className="text-xs font-bold text-slate-300 block mb-1">মোবাইল নম্বর *</label>
                 <input
                   type="tel"
                   required
                   value={manualPhone}
                   onChange={(e) => setManualPhone(e.target.value)}
                   placeholder="01XXXXXXXXX"
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600 font-mono"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono outline-none focus:border-emerald-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">কোর্স</label>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">কোর্স</label>
                   <select
                     value={manualCourseId}
                     onChange={(e) => setManualCourseId(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none"
                   >
                     {courses.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -315,61 +319,66 @@ export function MonthlyFeeApprovals() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">কোন মাসের ফি?</label>
-                  <input
-                    type="text"
-                    required
+                  <label className="text-xs font-bold text-slate-300 block mb-1">কোন মাসের ফি</label>
+                  <select
                     value={manualMonth}
                     onChange={(e) => setManualMonth(e.target.value)}
-                    placeholder="সেপ্টেম্বর ২০২৬"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600 font-bold"
-                  />
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                  >
+                    {monthsList.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">পেমেন্ট মেথড</label>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">পেমেন্ট মেথড</label>
                   <select
                     value={manualMethod}
                     onChange={(e) => setManualMethod(e.target.value as any)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none"
                   >
-                    <option value="cash">ক্যাশ / ক্যাশ রিসিট</option>
-                    <option value="bkash">বিকাশ</option>
-                    <option value="nagad">নগদ</option>
+                    <option value="bkash">বিকাশ (bKash)</option>
+                    <option value="nagad">নগদ (Nagad)</option>
+                    <option value="cash">সরাসরি ক্যাশ (Cash)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">পরিমাণ (টাকা)</label>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">পরিমাণ (৳)</label>
                   <input
                     type="number"
                     value={manualAmount}
                     onChange={(e) => setManualAmount(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600 font-mono font-bold"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">TrxID / ভাউচার</label>
-                  <input
-                    type="text"
-                    value={manualTrxId}
-                    onChange={(e) => setManualTrxId(e.target.value)}
-                    placeholder="CASH-FEE-01"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none focus:border-emerald-600 font-mono uppercase"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white font-mono outline-none"
                   />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs py-3.5 rounded-xl shadow-lg transition"
-              >
-                {isSubmitting ? 'ডাটাবেজে সেভ হচ্ছে...' : 'মাসিক ফি নিশ্চিত ও ডাটাবেজে সংরক্ষণ করুন'}
-              </button>
+              <div>
+                <label className="text-xs font-bold text-slate-300 block mb-1">Transaction ID (ঐচ্ছিক)</label>
+                <input
+                  type="text"
+                  value={manualTrxId}
+                  onChange={(e) => setManualTrxId(e.target.value)}
+                  placeholder="যেমন: BKL983949 বা খালি রাখুন"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white font-mono outline-none"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3.5 rounded-xl shadow-lg transition"
+                >
+                  {isSubmitting ? 'সংরক্ষণ হচ্ছে...' : 'মাসিক ফি এন্ট্রি করুন'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

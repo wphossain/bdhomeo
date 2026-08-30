@@ -28,7 +28,7 @@ interface AppContextType {
   refreshData: () => Promise<void>;
   certificateRequests: CertificateRequest[];
   submitCertificateRequest: (data: { phone: string; courierAddress: string; district?: string; courseId: string; courseTitle: string }) => Promise<boolean>;
-  updateCertificateStatus: (id: string, status: 'pending' | 'dispatched' | 'delivered') => Promise<void>;
+  updateCertificateStatus: (id: string, status: 'pending' | 'dispatched' | 'delivered', trackingNumber?: string) => Promise<void>;
   submitEnrollment: (data: { courseId: string; trxId: string; senderPhone: string; studentPhone?: string; paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' }) => Promise<boolean>;
   addManualEnrollment: (data: { studentName: string; studentEmail: string; studentPhone: string; courseId: string; batchType?: 'basic' | 'advance' | 'special'; paymentMethod: 'bkash' | 'nagad' | 'cash' | 'rocket'; senderPhone: string; trxId: string; admissionStatus?: 'approved' | 'pending'; amount?: number }) => Promise<boolean>;
   approveEnrollment: (enrollmentId: string) => Promise<void>;
@@ -805,13 +805,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return true;
   };
 
-  const updateCertificateStatus = async (id: string, status: 'pending' | 'dispatched' | 'delivered') => {
+  const updateCertificateStatus = async (id: string, status: 'pending' | 'dispatched' | 'delivered', trackingNumber?: string) => {
     setCertificateRequests((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status } : c))
+      prev.map((c) => (c.id === id ? { ...c, status, trackingNumber: trackingNumber || c.trackingNumber } : c))
     );
 
     try {
-      await supabase.from('certificate_requests').update({ status }).eq('id', id);
+      const updateData: any = { status };
+      if (trackingNumber) updateData.tracking_number = trackingNumber;
+      await supabase.from('certificate_requests').update(updateData).eq('id', id);
     } catch (err) {
       console.warn('Update cert status error:', err);
     }

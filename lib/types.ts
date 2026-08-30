@@ -136,6 +136,7 @@ export interface MonthlyPayment {
   studentId: string;
   studentName: string;
   studentPhone: string;
+  studentEmail?: string;
   courseId: string;
   courseTitle: string;
   monthName: string;
@@ -179,5 +180,6 @@ export interface CertificateRequest {
   courseId: string;
   courseTitle: string;
   status: 'pending' | 'dispatched' | 'delivered';
+  trackingNumber?: string;
   createdAt: string;
 }
