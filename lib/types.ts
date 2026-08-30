@@ -160,3 +160,9 @@ export interface FAQItem {
   question: string;
   answer: string;
 }
+
+export interface ToastNotification {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}

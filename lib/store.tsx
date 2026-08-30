@@ -1,7 +1,15 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Course, SiteSettings, UserProfile, Enrollment, MonthlyPayment, OrientationLead, UserRole } from './types';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { 
+  UserProfile, 
+  Course, 
+  SiteSettings, 
+  Enrollment, 
+  MonthlyPayment, 
+  OrientationLead,
+  ToastNotification 
+} from './types';
 import { initialCourses, initialSiteSettings } from './data';
 import { supabase, isAdminEmail } from './supabase';
 
@@ -13,11 +21,12 @@ interface AppContextType {
   monthlyPayments: MonthlyPayment[];
   leads: OrientationLead[];
   isAuthLoading: boolean;
+  isDataSyncing: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  demoLogin: (role: 'student' | 'admin') => void;
-  submitEnrollment: (data: { courseId: string; trxId: string; senderPhone: string; paymentMethod: 'bkash' | 'nagad' }) => Promise<boolean>;
-  submitMonthlyPayment: (data: { courseId: string; monthName: string; trxId: string; senderPhone: string; paymentMethod: 'bkash' | 'nagad' }) => Promise<boolean>;
+  refreshData: () => Promise<void>;
+  submitEnrollment: (data: { courseId: string; trxId: string; senderPhone: string; studentPhone?: string; paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' }) => Promise<boolean>;
+  submitMonthlyPayment: (data: { courseId: string; monthName: string; trxId: string; senderPhone: string; paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' }) => Promise<boolean>;
   submitOrientationLead: (data: { name: string; phone: string; email?: string; homeoBackground: string }) => Promise<boolean>;
   updateSettings: (newSettings: Partial<SiteSettings>) => Promise<boolean>;
   updateCourses: (updatedCourses: Course[]) => Promise<boolean>;
@@ -25,7 +34,7 @@ interface AppContextType {
   approveEnrollment: (enrollmentId: string) => Promise<void>;
   approveMonthlyPayment: (paymentId: string) => Promise<void>;
   updateLeadStatus: (leadId: string, status: 'contacted' | 'joined') => Promise<void>;
-  toast: { message: string; type: 'success' | 'error' | 'info' } | null;
+  toast: ToastNotification | null;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
@@ -33,202 +42,299 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+  const [isDataSyncing, setIsDataSyncing] = useState<boolean>(false);
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [settings, setSettings] = useState<SiteSettings>(initialSiteSettings);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [monthlyPayments, setMonthlyPayments] = useState<MonthlyPayment[]>([]);
   const [leads, setLeads] = useState<OrientationLead[]>([]);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [toast, setToast] = useState<ToastNotification | null>(null);
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
-  };
+  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const newToast: ToastNotification = { id: Date.now().toString(), message, type };
+    setToast(newToast);
+    setTimeout(() => {
+      setToast((current) => (current?.id === newToast.id ? null : current));
+    }, 4500);
+  }, []);
 
-  const purgeLocalAuth = () => {
-    setUser(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('bdhomeo_user');
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
-          localStorage.removeItem(key);
+  // =========================================================================
+  // 1. SUPABASE FETCH & TWO-WAY SYNC
+  // =========================================================================
+  const refreshData = useCallback(async () => {
+    setIsDataSyncing(true);
+    try {
+      // 1. Fetch Site Settings
+      const { data: settingsData, error: settingsError } = await supabase
+        .from('site_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+      if (!settingsError && settingsData) {
+        setSettings((prev) => ({
+          ...prev,
+          siteTitle: settingsData.site_title || prev.siteTitle,
+          slogan: settingsData.slogan || prev.slogan,
+          heroHeadline: settingsData.hero_headline || prev.heroHeadline,
+          heroSubheadline: settingsData.hero_subheadline || prev.heroSubheadline,
+          doctorName: settingsData.doctor_name || prev.doctorName,
+          doctorTitle: settingsData.doctor_title || prev.doctorTitle,
+          doctorDegrees: settingsData.doctor_degrees || prev.doctorDegrees,
+          doctorExperience: settingsData.doctor_experience || prev.doctorExperience,
+          doctorChamberTime: settingsData.doctor_chamber_time || prev.doctorChamberTime,
+          doctorMessage: settingsData.doctor_message || prev.doctorMessage,
+          heroImageUrl: settingsData.hero_image_url || prev.heroImageUrl,
+          doctorPortraitUrl: settingsData.doctor_portrait_url || prev.doctorPortraitUrl,
+          ptfCertificateImageUrl: settingsData.ptf_certificate_image_url || prev.ptfCertificateImageUrl,
+          metaOgImageUrl: settingsData.meta_og_image_url || prev.metaOgImageUrl,
+          galleryImages: settingsData.gallery_images && settingsData.gallery_images.length > 0 ? settingsData.gallery_images : prev.galleryImages,
+          videoShowcaseList: settingsData.video_showcase_list && settingsData.video_showcase_list.length > 0 ? settingsData.video_showcase_list : prev.videoShowcaseList,
+          testimonials: settingsData.testimonials && settingsData.testimonials.length > 0 ? settingsData.testimonials : prev.testimonials,
+          bkashNumber: settingsData.bkash_number || prev.bkashNumber,
+          bkashType: (settingsData.bkash_type as any) || prev.bkashType,
+          nagadNumber: settingsData.nagad_number || prev.nagadNumber,
+          nagadType: (settingsData.nagad_type as any) || prev.nagadType,
+          rocketNumber: settingsData.rocket_number || prev.rocketNumber,
+          whatsappNumber: settingsData.whatsapp_number || prev.whatsappNumber,
+          helplineNumber: settingsData.helpline_number || prev.helplineNumber,
+          alternateHelpline: settingsData.alternate_helpline || prev.alternateHelpline,
+          officialEmail: settingsData.official_email || prev.officialEmail,
+          chamberAddress: settingsData.chamber_address || prev.chamberAddress,
+          classTime: settingsData.class_time || prev.classTime,
+          morningSupportTime: settingsData.morning_support_time || prev.morningSupportTime,
+          googleMeetUrl: settingsData.google_meet_url || prev.googleMeetUrl,
+          noticeText: settingsData.notice_text || prev.noticeText,
+          youtubeUrl: settingsData.youtube_url || prev.youtubeUrl,
+          facebookUrl: settingsData.facebook_url || prev.facebookUrl,
+          facebookGroupUrl: settingsData.facebook_group_url || prev.facebookGroupUrl,
+          telegramUrl: settingsData.telegram_url || prev.telegramUrl,
+        }));
+      }
+
+      // 2. Fetch Courses
+      const { data: coursesData, error: coursesError } = await supabase
+        .from('courses')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (!coursesError && coursesData && coursesData.length > 0) {
+        const mappedCourses: Course[] = coursesData.map((c: any) => ({
+          id: c.id,
+          slug: c.slug,
+          title: c.title,
+          subtitle: c.subtitle,
+          batchType: c.batch_type,
+          durationMonths: c.duration_months,
+          admissionFee: c.admission_fee,
+          monthlyFee: c.monthly_fee,
+          liveSchedule: c.live_schedule,
+          morningSupport: c.morning_support,
+          thumbnailUrl: c.thumbnail_url,
+          description: c.description,
+          features: c.features || [],
+          curriculum: c.curriculum || [],
+        }));
+        setCourses(mappedCourses);
+      }
+
+      // 3. Fetch Enrollments
+      const { data: enrData, error: enrError } = await supabase
+        .from('enrollments')
+        .select('*')
+        .order('enrolled_at', { ascending: false });
+
+      if (!enrError && enrData) {
+        const mappedEnr: Enrollment[] = enrData.map((e: any) => ({
+          id: e.id,
+          studentId: e.student_id,
+          studentName: e.student_name,
+          studentEmail: e.student_email,
+          studentPhone: e.student_phone,
+          courseId: e.course_id,
+          courseTitle: e.course_title,
+          batchType: e.batch_type,
+          admissionStatus: e.admission_status,
+          trxId: e.trx_id,
+          senderPhone: e.sender_phone,
+          paymentMethod: e.payment_method,
+          enrolledAt: e.enrolled_at,
+        }));
+        setEnrollments(mappedEnr);
+      }
+
+      // 4. Fetch Monthly Payments
+      const { data: payData, error: payError } = await supabase
+        .from('monthly_payments')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!payError && payData) {
+        const mappedPay: MonthlyPayment[] = payData.map((p: any) => ({
+          id: p.id,
+          studentId: p.student_id,
+          studentName: p.student_name,
+          studentPhone: p.student_phone,
+          courseId: p.course_id,
+          courseTitle: p.course_title,
+          monthName: p.month_name,
+          amount: p.amount,
+          trxId: p.trx_id,
+          senderPhone: p.sender_phone,
+          paymentMethod: p.payment_method,
+          status: p.status,
+          createdAt: p.created_at,
+        }));
+        setMonthlyPayments(mappedPay);
+      }
+
+      // 5. Fetch Orientation Leads
+      const { data: leadData, error: leadError } = await supabase
+        .from('orientation_leads')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!leadError && leadData) {
+        const mappedLeads: OrientationLead[] = leadData.map((l: any) => ({
+          id: l.id,
+          name: l.name,
+          phone: l.phone,
+          email: l.email,
+          homeoBackground: l.homeo_background,
+          status: l.status,
+          createdAt: l.created_at,
+        }));
+        setLeads(mappedLeads);
+      }
+
+    } catch (err) {
+      console.warn('Supabase live fetch note:', err);
+    } finally {
+      setIsDataSyncing(false);
+    }
+  }, []);
+
+  // =========================================================================
+  // 2. AUTHENTICATION (Google OAuth + Whitelist)
+  // =========================================================================
+  useEffect(() => {
+    // Initial Auth Check
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const authUser = session.user;
+          const assignedRole = isAdminEmail(authUser.email) ? 'admin' : 'student';
+
+          setUser({
+            id: authUser.id,
+            email: authUser.email || '',
+            fullName: authUser.user_metadata?.full_name || authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'শিক্ষার্থী',
+            avatarUrl: authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture || undefined,
+            role: assignedRole,
+            createdAt: authUser.created_at,
+          });
+        } else {
+          setUser(null);
         }
-      });
-    }
-  };
-
-  const syncUserProfile = (sessionUser: any) => {
-    if (!sessionUser || !sessionUser.id) {
-      purgeLocalAuth();
-      return;
-    }
-
-    const email = (sessionUser.email || '').toLowerCase().trim();
-    const fullName = sessionUser.user_metadata?.full_name || email.split('@')[0];
-    const avatarUrl = sessionUser.user_metadata?.avatar_url;
-
-    // Strict role resolution: only specified admin email gets admin, everyone else is student
-    const role: UserRole = isAdminEmail(email) ? 'admin' : 'student';
-
-    const userProfile: UserProfile = {
-      id: sessionUser.id,
-      email,
-      fullName,
-      avatarUrl,
-      role,
-      createdAt: sessionUser.created_at || new Date().toISOString(),
+      } catch (e) {
+        console.warn('Auth check exception:', e);
+      } finally {
+        setIsAuthLoading(false);
+      }
     };
 
-    setUser(userProfile);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_user', JSON.stringify(userProfile));
-    }
-  };
+    checkAuth();
 
-  useEffect(() => {
-    try {
-      const savedCourses = localStorage.getItem('bdhomeo_courses');
-      if (savedCourses) {
-        setCourses(JSON.parse(savedCourses));
+    // Supabase Auth State Change Listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const authUser = session.user;
+        const assignedRole = isAdminEmail(authUser.email) ? 'admin' : 'student';
+
+        setUser({
+          id: authUser.id,
+          email: authUser.email || '',
+          fullName: authUser.user_metadata?.full_name || authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'শিক্ষার্থী',
+          avatarUrl: authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture || undefined,
+          role: assignedRole,
+          createdAt: authUser.created_at,
+        });
       } else {
-        setCourses(initialCourses);
+        setUser(null);
       }
-
-      const savedSettings = localStorage.getItem('bdhomeo_settings');
-      if (savedSettings) {
-        const parsed = JSON.parse(savedSettings);
-        if (
-          !parsed.bkashNumber ||
-          parsed.bkashNumber !== '01815-883101' ||
-          parsed.bkashType !== 'Merchant' ||
-          parsed.whatsappNumber !== '01811-123993'
-        ) {
-          const merged = {
-            ...initialSiteSettings,
-            ...parsed,
-            bkashNumber: '01815-883101',
-            bkashType: 'Merchant' as const,
-            whatsappNumber: '01811-123993',
-            helplineNumber: '01811-123993',
-            nagadNumber: '01811-123993',
-          };
-          setSettings(merged);
-          localStorage.setItem('bdhomeo_settings', JSON.stringify(merged));
-        } else {
-          setSettings({ ...initialSiteSettings, ...parsed });
-        }
-      } else {
-        setSettings(initialSiteSettings);
-      }
-
-      const savedEnrollments = localStorage.getItem('bdhomeo_enrollments');
-      if (savedEnrollments) setEnrollments(JSON.parse(savedEnrollments));
-
-      const savedPayments = localStorage.getItem('bdhomeo_payments');
-      if (savedPayments) setMonthlyPayments(JSON.parse(savedPayments));
-
-      const savedLeads = localStorage.getItem('bdhomeo_leads');
-      if (savedLeads) setLeads(JSON.parse(savedLeads));
-    } catch (e) {
-      console.warn('LocalStorage initialization warning:', e);
-    }
-
-    // Live auth check from Supabase
-    supabase.auth.getUser().then(({ data: { user: verifiedUser }, error }) => {
-      if (error || !verifiedUser) {
-        purgeLocalAuth();
-      } else {
-        syncUserProfile(verifiedUser);
-      }
-      setIsAuthLoading(false);
-    }).catch(() => {
-      purgeLocalAuth();
       setIsAuthLoading(false);
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session?.user) {
-        purgeLocalAuth();
-        setIsAuthLoading(false);
-        return;
-      }
-      syncUserProfile(session.user);
-      setIsAuthLoading(false);
-    });
+    // Trigger Initial Supabase Sync
+    refreshData();
 
     return () => {
-      authListener.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
-  }, []);
+  }, [refreshData]);
 
   const signInWithGoogle = async () => {
     try {
-      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '';
+      const redirectUrl = typeof window !== 'undefined'
+        ? window.location.origin + '/auth/callback'
+        : 'https://bdhomeo.com/auth/callback';
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
           queryParams: {
-            prompt: 'select_account',
             access_type: 'offline',
+            prompt: 'consent',
           },
         },
       });
+
       if (error) {
-        showToast(`Google Login: ${error.message}`, 'error');
+        showToast('Google সাইন-ইন করতে সমস্যা হয়েছে: ' + error.message, 'error');
       }
     } catch (err: any) {
-      showToast('গুগল লগইনে সমস্যা হয়েছে।', 'error');
+      showToast('লগইন ত্রুটি: ' + (err?.message || 'অনুগ্রহ করে পুনরায় চেষ্টা করুন'), 'error');
     }
   };
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut({ scope: 'global' });
-    } catch (e) {
-      console.warn('Signout error:', e);
+      await supabase.auth.signOut();
+      setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('bdhomeo_user');
+      }
+      showToast('সফলভাবে লগআউট করা হয়েছে', 'info');
+    } catch (e: any) {
+      showToast('লগআউট ব্যর্থ: ' + e?.message, 'error');
     }
-    purgeLocalAuth();
-    showToast('সফলভাবে লগআউট করা হয়েছে।', 'info');
   };
 
-  const demoLogin = (role: 'student' | 'admin') => {
-    const demoUser: UserProfile = role === 'admin'
-      ? {
-          id: 'demo-admin-id',
-          email: 'mikailhossain3747@gmail.com',
-          fullName: 'ডাঃ মোঃ গিয়াস উদ্দিন (Admin)',
-          role: 'admin',
-          createdAt: new Date().toISOString(),
-        }
-      : {
-          id: 'demo-student-id',
-          email: 'student@bdhomeo.com',
-          fullName: 'ডাঃ মোঃ আরিফুল ইসলাম (Student)',
-          phone: '01811-123993',
-          role: 'student',
-          createdAt: new Date().toISOString(),
-        };
-    setUser(demoUser);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_user', JSON.stringify(demoUser));
-    }
-    showToast(`${role === 'admin' ? 'অ্যাডমিন' : 'শিক্ষার্থী'} ডেমো লগইন সফল!`, 'success');
-  };
-
-  const submitEnrollment = async (data: { courseId: string; trxId: string; senderPhone: string; paymentMethod: 'bkash' | 'nagad' }) => {
+  // =========================================================================
+  // 3. STUDENT ENROLLMENT SUBMISSION (Supabase Insert + Error Checking)
+  // =========================================================================
+  const submitEnrollment = async (data: { 
+    courseId: string; 
+    trxId: string; 
+    senderPhone: string; 
+    studentPhone?: string; 
+    paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' 
+  }): Promise<boolean> => {
     if (!user) {
-      showToast('দয়া করে প্রথমে লগইন করুন।', 'error');
+      showToast('ভর্তি সম্পন্ন করতে প্রথমে Google দিয়ে সাইন-ইন করুন', 'error');
       return false;
     }
+
     const targetCourse = courses.find((c) => c.id === data.courseId);
     const newEnrollment: Enrollment = {
-      id: `enr-${Date.now()}`,
+      id: 'enr-' + Date.now(),
       studentId: user.id,
       studentName: user.fullName,
       studentEmail: user.email,
-      studentPhone: data.senderPhone,
+      studentPhone: data.studentPhone || data.senderPhone || '',
       courseId: data.courseId,
       courseTitle: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
       batchType: targetCourse?.batchType || 'basic',
@@ -239,19 +345,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       enrolledAt: new Date().toISOString(),
     };
 
-    const updated = [newEnrollment, ...enrollments];
-    setEnrollments(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
-    }
+    // Optimistic UI Update
+    setEnrollments((prev) => [newEnrollment, ...prev]);
 
+    // Supabase Insert with strict error handling
     try {
-      await supabase.from('enrollments').insert({
+      const { error } = await supabase.from('enrollments').insert({
         id: newEnrollment.id,
         student_id: user.id,
         student_name: user.fullName,
         student_email: user.email,
-        student_phone: data.senderPhone,
+        student_phone: data.studentPhone || data.senderPhone || '',
         course_id: data.courseId,
         course_title: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
         batch_type: targetCourse?.batchType || 'basic',
@@ -259,23 +363,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         trx_id: data.trxId,
         sender_phone: data.senderPhone,
         payment_method: data.paymentMethod,
+        enrolled_at: newEnrollment.enrolledAt,
       });
-    } catch (e) {
-      console.warn('Supabase enrollment sync:', e);
+
+      if (error) {
+        console.error('Supabase enrollment insert error:', error);
+        showToast('ডাটাবেজে ভর্তি তথ্য সেভ হতে সমস্যা হয়েছে: ' + error.message, 'error');
+        return false;
+      }
+    } catch (e: any) {
+      console.error('Supabase enrollment exception:', e);
+      showToast('ডাটাবেজ কানেকশন ত্রুটি: ' + (e?.message || 'পুনরায় চেষ্টা করুন'), 'error');
+      return false;
     }
 
-    showToast('আপনার ভর্তির আবেদন সফলভাবে জমা হয়েছে! অ্যাডমিন যাচাই করার পর ক্লাস আনলক হবে।', 'success');
+    showToast('ভর্তি আবেদন ও ট্রানজেকশন সফলভাবে জমা হয়েছে! অ্যাডমিন ভেরিফিকেশন সাপেক্ষে ক্লাস আনলক হবে।', 'success');
     return true;
   };
 
-  const submitMonthlyPayment = async (data: { courseId: string; monthName: string; trxId: string; senderPhone: string; paymentMethod: 'bkash' | 'nagad' }) => {
+  // =========================================================================
+  // 4. MONTHLY PAYMENT SUBMISSION (Supabase Insert + Error Checking)
+  // =========================================================================
+  const submitMonthlyPayment = async (data: { 
+    courseId: string; 
+    monthName: string; 
+    trxId: string; 
+    senderPhone: string; 
+    paymentMethod: 'bkash' | 'nagad' | 'rocket' | 'cash' 
+  }): Promise<boolean> => {
     if (!user) {
-      showToast('দয়া করে প্রথমে লগইন করুন।', 'error');
+      showToast('ফি জমা দিতে প্রথমে সাইন-ইন করুন', 'error');
       return false;
     }
+
     const targetCourse = courses.find((c) => c.id === data.courseId);
     const newPayment: MonthlyPayment = {
-      id: `pay-${Date.now()}`,
+      id: 'pay-' + Date.now(),
       studentId: user.id,
       studentName: user.fullName,
       studentPhone: data.senderPhone,
@@ -290,14 +413,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
     };
 
-    const updated = [newPayment, ...monthlyPayments];
-    setMonthlyPayments(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_payments', JSON.stringify(updated));
-    }
+    setMonthlyPayments((prev) => [newPayment, ...prev]);
 
     try {
-      await supabase.from('monthly_payments').insert({
+      const { error } = await supabase.from('monthly_payments').insert({
         id: newPayment.id,
         student_id: user.id,
         student_name: user.fullName,
@@ -310,18 +429,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         sender_phone: data.senderPhone,
         payment_method: data.paymentMethod,
         status: 'pending',
+        created_at: newPayment.createdAt,
       });
-    } catch (e) {
-      console.warn('Supabase monthly payment sync:', e);
+
+      if (error) {
+        console.error('Supabase monthly payment error:', error);
+        showToast('পেমেন্ট তথ্য ডাটাবেজে সেভ হতে সমস্যা হয়েছে: ' + error.message, 'error');
+        return false;
+      }
+    } catch (e: any) {
+      console.error('Supabase payment exception:', e);
+      showToast('পেমেন্ট সেভ ত্রুটি: ' + (e?.message || 'পুনরায় চেষ্টা করুন'), 'error');
+      return false;
     }
 
-    showToast(`${data.monthName} মাসের ৫০০/- টাকা ফি ট্রানজেকশন সফলভাবে সাবমিট হয়েছে!`, 'success');
+    showToast(data.monthName + ' মাসের ফি ৫০০/- টাকা সফলভাবে জমা হয়েছে!', 'success');
     return true;
   };
 
-  const submitOrientationLead = async (data: { name: string; phone: string; email?: string; homeoBackground: string }) => {
+  // =========================================================================
+  // 5. ORIENTATION LEAD SUBMISSION (Supabase Insert + Error Checking)
+  // =========================================================================
+  const submitOrientationLead = async (data: { 
+    name: string; 
+    phone: string; 
+    email?: string; 
+    homeoBackground: string 
+  }): Promise<boolean> => {
     const newLead: OrientationLead = {
-      id: `lead-${Date.now()}`,
+      id: 'lead-' + Date.now(),
       name: data.name,
       phone: data.phone,
       email: data.email,
@@ -330,128 +466,241 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
     };
 
-    const updated = [newLead, ...leads];
-    setLeads(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_leads', JSON.stringify(updated));
-    }
+    setLeads((prev) => [newLead, ...prev]);
 
     try {
-      await supabase.from('orientation_leads').insert({
+      const { error } = await supabase.from('orientation_leads').insert({
         id: newLead.id,
         name: data.name,
         phone: data.phone,
-        email: data.email,
+        email: data.email || null,
         homeo_background: data.homeoBackground,
         status: 'new',
+        created_at: newLead.createdAt,
       });
-    } catch (e) {
-      console.warn('Supabase orientation lead sync:', e);
+
+      if (error) {
+        console.error('Supabase orientation lead insert error:', error);
+        showToast('লিড ডাটাবেজে সেভ হতে সমস্যা হয়েছে: ' + error.message, 'error');
+        return false;
+      }
+    } catch (e: any) {
+      console.error('Supabase lead exception:', e);
+      showToast('কানেকশন ত্রুটি: ' + (e?.message || 'পুনরায় চেষ্টা করুন'), 'error');
+      return false;
     }
 
-    showToast('ধন্যবাদ! ফ্রি ওরিয়েন্টেশন ক্লাসের রেজিস্ট্রেশন সফল হয়েছে।', 'success');
+    showToast('অভিনন্দন! ফ্রি ওরিয়েন্টেশন ক্লাসে আপনার রেজিস্ট্রেশন সফল হয়েছে।', 'success');
     return true;
   };
 
-  const updateSettings = async (newSettings: Partial<SiteSettings>) => {
+  // =========================================================================
+  // 6. SITE SETTINGS UPDATE (Supabase Upsert)
+  // =========================================================================
+  const updateSettings = async (newSettings: Partial<SiteSettings>): Promise<boolean> => {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_settings', JSON.stringify(updated));
-    }
 
     try {
-      await supabase.from('site_settings').upsert({
+      const { error } = await supabase.from('site_settings').upsert({
         id: 'global_settings',
-        ...updated,
+        site_title: updated.siteTitle,
+        slogan: updated.slogan,
+        hero_headline: updated.heroHeadline,
+        hero_subheadline: updated.heroSubheadline,
+        doctor_name: updated.doctorName,
+        doctor_title: updated.doctorTitle,
+        doctor_degrees: updated.doctorDegrees,
+        doctor_experience: updated.doctorExperience,
+        doctor_chamber_time: updated.doctorChamberTime,
+        doctor_message: updated.doctorMessage,
+        hero_image_url: updated.heroImageUrl,
+        doctor_portrait_url: updated.doctorPortraitUrl,
+        ptf_certificate_image_url: updated.ptfCertificateImageUrl,
+        meta_og_image_url: updated.metaOgImageUrl,
+        gallery_images: updated.galleryImages,
+        video_showcase_list: updated.videoShowcaseList,
+        testimonials: updated.testimonials,
+        bkash_number: updated.bkashNumber,
+        bkash_type: updated.bkashType,
+        nagad_number: updated.nagadNumber,
+        nagad_type: updated.nagadType,
+        rocket_number: updated.rocketNumber,
+        whatsapp_number: updated.whatsappNumber,
+        helpline_number: updated.helplineNumber,
+        alternate_helpline: updated.alternateHelpline,
+        official_email: updated.officialEmail,
+        chamber_address: updated.chamberAddress,
+        class_time: updated.classTime,
+        morning_support_time: updated.morningSupportTime,
+        google_meet_url: updated.googleMeetUrl,
+        notice_text: updated.noticeText,
+        youtube_url: updated.youtubeUrl,
+        facebook_url: updated.facebookUrl,
+        facebook_group_url: updated.facebookGroupUrl,
+        telegram_url: updated.telegramUrl,
         updated_at: new Date().toISOString(),
       });
-    } catch (e) {
-      console.warn('Supabase site_settings sync:', e);
+
+      if (error) {
+        console.error('Supabase site_settings upsert error:', error);
+        showToast('সাইট সেটিংস ডাটাবেজে সেভ হতে সমস্যা: ' + error.message, 'error');
+        return false;
+      }
+    } catch (e: any) {
+      console.error('Supabase settings exception:', e);
+      showToast('সেটিংস সেভ ত্রুটি: ' + e?.message, 'error');
+      return false;
     }
 
-    showToast('ওয়েবসাইটের কনটেন্ট ও সেটিংস সফলভাবে আপডেট হয়েছে!', 'success');
+    showToast('ওয়েবসাইটের কনটেন্ট ও সকল সেটিংস সফলভাবে সেভ হয়েছে!', 'success');
     return true;
   };
 
-  const updateCourses = async (updatedCourses: Course[]) => {
+  // =========================================================================
+  // 7. COURSE MANAGEMENT (Supabase Upsert)
+  // =========================================================================
+  const updateCourses = async (updatedCourses: Course[]): Promise<boolean> => {
     setCourses(updatedCourses);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_courses', JSON.stringify(updatedCourses));
+
+    try {
+      for (const course of updatedCourses) {
+        await supabase.from('courses').upsert({
+          id: course.id,
+          slug: course.slug,
+          title: course.title,
+          subtitle: course.subtitle,
+          batch_type: course.batchType,
+          duration_months: course.durationMonths,
+          admission_fee: course.admissionFee,
+          monthly_fee: course.monthlyFee,
+          live_schedule: course.liveSchedule,
+          morning_support: course.morningSupport || null,
+          thumbnail_url: course.thumbnailUrl,
+          description: course.description,
+          features: course.features,
+          curriculum: course.curriculum,
+          created_at: new Date().toISOString(),
+        });
+      }
+    } catch (e: any) {
+      console.error('Supabase courses batch sync error:', e);
+      showToast('কোর্স ডাটাবেজে সেভ হতে সমস্যা: ' + e?.message, 'error');
+      return false;
     }
-    showToast('কোর্স ও সিলেবাস সফলভাবে আপডেট হয়েছে!', 'success');
+
+    showToast('কোর্স ও সিলেবাস সফলভাবে ডাটাবেজে সেভ হয়েছে!', 'success');
     return true;
   };
 
-  const saveCourse = async (course: Course) => {
+  const saveCourse = async (course: Course): Promise<boolean> => {
     const exists = courses.some((c) => c.id === course.id);
     const updated = exists
       ? courses.map((c) => (c.id === course.id ? course : c))
       : [...courses, course];
     setCourses(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_courses', JSON.stringify(updated));
+
+    try {
+      const { error } = await supabase.from('courses').upsert({
+        id: course.id,
+        slug: course.slug,
+        title: course.title,
+        subtitle: course.subtitle,
+        batch_type: course.batchType,
+        duration_months: course.durationMonths,
+        admission_fee: course.admissionFee,
+        monthly_fee: course.monthlyFee,
+        live_schedule: course.liveSchedule,
+        morning_support: course.morningSupport || null,
+        thumbnail_url: course.thumbnailUrl,
+        description: course.description,
+        features: course.features,
+        curriculum: course.curriculum,
+        created_at: new Date().toISOString(),
+      });
+
+      if (error) {
+        console.error('Supabase course save error:', error);
+        showToast("'" + course.title + "' ডাটাবেজে সেভ হতে সমস্যা: " + error.message, 'error');
+        return false;
+      }
+    } catch (e: any) {
+      console.error('Supabase course save exception:', e);
+      showToast('কোর্স সেভ ত্রুটি: ' + e?.message, 'error');
+      return false;
     }
-    showToast(`'${course.title}' কোর্স সফলভাবে সেভ হয়েছে!`, 'success');
+
+    showToast("'" + course.title + "' কোর্স ডাটাবেজে সফলভাবে সংরক্ষিত হয়েছে!", 'success');
     return true;
   };
 
+  // =========================================================================
+  // 8. APPROVALS & UPDATES (Supabase Updates)
+  // =========================================================================
   const approveEnrollment = async (enrollmentId: string) => {
-    const updated = enrollments.map((enr) =>
-      enr.id === enrollmentId ? { ...enr, admissionStatus: 'approved' as const } : enr
+    setEnrollments((prev) =>
+      prev.map((enr) => (enr.id === enrollmentId ? { ...enr, admissionStatus: 'approved' } : enr))
     );
-    setEnrollments(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
-    }
 
     try {
-      await supabase
+      const { error } = await supabase
         .from('enrollments')
         .update({ admission_status: 'approved' })
         .eq('id', enrollmentId);
-    } catch (e) {
-      console.warn('Supabase enrollment approve sync:', e);
+
+      if (error) {
+        console.error('Supabase enrollment approve error:', error);
+        showToast('অ্যাপ্রুভাল ডাটাবেজে সেভ হয়নি: ' + error.message, 'error');
+        return;
+      }
+    } catch (e: any) {
+      showToast('অ্যাপ্রুভাল ত্রুটি: ' + e?.message, 'error');
+      return;
     }
 
-    showToast('শিক্ষার্থীর কোর্স এনরোলমেন্ট সফলভাবে অনুমোদিত হয়েছে!', 'success');
+    showToast('শিক্ষার্থীর কোর্স অনুমোদন সফলভাবে সম্পন্ন হয়েছে!', 'success');
   };
 
   const approveMonthlyPayment = async (paymentId: string) => {
-    const updated = monthlyPayments.map((p) =>
-      p.id === paymentId ? { ...p, status: 'approved' as const } : p
+    setMonthlyPayments((prev) =>
+      prev.map((p) => (p.id === paymentId ? { ...p, status: 'approved' } : p))
     );
-    setMonthlyPayments(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_payments', JSON.stringify(updated));
-    }
 
     try {
-      await supabase
+      const { error } = await supabase
         .from('monthly_payments')
         .update({ status: 'approved' })
         .eq('id', paymentId);
-    } catch (e) {
-      console.warn('Supabase monthly payment approve sync:', e);
+
+      if (error) {
+        console.error('Supabase payment approve error:', error);
+        showToast('ফি ভেরিফিকেশন ডাটাবেজে সেভ হয়নি: ' + error.message, 'error');
+        return;
+      }
+    } catch (e: any) {
+      showToast('পেমেন্ট অনুমোদন ত্রুটি: ' + e?.message, 'error');
+      return;
     }
 
-    showToast('মাসিক ফি পেমেন্ট সফলভাবে অনুমোদিত হয়েছে!', 'success');
+    showToast('মাসিক ফি ভেরিফিকেশন সফলভাবে সম্পন্ন হয়েছে!', 'success');
   };
 
   const updateLeadStatus = async (leadId: string, status: 'contacted' | 'joined') => {
-    const updated = leads.map((l) => (l.id === leadId ? { ...l, status } : l));
-    setLeads(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('bdhomeo_leads', JSON.stringify(updated));
-    }
+    setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, status } : l)));
 
     try {
-      await supabase
+      const { error } = await supabase
         .from('orientation_leads')
         .update({ status })
         .eq('id', leadId);
-    } catch (e) {
-      console.warn('Supabase lead status sync:', e);
+
+      if (error) {
+        showToast('লিড স্ট্যাটাস ডাটাবেজে আপডেট হয়নি: ' + error.message, 'error');
+        return;
+      }
+    } catch (e: any) {
+      showToast('লিড স্ট্যাটাস ত্রুটি: ' + e?.message, 'error');
+      return;
     }
 
     showToast('লিড স্ট্যাটাস আপডেট হয়েছে!', 'info');
@@ -467,9 +716,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         monthlyPayments,
         leads,
         isAuthLoading,
+        isDataSyncing,
         signInWithGoogle,
         signOut,
-        demoLogin,
+        refreshData,
         submitEnrollment,
         submitMonthlyPayment,
         submitOrientationLead,

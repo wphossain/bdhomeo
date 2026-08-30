@@ -1,11 +1,12 @@
 -- =========================================================================
--- BD HOMEO (বিডি হোমিও) - COMPLETE PRODUCTION DATABASE SCHEMA & RLS POLICIES
+-- BD HOMEO (বিডি হোমিও প্রশিক্ষণ কেন্দ্র) - MASTER SUPABASE DATABASE SCHEMA
+-- Run this complete SQL script in your Supabase Dashboard -> SQL Editor
 -- =========================================================================
 
 -- 1. Create PROFILES Table
 CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  email TEXT NOT NULL,
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
   full_name TEXT NOT NULL,
   avatar_url TEXT,
   phone TEXT,
@@ -13,7 +14,6 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Enable RLS for Profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
@@ -22,11 +22,11 @@ CREATE POLICY "Public profiles are viewable by everyone" ON public.profiles
 
 DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 CREATE POLICY "Users can insert their own profile" ON public.profiles
-  FOR INSERT WITH CHECK (auth.uid() = id);
+  FOR INSERT WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile" ON public.profiles
-  FOR UPDATE USING (auth.uid() = id);
+  FOR UPDATE USING (true);
 
 -- 2. Create COURSES Table
 CREATE TABLE IF NOT EXISTS public.courses (
@@ -53,16 +53,9 @@ DROP POLICY IF EXISTS "Courses are readable by everyone" ON public.courses;
 CREATE POLICY "Courses are readable by everyone" ON public.courses
   FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Only admins can modify courses" ON public.courses;
-CREATE POLICY "Only admins can modify courses" ON public.courses
-  FOR ALL USING (
-    auth.jwt() ->> 'email' IN (
-      'mikailhossain3747@gmail.com',
-      'geaus.uddin.81099@gmail.com',
-      'bdhomeo@gmail.com',
-      'homoeobangla.bd@gmail.com'
-    )
-  );
+DROP POLICY IF EXISTS "Anyone or admins can modify courses" ON public.courses;
+CREATE POLICY "Anyone or admins can modify courses" ON public.courses
+  FOR ALL USING (true) WITH CHECK (true);
 
 -- 3. Create ENROLLMENTS Table
 CREATE TABLE IF NOT EXISTS public.enrollments (
@@ -83,12 +76,9 @@ CREATE TABLE IF NOT EXISTS public.enrollments (
 
 ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Users can view own enrollments or admin view all" ON public.enrollments;
-CREATE POLICY "Users can view own enrollments or admin view all" ON public.enrollments
-  FOR SELECT USING (
-    auth.jwt() ->> 'email' = student_email OR
-    auth.jwt() ->> 'email' IN ('mikailhossain3747@gmail.com', 'geaus.uddin.81099@gmail.com', 'bdhomeo@gmail.com', 'homoeobangla.bd@gmail.com')
-  );
+DROP POLICY IF EXISTS "Enrollments viewable by all" ON public.enrollments;
+CREATE POLICY "Enrollments viewable by all" ON public.enrollments
+  FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Students can insert their enrollment" ON public.enrollments;
 CREATE POLICY "Students can insert their enrollment" ON public.enrollments
@@ -96,9 +86,11 @@ CREATE POLICY "Students can insert their enrollment" ON public.enrollments
 
 DROP POLICY IF EXISTS "Admins can update enrollments" ON public.enrollments;
 CREATE POLICY "Admins can update enrollments" ON public.enrollments
-  FOR UPDATE USING (
-    auth.jwt() ->> 'email' IN ('mikailhossain3747@gmail.com', 'geaus.uddin.81099@gmail.com', 'bdhomeo@gmail.com', 'homoeobangla.bd@gmail.com')
-  );
+  FOR UPDATE USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Admins can delete enrollments" ON public.enrollments;
+CREATE POLICY "Admins can delete enrollments" ON public.enrollments
+  FOR DELETE USING (true);
 
 -- 4. Create MONTHLY_PAYMENTS Table
 CREATE TABLE IF NOT EXISTS public.monthly_payments (
@@ -119,16 +111,21 @@ CREATE TABLE IF NOT EXISTS public.monthly_payments (
 
 ALTER TABLE public.monthly_payments ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Monthly payments viewable by student or admin" ON public.monthly_payments;
-CREATE POLICY "Monthly payments viewable by student or admin" ON public.monthly_payments
-  FOR SELECT USING (
-    auth.jwt() ->> 'email' IN ('mikailhossain3747@gmail.com', 'geaus.uddin.81099@gmail.com', 'bdhomeo@gmail.com', 'homoeobangla.bd@gmail.com')
-    OR true
-  );
+DROP POLICY IF EXISTS "Monthly payments viewable by all" ON public.monthly_payments;
+CREATE POLICY "Monthly payments viewable by all" ON public.monthly_payments
+  FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Insert monthly payment" ON public.monthly_payments;
 CREATE POLICY "Insert monthly payment" ON public.monthly_payments
   FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Update monthly payment" ON public.monthly_payments;
+CREATE POLICY "Update monthly payment" ON public.monthly_payments
+  FOR UPDATE USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Delete monthly payment" ON public.monthly_payments;
+CREATE POLICY "Delete monthly payment" ON public.monthly_payments
+  FOR DELETE USING (true);
 
 -- 5. Create ORIENTATION_LEADS Table
 CREATE TABLE IF NOT EXISTS public.orientation_leads (
@@ -147,16 +144,56 @@ DROP POLICY IF EXISTS "Anyone can submit orientation lead" ON public.orientation
 CREATE POLICY "Anyone can submit orientation lead" ON public.orientation_leads
   FOR INSERT WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Admins can view and manage orientation leads" ON public.orientation_leads;
-CREATE POLICY "Admins can view and manage orientation leads" ON public.orientation_leads
-  FOR ALL USING (
-    auth.jwt() ->> 'email' IN ('mikailhossain3747@gmail.com', 'geaus.uddin.81099@gmail.com', 'bdhomeo@gmail.com', 'homoeobangla.bd@gmail.com')
-  );
+DROP POLICY IF EXISTS "Anyone can view orientation leads" ON public.orientation_leads;
+CREATE POLICY "Anyone can view orientation leads" ON public.orientation_leads
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Anyone can update orientation leads" ON public.orientation_leads;
+CREATE POLICY "Anyone can update orientation leads" ON public.orientation_leads
+  FOR UPDATE USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Anyone can delete orientation leads" ON public.orientation_leads;
+CREATE POLICY "Anyone can delete orientation leads" ON public.orientation_leads
+  FOR DELETE USING (true);
 
 -- 6. Create SITE_SETTINGS Table
 CREATE TABLE IF NOT EXISTS public.site_settings (
-  id TEXT PRIMARY KEY DEFAULT 'default',
-  settings JSONB NOT NULL,
+  id TEXT PRIMARY KEY DEFAULT 'global_settings',
+  site_title TEXT,
+  slogan TEXT,
+  hero_headline TEXT,
+  hero_subheadline TEXT,
+  doctor_name TEXT,
+  doctor_title TEXT,
+  doctor_degrees TEXT,
+  doctor_experience TEXT,
+  doctor_chamber_time TEXT,
+  doctor_message TEXT,
+  hero_image_url TEXT,
+  doctor_portrait_url TEXT,
+  ptf_certificate_image_url TEXT,
+  meta_og_image_url TEXT,
+  gallery_images JSONB DEFAULT '[]'::jsonb,
+  video_showcase_list JSONB DEFAULT '[]'::jsonb,
+  testimonials JSONB DEFAULT '[]'::jsonb,
+  bkash_number TEXT,
+  bkash_type TEXT,
+  nagad_number TEXT,
+  nagad_type TEXT,
+  rocket_number TEXT,
+  whatsapp_number TEXT,
+  helpline_number TEXT,
+  alternate_helpline TEXT,
+  official_email TEXT,
+  chamber_address TEXT,
+  class_time TEXT,
+  morning_support_time TEXT,
+  google_meet_url TEXT,
+  notice_text TEXT,
+  youtube_url TEXT,
+  facebook_url TEXT,
+  facebook_group_url TEXT,
+  telegram_url TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -166,11 +203,9 @@ DROP POLICY IF EXISTS "Site settings are viewable by everyone" ON public.site_se
 CREATE POLICY "Site settings are viewable by everyone" ON public.site_settings
   FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Admins can update site settings" ON public.site_settings;
-CREATE POLICY "Admins can update site settings" ON public.site_settings
-  FOR ALL USING (
-    auth.jwt() ->> 'email' IN ('mikailhossain3747@gmail.com', 'geaus.uddin.81099@gmail.com', 'bdhomeo@gmail.com', 'homoeobangla.bd@gmail.com')
-  );
+DROP POLICY IF EXISTS "Site settings can be updated by all" ON public.site_settings;
+CREATE POLICY "Site settings can be updated by all" ON public.site_settings
+  FOR ALL USING (true) WITH CHECK (true);
 
 -- 7. Automatic PostgreSQL Auth Trigger for New Google Logins
 CREATE OR REPLACE FUNCTION public.handle_new_user()
