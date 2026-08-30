@@ -152,7 +152,7 @@ export default function DashboardPage() {
   }
 
   // =========================================================================
-  // CINEMA PLAYER / VIDEO CLASSROOM VIEW
+  // CINEMA PLAYER / VIDEO CLASSROOM VIEW (STEP 955: LEFT PLAYLIST + RIGHT VIDEO)
   // =========================================================================
   if (learningCourseId) {
     const course = courses.find((c) => c.id === learningCourseId) || courses[0];
@@ -162,35 +162,87 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-slate-950 text-slate-100 font-bangla pb-20">
         
         {/* Top Video Player Bar */}
-        <div className="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-30">
+        <div className="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-md">
           <button
             onClick={() => setLearningCourseId(null)}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 px-3.5 py-2 rounded-xl transition"
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3.5 py-2 rounded-xl transition"
           >
             <ArrowLeft className="w-4 h-4 text-emerald-400" />
             <span>ড্যাশবোর্ডে ফিরে যান</span>
           </button>
 
-          <div className="text-center hidden sm:block">
-            <h2 className="text-sm font-black text-white">{course.title}</h2>
-            <p className="text-[11px] text-emerald-400 font-bold">{activeLesson.title}</p>
+          <div className="text-center hidden sm:block truncate max-w-md">
+            <h2 className="text-sm font-black text-white truncate">{course.title}</h2>
+            <p className="text-[11px] text-emerald-400 font-bold truncate">{activeLesson.title}</p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <span className="text-xs font-bold text-slate-400 hidden sm:inline">প্রগ্রেস: {progressPercent}%</span>
-            <div className="w-20 bg-slate-800 h-2 rounded-full overflow-hidden">
-              <div className="bg-emerald-500 h-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
+            <div className="w-24 bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700">
+              <div className="bg-emerald-500 h-full transition-all duration-500 rounded-full" style={{ width: `${progressPercent}%` }} />
             </div>
           </div>
         </div>
 
-        {/* Video Player & Curriculum Grid */}
+        {/* Step 955 Layout: LEFT SIDE CHAPTER LIST + RIGHT SIDE VIDEO SCREEN */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Main Video Screen & Notes */}
-          <div className="lg:col-span-8 space-y-6">
+          {/* LEFT SIDE: CHAPTER PLAYLIST (4 COLUMNS) */}
+          <div className="lg:col-span-4 bg-slate-900 rounded-3xl border border-slate-800 p-5 space-y-4 sticky top-20 order-2 lg:order-1">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h4 className="text-sm font-black text-white flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-emerald-400" />
+                <span>কোর্স কারিকুলাম</span>
+              </h4>
+              <span className="text-xs text-slate-400 font-mono">{allLearningLessons.length}টি লেকচার</span>
+            </div>
+
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+              {course.curriculum.map((chapter) => (
+                <div key={chapter.id} className="space-y-2">
+                  <h5 className="text-xs font-bold text-emerald-400 px-2 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>{chapter.title}</span>
+                  </h5>
+                  
+                  <div className="space-y-1.5">
+                    {chapter.lessons.map((lesson) => {
+                      const isActive = activeLesson.id === lesson.id;
+                      const isCompleted = completedLessonIds.includes(lesson.id);
+
+                      return (
+                        <div
+                          key={lesson.id}
+                          onClick={() => setActiveLesson(lesson)}
+                          className={`p-3 rounded-2xl cursor-pointer transition flex items-center justify-between text-xs ${
+                            isActive
+                              ? 'bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/30'
+                              : 'bg-slate-950 text-slate-300 hover:bg-slate-800'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <PlayCircle className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-emerald-400'}`} />
+                            <span className="truncate">{lesson.title}</span>
+                          </div>
+
+                          {isCompleted && (
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold shrink-0 ml-2">
+                              ✓
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT SIDE: MAIN VIDEO SCREEN & NOTES (8 COLUMNS) */}
+          <div className="lg:col-span-8 space-y-6 order-1 lg:order-2">
             
-            {/* Embedded YouTube Player */}
+            {/* Embedded YouTube Player Screen */}
             <div className="relative aspect-video rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${activeLesson.youtubeVideoId || 'M7lc1UVf-VE'}?autoplay=1&rel=0`}
@@ -201,8 +253,8 @@ export default function DashboardPage() {
               />
             </div>
 
-            {/* Lesson Title & Controls */}
-            <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* Lesson Title & Completion Checkmark Button */}
+            <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
               <div className="space-y-1">
                 <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase bg-emerald-950/80 px-2.5 py-0.5 rounded border border-emerald-800">
                   ক্লাস লেকচার • {activeLesson.durationMin} মিনিট
@@ -214,7 +266,7 @@ export default function DashboardPage() {
                 onClick={() => toggleLessonComplete(activeLesson.id)}
                 className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition shrink-0 ${
                   completedLessonIds.includes(activeLesson.id)
-                    ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/40'
+                    ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 shadow-inner'
                     : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg'
                 }`}
               >
@@ -224,7 +276,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Lesson PDF Handout & Notes */}
-            <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
+            <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4 shadow-lg">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-amber-400" />
@@ -236,7 +288,7 @@ export default function DashboardPage() {
                     href={activeLesson.pdfNotesUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-950/60 hover:bg-emerald-900/80 px-3 py-1.5 rounded-xl border border-emerald-800/60 transition"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-950/60 hover:bg-emerald-900/80 px-3.5 py-2 rounded-xl border border-emerald-800/60 transition shadow"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>PDF ডাউনলোড</span>
@@ -249,51 +301,6 @@ export default function DashboardPage() {
               </p>
             </div>
 
-          </div>
-
-          {/* Right Curriculum Playlist */}
-          <div className="lg:col-span-4 bg-slate-900 rounded-3xl border border-slate-800 p-5 space-y-4 sticky top-20">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h4 className="text-sm font-black text-white">কোর্স কারিকুলাম</h4>
-              <span className="text-xs text-slate-400">{allLearningLessons.length}টি লেকচার</span>
-            </div>
-
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-              {course.curriculum.map((chapter) => (
-                <div key={chapter.id} className="space-y-2">
-                  <h5 className="text-xs font-bold text-emerald-400 px-2">{chapter.title}</h5>
-                  <div className="space-y-1.5">
-                    {chapter.lessons.map((lesson) => {
-                      const isActive = activeLesson.id === lesson.id;
-                      const isCompleted = completedLessonIds.includes(lesson.id);
-
-                      return (
-                        <div
-                          key={lesson.id}
-                          onClick={() => setActiveLesson(lesson)}
-                          className={`p-3 rounded-2xl cursor-pointer transition flex items-center justify-between text-xs ${
-                            isActive
-                              ? 'bg-emerald-600 text-white font-bold shadow-lg'
-                              : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800/80'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <PlayCircle className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-emerald-400'}`} />
-                            <span className="line-clamp-1">{lesson.title}</span>
-                          </div>
-
-                          {isCompleted && (
-                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold">
-                              ✓
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
         </div>
@@ -311,7 +318,7 @@ export default function DashboardPage() {
       <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-black text-base shadow">
-            {user.fullName.charAt(0)}
+            {user.fullName ? user.fullName.charAt(0) : 'S'}
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -458,7 +465,7 @@ export default function DashboardPage() {
               <MorningSupportBox />
 
               {/* Course Cards */}
-              <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
+              <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <div>
                     <h3 className="text-lg font-black text-white">আমার কোর্স ও ভিডিও ক্লাসরুম</h3>
@@ -498,7 +505,7 @@ export default function DashboardPage() {
 
           {/* TAB 2: LECTURES LIBRARY */}
           {activeTab === 'lectures' && (
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
               <div className="border-b border-slate-800 pb-4">
                 <h3 className="text-lg font-black text-white">ভিডিও লেকচার লাইব্রেরি</h3>
                 <p className="text-xs text-slate-400">যে কোনো কোর্স সিলেক্ট করে প্লেয়ার ওপেন করুন</p>
@@ -508,7 +515,7 @@ export default function DashboardPage() {
                 {courses.map((course) => (
                   <div
                     key={course.id}
-                    className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3"
+                    className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 shadow"
                   >
                     <h4 className="font-bold text-sm text-white">{course.title}</h4>
                     <p className="text-xs text-slate-400">{course.curriculum.flatMap((c) => c.lessons).length}টি ভিডিও লেকচার উপলব্ধ</p>
@@ -533,7 +540,7 @@ export default function DashboardPage() {
 
           {/* TAB 5: STUDENT ID CARD */}
           {activeTab === 'id-card' && (
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 text-center">
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 text-center shadow-xl">
               <div className="space-y-1">
                 <h3 className="text-lg font-black text-white">ভার্চুয়াল স্টুডেন্ট আইডি কার্ড</h3>
                 <p className="text-xs text-slate-400">বিডি হোমিও প্রশিক্ষণ কেন্দ্র কর্তৃক অনুমোদিত ডিজিটাল স্টুডেন্ট কার্ড</p>
@@ -547,7 +554,7 @@ export default function DashboardPage() {
 
                 <div className="flex items-center gap-3.5">
                   <div className="w-14 h-14 rounded-2xl bg-emerald-700 text-white font-black text-lg flex items-center justify-center shadow">
-                    {user.fullName.charAt(0)}
+                    {user.fullName ? user.fullName.charAt(0) : 'S'}
                   </div>
                   <div>
                     <h4 className="text-sm font-black text-white">{user.fullName}</h4>
@@ -569,7 +576,7 @@ export default function DashboardPage() {
 
           {/* TAB 6: PTF CERTIFICATE & COURIER DISPATCH */}
           {activeTab === 'certificate' && (
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
               <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
                 <div className="p-3 bg-amber-500/20 text-amber-400 rounded-2xl">
                   <Award className="w-6 h-6" />
@@ -649,7 +656,7 @@ export default function DashboardPage() {
 
           {/* TAB 7: SUPPORT */}
           {activeTab === 'support' && (
-            <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-6">
+            <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-6 shadow-xl">
               <h3 className="text-xl font-black text-white flex items-center gap-2">
                 <MessageCircle className="w-6 h-6 text-emerald-400" />
                 একাডেমিক হেল্পলাইন ও স্যারের সাপোর্ট
