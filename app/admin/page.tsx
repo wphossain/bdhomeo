@@ -37,6 +37,7 @@ import Link from 'next/link';
 export default function AdminDashboardPage() {
   const { 
     user, 
+    isAuthLoading,
     courses, 
     settings, 
     enrollments, 
@@ -54,6 +55,18 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     refreshData();
   }, [refreshData]);
+
+  // Loading State while verifying session
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center p-4 font-bangla bg-slate-900 text-white">
+        <div className="flex flex-col items-center gap-3">
+          <RefreshCw className="w-8 h-8 animate-spin text-emerald-400" />
+          <p className="text-sm font-bold text-slate-300">অ্যাডমিন অনুমতি যাচাই হচ্ছে...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Auth Protection: If user is not logged in or is not an admin
   if (!user || user.role !== 'admin') {
