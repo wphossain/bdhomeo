@@ -18,10 +18,13 @@ import {
   CheckCircle2, 
   Clock, 
   ExternalLink, 
+  MessageCircle, 
   ChevronRight, 
   PlayCircle, 
   FileText, 
   Lock, 
+  Menu, 
+  X, 
   CheckCircle, 
   Home, 
   LogOut, 
@@ -34,37 +37,22 @@ import {
   ArrowLeft,
   FileDown,
   Play,
-  Truck,
-  AlertCircle
+  Share2,
+  Truck
 } from 'lucide-react';
 
-type StudentTab = 'classroom' | 'lectures' | 'notes' | 'monthly-fee' | 'id-card' | 'certificate';
+type StudentTab = 'classroom' | 'lectures' | 'notes' | 'monthly-fee' | 'id-card' | 'certificate' | 'support';
 
 export default function DashboardPage() {
-  const { user, courses, enrollments, settings, submitCertificateRequest, certificateRequests, signInWithGoogle, signOut, showToast } = useApp();
+  const { user, courses, enrollments, monthlyPayments, settings, submitCertificateRequest, certificateRequests, signInWithGoogle, signOut, showToast } = useApp();
   const [activeTab, setActiveTab] = useState<StudentTab>('classroom');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Strict enrollment matching
-  const myEnrolledCourses = courses.filter((course) =>
-    enrollments.some(
-      (enr) =>
-        (enr.studentId === user?.id || (user?.email && enr.studentEmail.toLowerCase() === user.email.toLowerCase())) &&
-        enr.courseId === course.id &&
-        enr.admissionStatus === 'approved'
-    )
-  );
-
-  const pendingEnrollments = enrollments.filter(
-    (enr) =>
-      (enr.studentId === user?.id || (user?.email && enr.studentEmail.toLowerCase() === user.email.toLowerCase())) &&
-      enr.admissionStatus === 'pending'
-  );
-
-  // FOCUSED LEARNING / PLAYER MODE
+  // FOCUSED LEARNING / PLAYER MODE (When entering a course classroom)
   const [learningCourseId, setLearningCourseId] = useState<string | null>(null);
   
+  // Track active playing lesson in Learning Mode
   const learningCourse = courses.find((c) => c.id === learningCourseId) || courses[0];
-  const isEnrolledInCurrent = myEnrolledCourses.some((c) => c.id === learningCourse?.id);
   const allLearningLessons = learningCourse?.curriculum.flatMap((c) => c.lessons) || [];
   
   const [activeLesson, setActiveLesson] = useState<Lesson>(
@@ -110,184 +98,200 @@ export default function DashboardPage() {
     });
   };
 
-  // Courier Delivery Form State for PTF Certificate
+  // Certificate Courier Form State
+  const existingCertReq = certificateRequests.find(
+    (r) => r.studentId === user?.id || (user?.email && r.studentEmail?.toLowerCase() === user.email.toLowerCase())
+  );
   const [courierPhone, setCourierPhone] = useState(user?.phone || '');
   const [courierAddress, setCourierAddress] = useState('');
-  const [courierDistrict, setCourierDistrict] = useState('');
   const [isCourierSubmitting, setIsCourierSubmitting] = useState(false);
-
-  const existingCertReq = certificateRequests.find((r) => r.studentId === user?.id || (user?.email && r.studentEmail.toLowerCase() === user.email.toLowerCase()));
-
-  const handleEnterCoursePlayer = (course: Course) => {
-    const isEnrolled = myEnrolledCourses.some((c) => c.id === course.id);
-    if (!isEnrolled) {
-      showToast('এই কোর্সের সকল পেইড লেকচার দেখতে প্রথমে ভর্তি সম্পন্ন ও অনুমোদন প্রয়োজন। ফ্রি প্রিভিউ ক্লাস চালু করা হচ্ছে...', 'info');
-    }
-    setLearningCourseId(course.id);
-    const firstLesson = course.curriculum[0]?.lessons[0];
-    if (firstLesson) setActiveLesson(firstLesson);
-  };
 
   const handleCourierSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!courierAddress || !courierPhone) {
-      showToast('মোবাইল নম্বর ও সম্পূর্ণ কুরিয়ার ঠিকানা লিখুন', 'error');
+    if (!courierPhone || !courierAddress) {
+      showToast('মোবাইল নম্বর ও সম্পূর্ণ ঠিকানা প্রদান করুন', 'error');
       return;
     }
 
     setIsCourierSubmitting(true);
-    const ok = await submitCertificateRequest({
+    const success = await submitCertificateRequest({
       phone: courierPhone,
-      courierAddress,
-      district: courierDistrict,
-      courseId: learningCourse.id,
-      courseTitle: learningCourse.title,
+      courierAddress: courierAddress,
+      courseId: learningCourse?.id || 'course-basic-foundation',
+      courseTitle: learningCourse?.title || 'বেসিক হোমিওপ্যাথি ফাউন্ডেশন কোর্স',
     });
+
     setIsCourierSubmitting(false);
+    if (success) {
+      showToast('সার্টিফিকেট কুরিয়ার ডেলিভারি রিকোয়েস্ট সফলভাবে জমা হয়েছে!', 'success');
+    }
   };
 
-  // Dynamic progress calculation
-  const totalLessonsCount = allLearningLessons.length || 1;
-  const progressPercent = Math.min(100, Math.round((completedLessonIds.length / totalLessonsCount) * 100));
-
-  // Not logged in screen
+  // If user is not logged in, show student portal sign in card
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 font-bangla">
-        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
-            <GraduationCap className="w-8 h-8 text-emerald-400" />
+      <div className="min-h-[85vh] flex items-center justify-center p-4 font-bangla bg-slate-950 text-white">
+        <div className="max-w-md w-full bg-slate-900 rounded-3xl p-8 border border-slate-800 text-center space-y-6 shadow-2xl">
+          <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
+            <GraduationCap className="w-8 h-8" />
           </div>
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-widest bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-3 py-1 rounded-full">
-              Student LMS Portal
-            </span>
-            <h2 className="text-2xl font-black text-white mt-3">
-              শিক্ষার্থী ভার্চুয়াল ক্লাসরুম
-            </h2>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              আপনার লাইভ ক্লাস, রেকর্ডেড লেকচার ও প্র্যাকটিস নোটস পেতে সাইন-ইন করুন।
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-white">শিক্ষার্থী ড্যাশবোর্ড পোর্টাল</h2>
+            <p className="text-xs sm:text-sm text-slate-400">
+              লাইভ ক্লাসরুম, রেকর্ডেড ভিডিও লেকচার, PDF শিট ও সার্টিফিকেট এক্সেস করতে লগইন করুন।
             </p>
           </div>
-
           <button
             onClick={signInWithGoogle}
-            className="w-full flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3.5 rounded-xl shadow-md transition"
+            className="w-full flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-4 rounded-2xl shadow-xl transition-all"
           >
-            <span>Google দিয়ে সাইন-ইন করুন</span>
+            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
+            </svg>
+            <span>গুগল দিয়ে স্টুডেন্ট লগইন</span>
           </button>
-
-          <div className="pt-2 border-t border-slate-800">
-            <Link
-              href="/"
-              className="text-xs text-slate-400 hover:text-emerald-400 font-bold flex items-center justify-center gap-1"
-            >
-              <Home className="w-3.5 h-3.5" />
-              <span>হোমপেজে ফিরে যান</span>
-            </Link>
-          </div>
         </div>
       </div>
     );
   }
 
   // =========================================================================
-  // VIEW A: FOCUSED FULLSCREEN LEARNING MODE
+  // FOCUSED LEARNING / VIDEO PLAYER CLASSROOM VIEW
   // =========================================================================
   if (learningCourseId) {
-    const isLockedLesson = !isEnrolledInCurrent && !activeLesson.isFreePreview;
+    const course = courses.find((c) => c.id === learningCourseId) || courses[0];
+    const progressPercent = Math.round((completedLessonIds.length / (allLearningLessons.length || 1)) * 100);
 
     return (
-      <div className="min-h-screen bg-slate-950 text-white font-bangla flex flex-col">
-        {/* Top Focused Navbar */}
-        <header className="h-16 bg-slate-900 border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setLearningCourseId(null)}
-              className="flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-xl transition"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>ড্যাশবোর্ডে ফিরুন</span>
-            </button>
-            <div className="hidden sm:block border-l border-slate-700 h-5" />
-            <h1 className="text-xs sm:text-sm font-bold text-emerald-400 truncate max-w-md">
-              {learningCourse.title}
-            </h1>
+      <div className="min-h-screen bg-slate-950 text-slate-100 font-bangla pb-20">
+        
+        {/* Top Video Player Bar */}
+        <div className="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-30">
+          <button
+            onClick={() => setLearningCourseId(null)}
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 px-3.5 py-2 rounded-xl transition"
+          >
+            <ArrowLeft className="w-4 h-4 text-emerald-400" />
+            <span>ড্যাশবোর্ডে ফিরে যান</span>
+          </button>
+
+          <div className="text-center hidden sm:block">
+            <h2 className="text-sm font-black text-white">{course.title}</h2>
+            <p className="text-[11px] text-emerald-400 font-bold">{activeLesson.title}</p>
           </div>
 
-          <div className="flex items-center gap-3">
-            {isEnrolledInCurrent ? (
-              <div className="hidden md:flex items-center gap-2 text-xs font-bold text-slate-300">
-                <span>প্রগ্রেস: {progressPercent}%</span>
-                <div className="w-24 bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
-                  <div
-                    className="bg-emerald-500 h-full rounded-full transition-all duration-500"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <span className="text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full">
-                ফ্রি প্রিভিউ মোড
-              </span>
-            )}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-400 hidden sm:inline">প্রগ্রেস: {progressPercent}%</span>
+            <div className="w-20 bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div className="bg-emerald-500 h-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
+            </div>
           </div>
-        </header>
+        </div>
 
-        {/* Learning Workspace Grid */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+        {/* Video Player & Curriculum Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Column: Lesson Curriculum & Lecture List */}
-          <div className="lg:col-span-4 bg-slate-900/90 border-r border-slate-800 p-4 overflow-y-auto space-y-4 max-h-[calc(100vh-4rem)]">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs font-black uppercase tracking-wider text-slate-300">কোর্স কারিকুলাম</span>
-              </div>
-              <span className="text-[11px] font-mono text-emerald-400">{allLearningLessons.length}টি লেকচার</span>
+          {/* Main Video Screen & Notes */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Embedded YouTube Player */}
+            <div className="relative aspect-video rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${activeLesson.youtubeVideoId || 'M7lc1UVf-VE'}?autoplay=1&rel=0`}
+                title={activeLesson.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full border-0"
+              />
             </div>
 
-            <div className="space-y-3">
-              {learningCourse.curriculum.map((chapter) => (
-                <div key={chapter.id} className="space-y-1.5">
-                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1 bg-slate-800/60 rounded-lg">
-                    {chapter.title}
-                  </div>
-                  <div className="space-y-1">
+            {/* Lesson Title & Controls */}
+            <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase bg-emerald-950/80 px-2.5 py-0.5 rounded border border-emerald-800">
+                  ক্লাস লেকচার • {activeLesson.durationMin} মিনিট
+                </span>
+                <h3 className="text-lg font-black text-white leading-snug">{activeLesson.title}</h3>
+              </div>
+
+              <button
+                onClick={() => toggleLessonComplete(activeLesson.id)}
+                className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition shrink-0 ${
+                  completedLessonIds.includes(activeLesson.id)
+                    ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/40'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg'
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{completedLessonIds.includes(activeLesson.id) ? 'ক্লাস সম্পন্ন হয়েছে ✓' : 'সম্পন্ন চিহ্নিত করুন'}</span>
+              </button>
+            </div>
+
+            {/* Lesson PDF Handout & Notes */}
+            <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-amber-400" />
+                  <h4 className="text-sm font-bold text-white">ক্লাস লেকচার নোটস ও হ্যান্ডআউট</h4>
+                </div>
+
+                {activeLesson.pdfNotesUrl && (
+                  <a
+                    href={activeLesson.pdfNotesUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-950/60 hover:bg-emerald-900/80 px-3 py-1.5 rounded-xl border border-emerald-800/60 transition"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>PDF ডাউনলোড</span>
+                  </a>
+                )}
+              </div>
+
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                {activeLesson.notesContent || 'এই ক্লাসের হ্যান্ডআউট ও লেকচার নোটস শীঘ্রই সংযোজন করা হবে।'}
+              </p>
+            </div>
+
+          </div>
+
+          {/* Right Curriculum Playlist */}
+          <div className="lg:col-span-4 bg-slate-900 rounded-3xl border border-slate-800 p-5 space-y-4 sticky top-20">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h4 className="text-sm font-black text-white">কোর্স কারিকুলাম</h4>
+              <span className="text-xs text-slate-400">{allLearningLessons.length}টি লেকচার</span>
+            </div>
+
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+              {course.curriculum.map((chapter) => (
+                <div key={chapter.id} className="space-y-2">
+                  <h5 className="text-xs font-bold text-emerald-400 px-2">{chapter.title}</h5>
+                  <div className="space-y-1.5">
                     {chapter.lessons.map((lesson) => {
                       const isActive = activeLesson.id === lesson.id;
-                      const isDone = completedLessonIds.includes(lesson.id);
-                      const isLocked = !isEnrolledInCurrent && !lesson.isFreePreview;
+                      const isCompleted = completedLessonIds.includes(lesson.id);
 
                       return (
-                        <button
+                        <div
                           key={lesson.id}
-                          onClick={() => {
-                            if (isLocked) {
-                              showToast('এই ক্লাসটি লক করা। সম্পূর্ণ কোর্স আনলক করতে ভর্তি সম্পন্ন করুন।', 'error');
-                            }
-                            setActiveLesson(lesson);
-                          }}
-                          className={`w-full text-left p-2.5 rounded-xl transition flex items-center justify-between gap-2.5 text-xs ${
+                          onClick={() => setActiveLesson(lesson)}
+                          className={`p-3 rounded-2xl cursor-pointer transition flex items-center justify-between text-xs ${
                             isActive
-                              ? 'bg-emerald-600/30 border border-emerald-500/50 text-white'
-                              : 'bg-slate-800/40 hover:bg-slate-800 text-slate-300'
-                          } ${isLocked ? 'opacity-60' : ''}`}
+                              ? 'bg-emerald-600 text-white font-bold shadow-lg'
+                              : 'bg-slate-950/60 text-slate-300 hover:bg-slate-800/80'
+                          }`}
                         >
-                          <div className="flex items-center gap-2 min-w-0">
-                            {isLocked ? (
-                              <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                            ) : isDone ? (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                            ) : (
-                              <Play className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            )}
-                            <span className="truncate font-semibold">{lesson.title}</span>
+                          <div className="flex items-center gap-2.5">
+                            <PlayCircle className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-emerald-400'}`} />
+                            <span className="line-clamp-1">{lesson.title}</span>
                           </div>
-                          <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                            {lesson.isFreePreview ? 'ফ্রি' : `${lesson.durationMin} মি.`}
-                          </span>
-                        </button>
+
+                          {isCompleted && (
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold">
+                              ✓
+                            </span>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
@@ -296,435 +300,327 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right Column: Video Player & Notes */}
-          <div className="lg:col-span-8 p-4 sm:p-6 overflow-y-auto max-h-[calc(100vh-4rem)] space-y-6">
-            
-            {isLockedLesson ? (
-              <div className="aspect-video rounded-3xl overflow-hidden bg-slate-900 border border-amber-500/40 p-8 flex flex-col items-center justify-center text-center space-y-4 shadow-2xl">
-                <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
-                  <Lock className="w-8 h-8" />
-                </div>
-                <div className="space-y-1 max-w-md">
-                  <h3 className="text-lg font-black text-white">এই ভিডিও লেকচারটি লক করা</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    সম্পূর্ণ কোর্স কারিকুলাম ও সকল রেকর্ডেড ক্লাস আনলক করতে ভর্তি সম্পন্ন করুন।
-                  </p>
-                </div>
-                <Link
-                  href={`/courses/${learningCourse.slug}`}
-                  className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow transition"
-                >
-                  <span>এখনই ভর্তি নিশ্চিত করুন</span>
-                </Link>
-              </div>
-            ) : (
-              <div className="relative aspect-video rounded-3xl overflow-hidden bg-black border border-slate-800 shadow-2xl">
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${activeLesson.youtubeVideoId || 'M7lc1UVf-VE'}?rel=0&modestbranding=1`}
-                  title={activeLesson.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="w-full h-full border-0"
-                />
-              </div>
-            )}
-
-            {/* Video Action & Title Bar */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
-                  বর্তমানে চলছে • {activeLesson.durationMin} মিনিট {activeLesson.isFreePreview && '(ফ্রি ওরিয়েন্টেশন)'}
-                </span>
-                <h2 className="text-base sm:text-lg font-black text-white">
-                  {activeLesson.title}
-                </h2>
-              </div>
-
-              {isEnrolledInCurrent && (
-                <button
-                  onClick={() => toggleLessonComplete(activeLesson.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
-                    completedLessonIds.includes(activeLesson.id)
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
-                  }`}
-                >
-                  <CheckCircle className="w-4 h-4" />
-                  <span>
-                    {completedLessonIds.includes(activeLesson.id)
-                      ? 'সম্পন্ন হয়েছে ✅'
-                      : 'সম্পন্ন হিসেবে চিহ্নিত করুন'}
-                  </span>
-                </button>
-              )}
-            </div>
-
-            {/* Lecture Notes & PDF Handout Download */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-emerald-400" />
-                  <h3 className="text-sm font-bold text-white">ক্লাস নোটস ও লেকচার হ্যান্ডআউট</h3>
-                </div>
-
-                {activeLesson.pdfNotesUrl && (
-                  <a
-                    href={activeLesson.pdfNotesUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl transition shadow"
-                  >
-                    <FileDown className="w-3.5 h-3.5" />
-                    <span>পিডিএফ ডাউনলোড</span>
-                  </a>
-                )}
-              </div>
-
-              <div className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
-                {activeLesson.notesContent || 'এই ক্লাসের হ্যান্ডআউট ও পয়েন্টসমূহ অর্গানন ও মেটেরিয়া মেডিকা ভিত্তিক। নিয়মিত রিভিশন ও প্র্যাকটিস করুন।'}
-              </div>
-            </div>
-
-          </div>
-
         </div>
       </div>
     );
   }
 
   // =========================================================================
-  // VIEW B: MAIN STUDENT DASHBOARD PORTAL
+  // MAIN STUDENT DASHBOARD PORTAL (SIDEBAR + TABS)
   // =========================================================================
-  const tabs: { id: StudentTab; label: string; icon: any }[] = [
-    { id: 'classroom', label: 'লাইভ ক্লাসরুম ও কোর্স', icon: GraduationCap },
-    { id: 'lectures', label: 'রেকর্ডেড লেকচার', icon: Video },
-    { id: 'notes', label: 'পিডিএফ ও নোটস', icon: FileText },
-    { id: 'monthly-fee', label: 'মাসিক ফি (৫০০/-)', icon: CreditCard },
-    { id: 'id-card', label: 'স্টুডেন্ট আইডি কার্ড', icon: ShieldCheck },
-    { id: 'certificate', label: 'সনদপত্র ও কুরিয়ার', icon: Award },
-  ];
-
   return (
-    <div className="bg-slate-950 min-h-screen font-bangla text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-bangla pb-20">
       
-      {/* Student Portal Header */}
-      <header className="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
-          
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-sm shadow">
-                BD
-              </div>
-              <span className="font-black text-white text-base hidden sm:inline">বিডি হোমিও পোর্টাল</span>
-            </Link>
+      {/* Top Student Header */}
+      <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-black text-base shadow">
+            {user.fullName.charAt(0)}
           </div>
+          <div>
+            <h1 className="text-base font-black text-white">{user.fullName}</h1>
+            <p className="text-[11px] text-emerald-400 font-mono">আইডি: BDH-{user.id.substring(0, 6).toUpperCase()}</p>
+          </div>
+        </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
-              <div className="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs font-bold">
-                {user.fullName.charAt(0)}
-              </div>
-              <span className="text-xs font-bold text-slate-200 hidden sm:inline">{user.fullName}</span>
-            </div>
-
-            <button
-              onClick={signOut}
-              className="p-2 text-slate-400 hover:text-rose-400 bg-slate-800 hover:bg-slate-700 rounded-xl transition"
-              title="লগআউট"
+        <div className="flex items-center gap-3">
+          {user.role === 'admin' && (
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition"
             >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>অ্যাডমিন প্যানেল</span>
+            </Link>
+          )}
 
+          <button
+            onClick={() => signOut()}
+            className="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 transition"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">লগআউট</span>
+          </button>
         </div>
       </header>
 
-      {/* Main Workspace Layout */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Main Student Portal Grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Left Navigation Sidebar */}
+        <aside className="lg:col-span-3 bg-slate-900 rounded-3xl p-3 border border-slate-800 space-y-1.5 sticky top-20">
+          <button
+            onClick={() => setActiveTab('classroom')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
+              activeTab === 'classroom'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <GraduationCap className="w-4 h-4" />
+            <span>লাইভ ক্লাসরুম ও শিডিউল</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('lectures')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
+              activeTab === 'lectures'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <Video className="w-4 h-4" />
+            <span>ভিডিও লেকচার লাইব্রেরি</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('notes')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
+              activeTab === 'notes'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>অধ্যায়ভিত্তিক PDF নোটস</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('monthly-fee')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
+              activeTab === 'monthly-fee'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>মাসিক ফি ও পেমেন্ট</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('id-card')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
+              activeTab === 'id-card'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>ভার্চুয়াল আইডি কার্ড</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('certificate')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition ${
+              activeTab === 'certificate'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <Award className="w-4 h-4" />
+            <span>সনদপত্র ও কুরিয়ার ডেলিভারি</span>
+          </button>
+        </aside>
+
+        {/* Right Main Content Tabs */}
+        <main className="lg:col-span-9 space-y-6">
           
-          {/* Navigation Sidebar */}
-          <div className="lg:col-span-3 space-y-3 bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-xl">
-            <div className="p-3 bg-slate-800/60 rounded-2xl border border-slate-700/60 text-center space-y-1">
-              <span className="text-[10px] uppercase font-mono font-bold text-emerald-400">স্টুডেন্ট একাউন্ট</span>
-              <p className="text-xs font-black text-white truncate">{user.fullName}</p>
-              <p className="text-[10px] text-slate-400 font-mono truncate">{user.email}</p>
-            </div>
+          {/* TAB 1: LIVE CLASSROOM */}
+          {activeTab === 'classroom' && (
+            <div className="space-y-6">
+              
+              {/* Google Meet Launcher Banner */}
+              <GoogleMeetLauncher />
 
-            <div className="space-y-1 pt-2">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${
-                      isActive
-                        ? 'bg-emerald-600 text-white shadow-md'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 shrink-0" />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+              {/* Morning Case Support Box */}
+              <MorningSupportBox />
 
-          {/* Main Display Pane */}
-          <div className="lg:col-span-9 space-y-6">
-            
-            {/* Pending Admission Alert (If submitted but not yet approved) */}
-            {pendingEnrollments.length > 0 && myEnrolledCourses.length === 0 && (
-              <div className="bg-amber-950/60 border border-amber-500/40 rounded-3xl p-5 flex items-start gap-4 text-amber-200">
-                <Clock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-white">আপনার ভর্তি আবেদনটি যাচাইাধীন রয়েছে</h4>
-                  <p className="text-xs text-amber-200/80 leading-relaxed">
-                    অ্যাডমিন কর্তৃক পেমেন্ট ভেরিফিকেশন সম্পন্ন হওয়ার পর আপনার সম্পূর্ণ ভিডিও ক্লাসরুম ও স্টুডেন্ট আইডি স্বয়ংক্রিয়ভাবে সক্রিয় হবে।
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 1: CLASSROOM & ENROLLED COURSES */}
-            {activeTab === 'classroom' && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <GoogleMeetLauncher />
-                  <MorningSupportBox />
-                </div>
-
-                <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                    <div>
-                      <h3 className="text-lg font-black text-white">আমার এনরোল্ড কোর্সসমূহ</h3>
-                      <p className="text-xs text-slate-400">কোর্সের রেকর্ডেড ক্লাস ও লেকচার দেখতে ক্লাসরুমে প্রবেশ করুন</p>
-                    </div>
-                  </div>
-
-                  {myEnrolledCourses.length === 0 ? (
-                    <div className="bg-slate-950 rounded-2xl border border-slate-800 p-8 text-center space-y-4">
-                      <GraduationCap className="w-10 h-10 text-slate-500 mx-auto" />
-                      <div className="space-y-1 max-w-md mx-auto">
-                        <h4 className="text-base font-bold text-white">আপনি এখনো কোনো কোর্সে ভর্তি হননি</h4>
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                          হ্যানিম্যানের খাঁটি হোমিওপ্যাথি প্রশিক্ষণ নিতে আপনার পছন্দের কোর্সে ভর্তি আবেদন সম্পন্ন করুন।
-                        </p>
-                      </div>
-                      <Link
-                        href="/courses"
-                        className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow transition"
-                      >
-                        <span>সকল কোর্স দেখুন ও ভর্তি হোন</span>
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      {myEnrolledCourses.map((course) => (
-                        <div
-                          key={course.id}
-                          className="bg-slate-950 rounded-2xl border border-slate-800 p-5 space-y-4 flex flex-col justify-between"
-                        >
-                          <div className="space-y-3">
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900">
-                              <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" />
-                            </div>
-                            <h4 className="text-sm font-bold text-white leading-snug">{course.title}</h4>
-                            <p className="text-xs text-slate-400 line-clamp-2">{course.subtitle}</p>
-                          </div>
-
-                          <button
-                            onClick={() => handleEnterCoursePlayer(course)}
-                            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow"
-                          >
-                            <PlayCircle className="w-4 h-4" />
-                            <span>ভিডিও ক্লাসরুমে প্রবেশ করুন</span>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: RECORDED LECTURES */}
-            {activeTab === 'lectures' && (
+              {/* Enrolled Courses Quick Cards */}
               <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                   <div>
-                    <h3 className="text-lg font-black text-white">রেকর্ডেড ভিডিও লেকচার</h3>
-                    <p className="text-xs text-slate-400">যে কোর্সটির ক্লাস দেখতে চান সিলেক্ট করুন</p>
+                    <h3 className="text-lg font-black text-white">আমার কোর্স ও ভিডিও ক্লাসরুম</h3>
+                    <p className="text-xs text-slate-400">আপনার নথিভুক্ত কোর্সসমূহ থেকে ভিডিও ক্লাসে প্রবেশ করুন</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {courses.map((course) => {
-                    const isEnrolled = myEnrolledCourses.some((c) => c.id === course.id);
-                    return (
-                      <div key={course.id} className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
-                        <div className="flex items-start justify-between gap-2">
-                          <h4 className="font-bold text-sm text-white">{course.title}</h4>
-                          {isEnrolled ? (
-                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded shrink-0">
-                              অনুমোদিত ✅
-                            </span>
-                          ) : (
-                            <span className="text-[10px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded shrink-0">
-                              ফ্রি ট্রায়াল
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="text-xs text-slate-400">{course.curriculum.flatMap((c) => c.lessons).length}টি ভিডিও লেকচার উপলব্ধ</p>
-
-                        <button
-                          onClick={() => handleEnterCoursePlayer(course)}
-                          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2"
-                        >
-                          <Play className="w-4 h-4" />
-                          <span>{isEnrolled ? 'ভিডিও প্লেয়ার খুলুন' : 'ফ্রি ক্লাস দেখুন'}</span>
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: NOTES & PDF HANDOUTS */}
-            {activeTab === 'notes' && <PDFList />}
-
-            {/* TAB 4: MONTHLY FEE */}
-            {activeTab === 'monthly-fee' && <MonthlyFeeStatus />}
-
-            {/* TAB 5: STUDENT ID CARD */}
-            {activeTab === 'id-card' && (
-              <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 text-center">
-                <h3 className="text-lg font-black text-white">ভার্চুয়াল স্টুডেন্ট আইডি কার্ড</h3>
-                
-                {myEnrolledCourses.length > 0 ? (
-                  <div className="max-w-sm mx-auto bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 rounded-3xl p-6 border-2 border-emerald-500/40 shadow-2xl text-left space-y-5">
-                    <div className="flex items-center justify-between border-b border-emerald-800/60 pb-3">
-                      <span className="text-xs font-black text-emerald-400">বিডি হোমিও প্রশিক্ষণ কেন্দ্র</span>
-                      <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                    </div>
-
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-14 h-14 rounded-2xl bg-emerald-700 text-white font-black text-lg flex items-center justify-center shadow">
-                        {user.fullName.charAt(0)}
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-black text-white">{user.fullName}</h4>
-                        <p className="text-[10px] text-slate-300 font-mono">আইডি: BDH-{user.id.substring(0, 8).toUpperCase()}</p>
-                        <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded">
-                          সক্রিয় শিক্ষার্থী ✅
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="text-[11px] text-slate-300 space-y-1 pt-2 border-t border-emerald-800/40">
-                      <p>কোর্স: {myEnrolledCourses[0]?.title}</p>
-                      <p>প্রশিক্ষক: ডাঃ মোঃ গিয়াস উদ্দিন</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 max-w-sm mx-auto space-y-3">
-                    <AlertCircle className="w-8 h-8 text-amber-400 mx-auto" />
-                    <p className="text-xs text-slate-300">ভর্তি অনুমোদিত হলে আপনার ভার্চুয়াল আইডি কার্ড জেনারেট হবে।</p>
-                    <Link href="/courses" className="inline-block text-xs font-bold text-emerald-400 hover:underline">
-                      কোর্স ক্যাটালগ দেখুন ↗
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* TAB 6: PTF CERTIFICATE & COURIER DISPATCH */}
-            {activeTab === 'certificate' && (
-              <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-                  <Award className="w-6 h-6 text-amber-400" />
-                  <div>
-                    <h3 className="text-lg font-black text-white">PTF প্রফেশনাল সার্টিফিকেট ও কুরিয়ার ডেলিভারি</h3>
-                    <p className="text-xs text-slate-400">৬ মাসের কোর্স সমাপনী সনদপত্র সরাসরি আপনার চেম্বার বা ঠিকানায় কুরিয়ারে পেতে ফর্ম পূরণ করুন</p>
-                  </div>
-                </div>
-
-                {existingCertReq ? (
-                  <div className="bg-emerald-950/60 border border-emerald-800 rounded-2xl p-6 space-y-3">
-                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
-                      <CheckCircle2 className="w-5 h-5" />
-                      <span>আপনার সার্টিফিকেট কুরিয়ার রিকোয়েস্ট জমা আছে!</span>
-                    </div>
-                    <div className="text-xs text-slate-300 space-y-1">
-                      <p><strong>প্রাপকের ঠিকানা:</strong> {existingCertReq.courierAddress}</p>
-                      <p><strong>মোবাইল:</strong> {existingCertReq.phone}</p>
-                      <p><strong>বর্তমান স্ট্যাটাস:</strong> <span className="font-bold text-amber-400 uppercase">{existingCertReq.status}</span></p>
-                    </div>
-                  </div>
-                ) : (
-                  <form onSubmit={handleCourierSubmit} className="space-y-4 max-w-lg">
-                    <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
-                        সার্টিফিকেটে যে নাম থাকবে (Full Name) *
-                      </label>
-                      <input
-                        type="text"
-                        disabled
-                        value={user.fullName}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-400 font-bold"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
-                        কুরিয়ার যোগাযোগের মোবাইল নম্বর *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={courierPhone}
-                        onChange={(e) => setCourierPhone(e.target.value)}
-                        placeholder="01XXXXXXXXX"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-mono"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold text-slate-300 block mb-1">
-                        সম্পূর্ণ কুরিয়ার ডেলিভারি ঠিকানা (চেম্বার / বাড়ি) *
-                      </label>
-                      <textarea
-                        required
-                        rows={3}
-                        value={courierAddress}
-                        onChange={(e) => setCourierAddress(e.target.value)}
-                        placeholder="যেমন: ডাঃ আশরাফুল চেম্বার, মেইন রোড, সদর..."
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs text-white outline-none focus:border-emerald-500"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isCourierSubmitting}
-                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {courses.map((course) => (
+                    <div
+                      key={course.id}
+                      className="bg-slate-950 rounded-2xl p-5 border border-slate-800 space-y-4 hover:border-emerald-500/40 transition"
                     >
-                      <Truck className="w-4 h-4" />
-                      <span>{isCourierSubmitting ? 'সংরক্ষণ হচ্ছে...' : 'সনদপত্র ডেলিভারি ঠিকানা সাবমিট করুন'}</span>
-                    </button>
-                  </form>
-                )}
+                      <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900">
+                        <Image src={course.thumbnailUrl} alt={course.title} fill sizes="400px" className="object-cover" />
+                      </div>
+
+                      <div className="space-y-1">
+                        <h4 className="font-bold text-sm text-white">{course.title}</h4>
+                        <p className="text-xs text-slate-400">{course.curriculum.flatMap((c) => c.lessons).length}টি ভিডিও লেকচার</p>
+                      </div>
+
+                      <button
+                        onClick={() => setLearningCourseId(course.id)}
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 rounded-xl shadow transition flex items-center justify-center gap-2"
+                      >
+                        <Play className="w-4 h-4" />
+                        <span>ভিডিও ক্লাসরুমে প্রবেশ করুন</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-            )}
 
-          </div>
+            </div>
+          )}
 
-        </div>
+          {/* TAB 2: LECTURES LIBRARY */}
+          {activeTab === 'lectures' && (
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
+              <div className="border-b border-slate-800 pb-4">
+                <h3 className="text-lg font-black text-white">ভিডিও লেকচার লাইব্রেরি</h3>
+                <p className="text-xs text-slate-400">যে কোনো কোর্স সিলেক্ট করে প্লেয়ার ওপেন করুন</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3"
+                  >
+                    <h4 className="font-bold text-sm text-white">{course.title}</h4>
+                    <p className="text-xs text-slate-400">{course.curriculum.flatMap((c) => c.lessons).length}টি ভিডিও লেকচার উপলব্ধ</p>
+                    <button
+                      onClick={() => setLearningCourseId(course.id)}
+                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2"
+                    >
+                      <Play className="w-4 h-4" />
+                      <span>ভিডিও প্লেয়ার খুলুন</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: NOTES & PDF HANDOUTS */}
+          {activeTab === 'notes' && <PDFList />}
+
+          {/* TAB 4: MONTHLY FEE */}
+          {activeTab === 'monthly-fee' && <MonthlyFeeStatus />}
+
+          {/* TAB 5: STUDENT ID CARD */}
+          {activeTab === 'id-card' && (
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 text-center">
+              <h3 className="text-lg font-black text-white">ভার্চুয়াল স্টুডেন্ট আইডি কার্ড</h3>
+              
+              <div className="max-w-sm mx-auto bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 rounded-3xl p-6 border-2 border-emerald-500/40 shadow-2xl text-left space-y-5">
+                <div className="flex items-center justify-between border-b border-emerald-800/60 pb-3">
+                  <span className="text-xs font-black text-emerald-400">বিডি হোমিও প্রশিক্ষণ কেন্দ্র</span>
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                </div>
+
+                <div className="flex items-center gap-3.5">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-700 text-white font-black text-lg flex items-center justify-center shadow">
+                    {user.fullName.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-white">{user.fullName}</h4>
+                    <p className="text-[10px] text-slate-300 font-mono">আইডি: BDH-{user.id.substring(0, 8).toUpperCase()}</p>
+                    <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded">
+                      ভেরিফায়েড শিক্ষার্থী
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-slate-300 space-y-1 pt-2 border-t border-emerald-800/40">
+                  <p>কোর্স: বেসিক ও ক্লিনিক্যাল হোমিওপ্যাথি</p>
+                  <p>ট্রেইনার: ডাঃ মোঃ গিয়াস উদ্দিন</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: PTF CERTIFICATE & COURIER DISPATCH */}
+          {activeTab === 'certificate' && (
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6">
+              <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <Award className="w-6 h-6 text-amber-400" />
+                <div>
+                  <h3 className="text-lg font-black text-white">PTF প্রফেশনাল সার্টিফিকেট ও কুরিয়ার ডেলিভারি</h3>
+                  <p className="text-xs text-slate-400">৬ মাসের কোর্স সমাপনী সনদপত্র সরাসরি আপনার চেম্বার বা ঠিকানায় কুরিয়ারে পেতে ফর্ম পূরণ করুন</p>
+                </div>
+              </div>
+
+              {existingCertReq ? (
+                <div className="bg-emerald-950/60 border border-emerald-800 rounded-2xl p-6 space-y-3">
+                  <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span>আপনার সার্টিফিকেট কুরিয়ার রিকোয়েস্ট জমা আছে!</span>
+                  </div>
+                  <div className="text-xs text-slate-300 space-y-1">
+                    <p><strong>প্রাপকের ঠিকানা:</strong> {existingCertReq.courierAddress}</p>
+                    <p><strong>মোবাইল:</strong> {existingCertReq.phone}</p>
+                    <p><strong>বর্তমান স্ট্যাটাস:</strong> <span className="font-bold text-amber-400 uppercase">{existingCertReq.status}</span></p>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleCourierSubmit} className="space-y-4 max-w-lg">
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1">
+                      সার্টিফিকেটে যে নাম থাকবে (Full Name) *
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={user.fullName}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-400 font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1">
+                      কুরিয়ার যোগাযোগের মোবাইল নম্বর *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={courierPhone}
+                      onChange={(e) => setCourierPhone(e.target.value)}
+                      placeholder="01XXXXXXXXX"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-emerald-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1">
+                      সম্পূর্ণ কুরিয়ার ডেলিভারি ঠিকানা (চেম্বার / বাড়ি) *
+                    </label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={courierAddress}
+                      onChange={(e) => setCourierAddress(e.target.value)}
+                      placeholder="যেমন: ডাঃ আশরাফুল চেম্বার, মেইন রোড, সদর..."
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs text-white outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isCourierSubmitting}
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+                  >
+                    <Truck className="w-4 h-4" />
+                    <span>{isCourierSubmitting ? 'সংরক্ষণ হচ্ছে...' : 'সনদপত্র ডেলিভারি ঠিকানা সাবমিট করুন'}</span>
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
+        </main>
+
       </div>
 
     </div>
