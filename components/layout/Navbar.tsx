@@ -3,60 +3,60 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
 import { useApp } from '@/lib/store';
+import { OrientationModal } from '@/components/landing/OrientationModal';
 import { 
   Menu, 
   X, 
+  ChevronDown, 
+  GraduationCap, 
+  ShieldCheck, 
+  LogIn, 
+  LogOut, 
   BookOpen, 
   User, 
   Phone, 
-  Sparkles, 
-  LogIn, 
-  LogOut, 
-  ShieldCheck, 
-  GraduationCap,
-  ChevronDown
+  Sparkles,
+  Camera
 } from 'lucide-react';
-import { OrientationModal } from '@/components/landing/OrientationModal';
 
 export function Navbar() {
-  const pathname = usePathname();
-  const { user, signOut, signInWithGoogle } = useApp();
+  const { user, signInWithGoogle, signOut } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isOrientationOpen, setIsOrientationOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isOrientationOpen, setIsOrientationOpen] = useState(false);
 
   const navLinks = [
     { name: 'হোম', href: '/' },
     { name: 'সকল কোর্স', href: '/courses' },
-    { name: 'ডাঃ গিয়াস উদ্দিন', href: '/about' },
-    { name: 'গ্যালারি ও কর্মশালা', href: '/about#gallery' },
+    { name: 'ডাঃ মোঃ গিয়াস উদ্দিন', href: '/about' },
+    { name: 'গ্যালারি ও কর্মশালা', href: '/gallery' },
     { name: 'যোগাযোগ', href: '/contact' },
   ];
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-sm font-bangla transition-all">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-emerald-100 font-bangla transition shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             
-            {/* Logo & Institute Identity */}
+            {/* Logo & Brand Identity */}
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-12 h-12 rounded-2xl overflow-hidden shadow-md border-2 border-emerald-600/20 group-hover:border-emerald-600 transition-colors">
+              <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-emerald-50 border-2 border-emerald-600/30 p-1 flex items-center justify-center group-hover:scale-105 transition shadow-sm">
                 <Image
                   src="/assets/logo.png"
                   alt="বিডি হোমিও লোগো"
                   fill
-                  className="object-contain p-1"
+                  sizes="48px"
+                  className="object-contain p-0.5"
                   priority
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-black text-emerald-950 tracking-tight leading-none group-hover:text-emerald-700 transition">
+                <span className="text-xl sm:text-2xl font-black text-emerald-950 tracking-tight leading-none">
                   বিডি হোমিও
                 </span>
-                <span className="text-[11px] font-bold text-slate-600 tracking-normal mt-0.5">
+                <span className="text-[11px] font-semibold text-emerald-700 tracking-normal mt-0.5">
                   প্রশিক্ষণ কেন্দ্র • BD Homeo
                 </span>
               </div>
@@ -64,54 +64,48 @@ export function Navbar() {
 
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center gap-7">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className={`text-sm font-bold transition-colors hover:text-emerald-700 relative py-1 ${
-                      isActive ? 'text-emerald-800 font-extrabold' : 'text-slate-700'
-                    }`}
-                  >
-                    {link.name}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-600 rounded-full" />
-                    )}
-                  </Link>
-                );
-              })}
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-sm font-bold text-slate-700 hover:text-emerald-700 transition"
+                >
+                  {link.name}
+                </Link>
+              ))}
             </nav>
 
-            {/* Right Action Button Group */}
-            <div className="hidden sm:flex items-center gap-3">
+            {/* Desktop CTA & Auth Hub */}
+            <div className="hidden lg:flex items-center gap-3.5">
               
-              {/* Free Orientation Trigger */}
+              {/* Free Orientation Lead Button */}
               <button
                 onClick={() => setIsOrientationOpen(true)}
-                className="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-1.5"
+                className="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl shadow hover:shadow-md transition flex items-center gap-1.5"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
                 <span>ফ্রি ওরিয়েন্টেশন</span>
               </button>
 
-              {/* User Account / Login State */}
+              {/* User Dropdown Profile or Google Login */}
               {user ? (
                 <div className="relative">
                   <button
                     onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                    className="flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-950 transition"
+                    className="flex items-center gap-2 p-1.5 pr-3 rounded-full bg-slate-100 hover:bg-slate-200 transition border border-slate-200"
                   >
-                    <div className="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px] font-bold">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-emerald-700 text-white font-bold flex items-center justify-center text-xs">
                       {user.avatarUrl ? (
-                        <Image src={user.avatarUrl} alt={user.fullName} width={24} height={24} className="rounded-full" />
+                        <Image src={user.avatarUrl} alt={user.fullName} fill sizes="32px" className="object-cover" />
                       ) : (
                         user.fullName.charAt(0)
                       )}
                     </div>
-                    <span className="max-w-[110px] truncate">{user.fullName}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-black uppercase ${user.role === 'admin' ? 'bg-amber-400 text-slate-950' : 'bg-emerald-200 text-emerald-900'}`}>
-                      {user.role === 'admin' ? 'Admin' : 'Student'}
+                    <span className="text-xs font-bold text-slate-800 max-w-[100px] truncate">
+                      {user.fullName}
+                    </span>
+                    <span className="text-[10px] font-black uppercase bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded">
+                      {user.role === 'admin' ? 'ADMIN' : 'STUDENT'}
                     </span>
                     <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
                   </button>
@@ -121,10 +115,10 @@ export function Navbar() {
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2">
                       <div className="px-4 py-2 border-b border-slate-100">
                         <p className="text-xs font-bold text-slate-900 truncate">{user.fullName}</p>
-                        <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
+                        <p className="text-[11px] text-slate-500 truncate font-mono">{user.email}</p>
                       </div>
 
-                      {user.role === 'admin' ? (
+                      {user.role === 'admin' && (
                         <Link
                           href="/admin"
                           onClick={() => setIsUserDropdownOpen(false)}
@@ -133,24 +127,15 @@ export function Navbar() {
                           <ShieldCheck className="w-4 h-4 text-emerald-700" />
                           <span>অ্যাডমিন কন্ট্রোল প্যানেল</span>
                         </Link>
-                      ) : (
-                        <Link
-                          href="/dashboard"
-                          onClick={() => setIsUserDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-emerald-900 hover:bg-emerald-50 transition"
-                        >
-                          <GraduationCap className="w-4 h-4 text-emerald-700" />
-                          <span>শিক্ষার্থী ক্লাসরুম (Dashboard)</span>
-                        </Link>
                       )}
 
                       <Link
                         href="/dashboard"
                         onClick={() => setIsUserDropdownOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition"
+                        className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-emerald-900 hover:bg-emerald-50 transition"
                       >
-                        <BookOpen className="w-4 h-4 text-slate-500" />
-                        <span>আমার কোর্সসমূহ ও ক্লাস</span>
+                        <GraduationCap className="w-4 h-4 text-emerald-700" />
+                        <span>শিক্ষার্থী ক্লাসরুম (LMS)</span>
                       </Link>
 
                       <div className="border-t border-slate-100 mt-1 pt-1">
@@ -218,7 +203,7 @@ export function Navbar() {
                 }}
                 className="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs py-3 rounded-xl shadow text-center"
               >
-                ফ্রি ওরিয়েন্টেশন ক্লাসে জয়েন করুন
+                ফ্রি ওরিয়েন্টেশন ক্লাসে যুক্ত হন
               </button>
 
               {user ? (

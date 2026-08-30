@@ -50,8 +50,30 @@ export interface GalleryItem {
   id: string;
   src: string;
   title: string;
+  subtitle?: string;
   category: string;
   desc: string;
+  date?: string;
+  showOnHome?: boolean;
+}
+
+export interface VideoShowcaseItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  youtubeId: string;
+  duration: string;
+  tag: string;
+}
+
+export interface TestimonialItem {
+  id: string;
+  name: string;
+  designation: string;
+  batchName: string;
+  quote: string;
+  avatarUrl?: string;
+  rating?: number;
 }
 
 export interface SiteSettings {
@@ -70,6 +92,8 @@ export interface SiteSettings {
   ptfCertificateImageUrl: string;
   metaOgImageUrl: string;
   galleryImages: GalleryItem[];
+  videoShowcaseList: VideoShowcaseItem[];
+  testimonials: TestimonialItem[];
   bkashNumber: string;
   bkashType: 'Personal' | 'Merchant';
   nagadNumber: string;
@@ -135,14 +159,4 @@ export interface OrientationLead {
 export interface FAQItem {
   question: string;
   answer: string;
-}
-
-export interface TestimonialItem {
-  id: string;
-  name: string;
-  designation: string;
-  batchName: string;
-  quote: string;
-  avatarUrl?: string;
-  rating?: number;
 }

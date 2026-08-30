@@ -15,7 +15,9 @@ import {
   ArrowRight,
   Clock,
   MapPin,
-  HeartHandshake
+  HeartHandshake,
+  Users,
+  Target
 } from 'lucide-react';
 
 export default function AboutPage() {
@@ -51,6 +53,7 @@ export default function AboutPage() {
                   src={settings.doctorPortraitUrl || '/assets/sir/sir-portrait.jpg'}
                   alt={settings.doctorName}
                   fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover"
                   priority
                 />
@@ -58,7 +61,7 @@ export default function AboutPage() {
 
               <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 space-y-3">
                 <h3 className="text-lg font-black text-slate-900">এক নজরে পরিচিতি</h3>
-                <div className="space-y-2 text-xs sm:text-sm text-slate-700">
+                <div className="space-y-2.5 text-xs sm:text-sm text-slate-700">
                   <p>🔹 <strong>নাম:</strong> {settings.doctorName}</p>
                   <p>🔹 <strong>পদবী:</strong> {settings.doctorTitle}</p>
                   <p>🔹 <strong>যোগ্যতা:</strong> {settings.doctorDegrees}</p>
@@ -85,25 +88,41 @@ export default function AboutPage() {
                 ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি নির্দেশনায় বিডি হোমিও প্রশিক্ষণ কেন্দ্র পরিচালিত হচ্ছে। বহু শিক্ষার্থী প্রাতিষ্ঠানিক ডিগ্রি অর্জনের পরও বাস্তব চেম্বারে রোগী আরোগ্যের ক্ষেত্রে দ্বিধাদ্বন্দ্বে পড়েন। এই ঘাটতি দূর করতেই অর্গানন অব মেডিসিনের মৌলিক নীতিমালা, মেটেরিয়া মেডিকার ড্রাগ পিকচার ও রেপার্টরির সঠিক ব্যবহারিক সমন্বয়ে চালু করা হয়েছে <strong>বিডি হোমিও প্রশিক্ষণ কেন্দ্র</strong>।
               </p>
 
-              <div className="space-y-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-5 space-y-2">
                   <h4 className="text-base font-bold text-emerald-950 flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-emerald-700" />
-                    ক্লাসিক্যাল মেটেরিয়া মেডিকা ও ড্রাগ পিকচার
+                    ক্লাসিক্যাল মেটেরিয়া মেডিকা
                   </h4>
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    ওষুধের লক্ষণাবলি কেবল তোতাপাখির মতো মুখস্থ না করে রোগীর মানসিক অনুভূতির সাথে ওষুধের কেন্দ্রীয় বৈশিষ্ট্য (Core Sensation) মিলিয়ে ওষুধ নির্বাচন করা শেখানো হয়।
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    ওষুধের লক্ষণাবলি কেবল তোতাপাখির মতো মুখস্থ না করে রোগীর মানসিক অনুভূতির সাথে ওষুধের কেন্দ্রীয় বৈশিষ্ট্য (Core Sensation) মিলিয়ে ওষুধ নির্বাচন।
                   </p>
                 </div>
 
                 <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 space-y-2">
                   <h4 className="text-base font-bold text-amber-950 flex items-center gap-2">
                     <Stethoscope className="w-5 h-5 text-amber-700" />
-                    সকালের মর্নিং কেস ডিসকাশন ও সরাসরি সমাধান
+                    মর্নিং কেস ডিসকাশন
                   </h4>
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    সপ্তাহে ৬ দিন সকাল ৮:০০ টায় সরাসরি লাইভ ক্লাসে চিকিৎসকদের চেম্বারে আসা জটিল ও নতুন রোগীদের কেস অ্যানালাইসিস করে ওষুধ ও পটেন্সি নির্ধারণ করে দেওয়া হয়।
+                  <p className="text-xs text-slate-700 leading-relaxed">
+                    সপ্তাহে ৬ দিন সকাল ৮:০০ টায় সরাসরি লাইভ ক্লাসে চিকিৎসকদের চেম্বারে আসা জটিল ও নতুন রোগীর কেস সলভিং।
                   </p>
+                </div>
+              </div>
+
+              {/* Milestones */}
+              <div className="grid grid-cols-3 gap-3 pt-3 text-center">
+                <div className="p-4 bg-slate-900 text-white rounded-2xl">
+                  <span className="text-xl sm:text-2xl font-black font-english text-emerald-400">১০০০+</span>
+                  <p className="text-[11px] text-slate-300 font-bold mt-0.5">সফল শিক্ষার্থী</p>
+                </div>
+                <div className="p-4 bg-slate-900 text-white rounded-2xl">
+                  <span className="text-xl sm:text-2xl font-black font-english text-amber-400">৬৪</span>
+                  <p className="text-[11px] text-slate-300 font-bold mt-0.5">জেলায় প্র্যাকটিশনার</p>
+                </div>
+                <div className="p-4 bg-slate-900 text-white rounded-2xl">
+                  <span className="text-xl sm:text-2xl font-black font-english text-purple-300">২০+</span>
+                  <p className="text-[11px] text-slate-300 font-bold mt-0.5">বছরের অভিজ্ঞতা</p>
                 </div>
               </div>
 
@@ -117,10 +136,10 @@ export default function AboutPage() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  href="/contact"
+                  href="/gallery"
                   className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm px-6 py-3.5 rounded-xl transition"
                 >
-                  যোগাযোগ করুন
+                  ফটো গ্যালারি দেখুন
                 </Link>
               </div>
 

@@ -7,12 +7,13 @@ import { useApp } from '@/lib/store';
 import { 
   Phone, 
   MessageCircle, 
+  MapPin, 
+  Clock, 
   Youtube, 
   Facebook, 
-  AlertTriangle, 
   Award, 
-  Clock,
-  Heart
+  CheckCircle2, 
+  Send
 } from 'lucide-react';
 
 export function Footer() {
@@ -21,12 +22,15 @@ export function Footer() {
   return (
     <footer className="bg-slate-950 text-slate-300 font-bangla border-t border-slate-800">
       
-      {/* Upper Disclaimer Bar */}
-      <div className="bg-amber-950/40 border-b border-amber-900/30 py-4 px-4 sm:px-6 lg:px-8 text-xs text-amber-200/90 text-center">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>
-            <strong>আইনি নোটিশ:</strong> বিডি হোমিও প্রশিক্ষণ কেন্দ্র সম্পূর্ণ শিক্ষামূলক ও হোমিওপ্যাথিক একাডেমিক প্রশিক্ষণ প্রতিষ্ঠান। এখানে অনলাইনে কোনো প্রকার রোগী দেখা বা চিকিৎসা পরামর্শ দেওয়া হয় না।
+      {/* Top Value Strip */}
+      <div className="bg-emerald-950/80 border-b border-emerald-900/60 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-emerald-300 font-bold">
+            <Award className="w-4 h-4 text-amber-400" />
+            <span>প্যারামেডিকেল টেকনোলজি ফাউন্ডেশন (PTF) অনুমোদিত প্রফেশনাল হোমিওপ্যাথি একাডেমি</span>
+          </div>
+          <span className="text-slate-400">
+            প্রতিষ্ঠাতা: <strong className="text-white">{settings.doctorName || 'ডাঃ মোঃ গিয়াস উদ্দিন'}</strong>
           </span>
         </div>
       </div>
@@ -43,6 +47,7 @@ export function Footer() {
                   src="/assets/logo.png"
                   alt="বিডি হোমিও লোগো"
                   fill
+                  sizes="48px"
                   className="object-contain"
                 />
               </div>
@@ -55,7 +60,7 @@ export function Footer() {
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি নির্দেশনায় বিশুদ্ধ ক্লাসিক্যাল অর্গানন ও মেটেরিয়া মেডিকা ভিত্তিক প্রফেশনাল হোমিওপ্যাথি প্রশিক্ষণ।
+              ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি নির্দেশনায় অর্গানন অব মেডিসিন ও মেটেরিয়া মেডিকা ভিত্তিক প্র্যাকটিক্যাল হোমিওপ্যাথি একাডেমি।
             </p>
 
             <div className="flex items-center gap-3 pt-2">
@@ -92,27 +97,27 @@ export function Footer() {
           {/* Col 2: Quick Links */}
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-emerald-500 pl-2.5">
-              কোর্স ও কারিকুলাম
+              কোর্স ও পেইজসমূহ
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link href="/courses/basic-homeopathy-foundation" className="hover:text-emerald-400 transition">
-                  • বেসিক হোমিওপ্যাথি ফাউন্ডেশন (৬ মাস)
+                  🔹 বেসিক হোমিওপ্যাথি ফাউন্ডেশন (৬ মাস)
                 </Link>
               </li>
               <li>
                 <Link href="/courses/advance-clinical-repertory" className="hover:text-emerald-400 transition">
-                  • এডভান্সড ক্লিনিক্যাল রেপার্টরি কোর্স
+                  🔹 এডভান্সড ক্লিনিক্যাল রেপার্টরি কোর্স
                 </Link>
               </li>
               <li>
-                <Link href="/about#gallery" className="hover:text-emerald-400 transition">
-                  • কর্মশালা ও সেমিনার গ্যালারি
+                <Link href="/gallery" className="hover:text-emerald-400 transition">
+                  🔹 ফটো গ্যালারি ও কর্মশালা অ্যালবাম
                 </Link>
               </li>
               <li>
                 <Link href="/dashboard" className="hover:text-emerald-400 transition">
-                  • স্টুডেন্ট ক্লাসরুম লগইন
+                  🔹 শিক্ষার্থী ক্লাসরুম ড্যাশবোর্ড
                 </Link>
               </li>
             </ul>
@@ -124,17 +129,17 @@ export function Footer() {
               সার্টিফিকেশন ও পেমেন্ট
             </h4>
             <div className="space-y-2 text-xs text-slate-400">
-              <p>• <strong>সনদ:</strong> PTF অনুমোদিত হার্ডকপি সার্টিফিকেট</p>
-              <p>• <strong>ডেলিভারি:</strong> সারা বাংলাদেশে কুরিয়ার সার্ভিস</p>
-              <p>• <strong>বিকাশ:</strong> {settings.bkashNumber} ({settings.bkashType})</p>
-              <p>• <strong>নগদ:</strong> {settings.nagadNumber} ({settings.nagadType})</p>
+              <p>🔹 <strong>সনদ:</strong> PTF অনুমোদিত প্রফেশনাল সার্টিফিকেট</p>
+              <p>🔹 <strong>ডেলিভারি:</strong> সারা বাংলাদেশে হোম ডেলিভারি</p>
+              <p>🔹 <strong>বিকাশ:</strong> {settings.bkashNumber} ({settings.bkashType})</p>
+              <p>🔹 <strong>নগদ:</strong> {settings.nagadNumber} ({settings.nagadType})</p>
             </div>
           </div>
 
           {/* Col 4: Contact & Help */}
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-emerald-500 pl-2.5">
-              হেল্পলাইন ও সহায়তা
+              যোগাযোগ ও সহায়তা
             </h4>
             <div className="space-y-2.5 text-xs">
               <div className="flex items-center gap-2">
@@ -159,7 +164,7 @@ export function Footer() {
           <p>© {new Date().getFullYear()} বিডি হোমিও প্রশিক্ষণ কেন্দ্র (BD Homeo) • সর্বস্বত্ব সংরক্ষিত</p>
           <div className="flex items-center gap-4">
             <Link href="/privacy" className="hover:text-slate-300 transition">প্রাইভেসি পলিসি</Link>
-            <Link href="/terms" className="hover:text-slate-300 transition">শর্তাবলী ও রিফান্ড নীতি</Link>
+            <Link href="/terms" className="hover:text-slate-300 transition">টার্মস অ্যান্ড কন্ডিশন</Link>
           </div>
         </div>
 

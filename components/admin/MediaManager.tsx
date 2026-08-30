@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useApp } from '@/lib/store';
 import { GalleryItem } from '@/lib/types';
@@ -12,8 +12,11 @@ import {
   Upload, 
   Sparkles, 
   User,
-  FolderOpen,
-  CheckCircle2
+  Search,
+  Filter,
+  CheckCircle2,
+  Calendar,
+  Eye
 } from 'lucide-react';
 
 export function MediaManager() {
@@ -22,6 +25,8 @@ export function MediaManager() {
   const [portraitImg, setPortraitImg] = useState(settings.doctorPortraitUrl);
   const [ptfImg, setPtfImg] = useState(settings.ptfCertificateImageUrl);
   const [galleryList, setGalleryList] = useState<GalleryItem[]>(settings.galleryImages || []);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [isSaving, setIsSaving] = useState(false);
 
   // File Upload Helper
@@ -70,19 +75,29 @@ export function MediaManager() {
       id: `g-${Date.now()}`,
       src: '/assets/gallery/workshop-practical.jpg',
       title: 'নতুন কর্মশালা ও কেস স্টাডি সেশন',
+      subtitle: 'ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি ক্লিনিক্যাল ক্লাস',
       category: 'কর্মশালা',
-      desc: 'ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি ক্লিনিক্যাল ক্লাস',
+      desc: 'বাস্তব রোগীর কেস টেকিং ও লক্ষণ সংগ্রহের বিশেষ সেশন।',
+      date: 'আগস্ট ২০২৬',
+      showOnHome: true,
     };
-    setGalleryList([...galleryList, newItem]);
+    setGalleryList([newItem, ...galleryList]);
   };
 
   const handleDeleteGalleryItem = (id: string) => {
     setGalleryList(galleryList.filter((item) => item.id !== id));
   };
 
-  const handleUpdateGalleryItem = (id: string, field: keyof GalleryItem, val: string) => {
+  const handleUpdateGalleryItem = (id: string, field: keyof GalleryItem, val: any) => {
     setGalleryList(galleryList.map((item) => (item.id === id ? { ...item, [field]: val } : item)));
   };
+
+  const filteredGallery = galleryList.filter((item) => {
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          item.desc.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCat = categoryFilter === 'all' || item.category === categoryFilter;
+    return matchesSearch && matchesCat;
+  });
 
   return (
     <div className="space-y-8 font-bangla">
@@ -95,7 +110,7 @@ export function MediaManager() {
             ছবি ও মিডিয়া ম্যানেজার (Media & Gallery CMS)
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            কম্পিউটার থেকে ছবি আপলোড করুন অথবা পাথ পরিবর্তন করে ওয়েবসাইট ব্যানার ও অ্যালবাম সাজান।
+            কম্পিউটার থেকে ছবি আপলোড করুন, গ্যালারি অ্যালবাম তৈরি করুন এবং হোমপেজ সেকশনের জন্য ছবি সিলেক্ট করুন।
           </p>
         </div>
 
@@ -118,12 +133,12 @@ export function MediaManager() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* Hero Banner Image */}
+          {/* Hero Banner */}
           <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
             <div className="space-y-2">
               <span className="text-xs font-bold text-slate-300 block">হিরো ব্যানার ইমেজ</span>
               <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-                <Image src={heroImg} alt="Hero Banner" fill className="object-cover" />
+                <Image src={heroImg} alt="Hero Banner" fill sizes="33vw" className="object-cover" />
               </div>
             </div>
 
@@ -149,12 +164,12 @@ export function MediaManager() {
             </div>
           </div>
 
-          {/* Doctor Portrait Image */}
+          {/* Doctor Portrait */}
           <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
             <div className="space-y-2">
               <span className="text-xs font-bold text-slate-300 block">স্যারের প্রোফাইল পোর্ট্রেট</span>
               <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-                <Image src={portraitImg} alt="Doctor Portrait" fill className="object-cover" />
+                <Image src={portraitImg} alt="Doctor Portrait" fill sizes="33vw" className="object-cover" />
               </div>
             </div>
 
@@ -180,12 +195,12 @@ export function MediaManager() {
             </div>
           </div>
 
-          {/* PTF Certificate Image */}
+          {/* PTF Certificate */}
           <div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
             <div className="space-y-2">
               <span className="text-xs font-bold text-slate-300 block">PTF সার্টিফিকেট সনদ</span>
               <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-                <Image src={ptfImg} alt="PTF Certificate" fill className="object-cover" />
+                <Image src={ptfImg} alt="PTF Certificate" fill sizes="33vw" className="object-cover" />
               </div>
             </div>
 
@@ -214,7 +229,7 @@ export function MediaManager() {
         </div>
       </div>
 
-      {/* 2. Photo Gallery & Workshops */}
+      {/* 2. Photo Gallery & Workshops CMS */}
       <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
@@ -224,7 +239,7 @@ export function MediaManager() {
               ২. ফটো গ্যালারি ও কর্মশালা অ্যালবাম ({galleryList.length} টি ছবি)
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              কর্মশালা, সেমিনার ও সার্টিফিকেট বিতরণী অ্যালবাম পরিবর্তন করুন।
+              গ্যালারি পেজ ও হোমপেজ সেকশনের জন্য ছবি যোগ, শিরোনাম ও হোমপেজ টগল সেট করুন।
             </p>
           </div>
 
@@ -237,15 +252,45 @@ export function MediaManager() {
           </button>
         </div>
 
+        {/* Search & Filter */}
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="relative flex-1 w-full">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="শিরোনাম দিয়ে গ্যালারি খুঁজুন..."
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs text-white outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5">
+            <Filter className="w-3.5 h-3.5 text-slate-400" />
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="bg-transparent text-xs text-slate-300 font-bold outline-none cursor-pointer"
+            >
+              <option value="all">সকল ক্যাটাগরি</option>
+              <option value="কর্মশালা">কর্মশালা</option>
+              <option value="সার্টিফিকেশন">সার্টিফিকেশন</option>
+              <option value="আলোচনা সভা">আলোচনা সভা</option>
+              <option value="একাডেমিক সেশন">একাডেমিক সেশন</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Gallery Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {galleryList.map((item) => (
+          {filteredGallery.map((item) => (
             <div
               key={item.id}
               className="bg-slate-900 rounded-2xl border border-slate-800 p-4 space-y-3 flex flex-col justify-between"
             >
               <div className="flex gap-4">
-                <div className="relative w-28 h-28 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0">
-                  <Image src={item.src} alt={item.title} fill className="object-cover" />
+                <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0">
+                  <Image src={item.src} alt={item.title} fill sizes="128px" className="object-cover" />
                 </div>
 
                 <div className="flex-1 space-y-2 min-w-0">
@@ -253,15 +298,23 @@ export function MediaManager() {
                     type="text"
                     value={item.title}
                     onChange={(e) => handleUpdateGalleryItem(item.id, 'title', e.target.value)}
-                    placeholder="ছবির ক্যাপশন / শিরোনাম"
+                    placeholder="ছবির মূল শিরোনাম"
                     className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white font-bold focus:border-emerald-500 outline-none"
+                  />
+
+                  <input
+                    type="text"
+                    value={item.subtitle || ''}
+                    onChange={(e) => handleUpdateGalleryItem(item.id, 'subtitle', e.target.value)}
+                    placeholder="সাব-টাইটেল বা সংক্ষিপ্ত বিবরণ"
+                    className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-1.5 text-[11px] text-slate-300 outline-none"
                   />
 
                   <div className="grid grid-cols-2 gap-2">
                     <select
                       value={item.category}
                       onChange={(e) => handleUpdateGalleryItem(item.id, 'category', e.target.value)}
-                      className="bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs text-slate-300 outline-none"
+                      className="bg-slate-950 border border-slate-700/80 rounded-lg px-2 py-1 text-xs text-slate-300 outline-none"
                     >
                       <option value="কর্মশালা">কর্মশালা</option>
                       <option value="সার্টিফিকেশন">সার্টিফিকেশন</option>
@@ -281,13 +334,25 @@ export function MediaManager() {
                     </label>
                   </div>
 
-                  <input
-                    type="text"
-                    value={item.src}
-                    onChange={(e) => handleUpdateGalleryItem(item.id, 'src', e.target.value)}
-                    placeholder="ইমেজ পাথ বা URL"
-                    className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[10px] font-mono text-slate-400 outline-none"
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={item.date || ''}
+                      onChange={(e) => handleUpdateGalleryItem(item.id, 'date', e.target.value)}
+                      placeholder="তারিখ (যেমন: আগস্ট ২০২৬)"
+                      className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[10px] text-slate-300 outline-none"
+                    />
+
+                    <label className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={item.showOnHome !== false}
+                        onChange={(e) => handleUpdateGalleryItem(item.id, 'showOnHome', e.target.checked)}
+                        className="rounded text-emerald-600 focus:ring-0"
+                      />
+                      <span>হোমপেজে দেখান</span>
+                    </label>
+                  </div>
                 </div>
               </div>
 

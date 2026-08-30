@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { useApp } from '@/lib/store';
 import { 
   Sparkles, 
-  Award, 
-  BookOpen, 
   CheckCircle, 
   ArrowRight, 
-  Flame 
+  Award, 
+  Flame, 
+  BookOpen, 
+  GraduationCap 
 } from 'lucide-react';
 
 interface HeroProps {
@@ -21,7 +22,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
   const { settings } = useApp();
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-brand-900 to-slate-950 text-white font-bangla min-h-[calc(100vh-80px)] flex items-center py-12 lg:py-16">
+    <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-slate-900 to-slate-950 text-white font-bangla min-h-[calc(100vh-80px)] flex items-center py-12 lg:py-16">
       
       {/* Decorative Background Glows */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none" />
@@ -53,7 +54,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1 max-w-xl mx-auto lg:mx-0 text-left">
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 p-3 rounded-2xl shadow-sm">
                 <CheckCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="text-xs font-bold">PTF সার্টিফিকেট সহ</span>
+                <span className="text-xs font-bold">PTF সার্টিফিকেট সনদ</span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 p-3 rounded-2xl shadow-sm">
                 <Flame className="w-4 h-4 text-amber-400 shrink-0" />
@@ -61,7 +62,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 p-3 rounded-2xl shadow-sm col-span-2 sm:col-span-1">
                 <BookOpen className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="text-xs font-bold">অধ্যায়ভিত্তিক PDF নোট</span>
+                <span className="text-xs font-bold">অধ্যায়ভিত্তিক PDF নোটস</span>
               </div>
             </div>
 
@@ -71,7 +72,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
                 onClick={onOpenOrientation}
                 className="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-950 font-black text-sm sm:text-base px-8 py-4 rounded-2xl shadow-2xl hover:shadow-amber-500/30 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
               >
-                <span>ফ্রি ওরিয়েন্টেশন ক্লাসে জয়েন করুন</span>
+                <span>ফ্রি ওরিয়েন্টেশন ক্লাসে যুক্ত হন</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -80,7 +81,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
                 className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold text-sm sm:text-base px-7 py-4 rounded-2xl border border-white/20 transition flex items-center justify-center gap-2 backdrop-blur-md"
               >
                 <BookOpen className="w-4 h-4 text-emerald-400" />
-                <span>কোর্স সিলেবাস ও ফি</span>
+                <span>সকল কোর্স ও ফি দেখুন</span>
               </Link>
             </div>
 
@@ -96,6 +97,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
                   src={settings.heroImageUrl || '/assets/sir/sir-hero.jpg'}
                   alt="ডাঃ মোঃ গিয়াস উদ্দিন - বিডি হোমিও"
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 450px"
                   className="object-cover"
                   priority
                 />
@@ -107,7 +109,7 @@ export function Hero({ onOpenOrientation }: HeroProps) {
                 <div className="absolute bottom-4 left-4 right-4 bg-slate-950/85 backdrop-blur-md p-4 rounded-2xl border border-white/15 text-left shadow-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-amber-400 text-xs font-bold uppercase tracking-wider">প্রধান প্রশিক্ষক ও গবেষক</p>
+                      <p className="text-amber-400 text-xs font-bold uppercase tracking-wider">প্রধান প্রশিক্ষক ও ট্রেইনার</p>
                       <h3 className="text-base sm:text-lg font-black text-white leading-tight">{settings.doctorName || 'ডাঃ মোঃ গিয়াস উদ্দিন'}</h3>
                       <p className="text-slate-300 text-xs mt-0.5">{settings.doctorTitle || 'বিডি হোমিও প্রশিক্ষণ কেন্দ্র'}</p>
                     </div>

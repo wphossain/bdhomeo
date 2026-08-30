@@ -7,9 +7,10 @@ import { CourseCards } from '@/components/landing/CourseCards';
 import { PTFCertificate } from '@/components/landing/PTFCertificate';
 import { VideoShowcase } from '@/components/landing/VideoShowcase';
 import { TrustGallery } from '@/components/landing/TrustGallery';
+import { TestimonialSection } from '@/components/landing/TestimonialSection';
 import { FaqSection } from '@/components/landing/FaqSection';
 import { OrientationModal } from '@/components/landing/OrientationModal';
-import { Sparkles, ArrowRight, ShieldCheck, Award } from 'lucide-react';
+import { Sparkles, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -30,31 +31,34 @@ export default function HomePage() {
       {/* 4. PTF Certification & Courier Delivery Showcase */}
       <PTFCertificate />
 
-      {/* 5. YouTube Video Lectures Demo Showcase */}
+      {/* 5. YouTube Video Lectures Demo Showcase with Clean Thumbnails */}
       <VideoShowcase />
 
-      {/* 6. Real Workshop & Certificate Distribution Trust Gallery */}
+      {/* 6. Real Workshop & Certificate Distribution Trust Gallery (4-Columns) */}
       <TrustGallery />
 
-      {/* 7. Bottom High-Converting Call to Action */}
-      <section className="py-16 bg-gradient-to-r from-emerald-950 via-brand-900 to-slate-950 text-white font-bangla text-center relative overflow-hidden">
+      {/* 7. Authentic Student Reviews & Testimonials Section */}
+      <TestimonialSection />
+
+      {/* 8. Bottom High-Converting Call to Action */}
+      <section className="py-16 bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 text-white font-bangla text-center relative overflow-hidden border-b border-emerald-950">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 relative z-10">
           <span className="inline-flex items-center gap-1.5 bg-amber-400/20 text-amber-300 text-xs font-bold px-3.5 py-1.5 rounded-full border border-amber-400/40">
             <Sparkles className="w-3.5 h-3.5" />
-            আগামী ব্যাচের ভর্তি চলছে
+            <span>নতুন ব্যাচে ভর্তি চলছে</span>
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
-            হোমিওপ্যাথি প্র্যাকটিসে নিজেকে একধাপ এগিয়ে নিতে চান?
+            হোমিওপ্যাথির খাঁটি চিকিৎসায় নিজেকে একধাপ এগিয়ে নিতে চান?
           </h2>
-          <p className="text-sm sm:text-base text-emerald-100/90 max-w-2xl mx-auto">
-            ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি তত্ত্বাবধানে ৬ মাসের নিয়মতান্ত্রিক কোর্সে অংশ নিন এবং অর্গানন ও মেটেরিয়া মেডিকার গভীর জ্ঞানে পারদর্শী হয়ে উঠুন।
+          <p className="text-sm sm:text-base text-emerald-100/90 max-w-2xl mx-auto leading-relaxed">
+            ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি নির্দেশনায় ৬ মাসের ক্লাসিক্যাল কোর্স ও সকালের মর্নিং কেস সাপোর্টে যুক্ত হয়ে আত্মবিশ্বাসী ডাক্তার হিসেবে প্রতিষ্ঠিত হোন।
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <button
               onClick={() => setIsOrientationOpen(true)}
               className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-base px-8 py-4 rounded-2xl shadow-xl transition-all hover:scale-105"
             >
-              ফ্রি ওরিয়েন্টেশন ক্লাসে যোগ দিন
+              ফ্রি ওরিয়েন্টেশন ক্লাসে যুক্ত হন
             </button>
             <Link
               href="/courses"
@@ -66,7 +70,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. FAQ Section */}
+      {/* 9. FAQ Section */}
       <FaqSection />
 
       {/* Free Orientation Lead Capture Modal */}
