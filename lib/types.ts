@@ -60,10 +60,14 @@ export interface SiteSettings {
   heroSubheadline: string;
   doctorName: string;
   doctorTitle: string;
+  doctorDegrees: string;
+  doctorExperience: string;
   doctorMessage: string;
+  doctorChamberTime: string;
   heroImageUrl: string;
   doctorPortraitUrl: string;
   ptfCertificateImageUrl: string;
+  metaOgImageUrl: string;
   galleryImages: GalleryItem[];
   bkashNumber: string;
   bkashType: 'Personal' | 'Merchant';

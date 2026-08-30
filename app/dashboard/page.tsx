@@ -20,25 +20,38 @@ import {
   ExternalLink, 
   MessageCircle, 
   ChevronRight, 
-  PlayCircle,
-  FileText,
-  Lock,
+  PlayCircle, 
+  FileText, 
+  Lock, 
   Menu, 
-  X,
-  CheckCircle,
-  Home,
-  LogOut,
-  ShieldCheck
+  X, 
+  CheckCircle, 
+  Home, 
+  LogOut, 
+  ShieldCheck, 
+  QrCode, 
+  Download, 
+  Printer, 
+  MapPin, 
+  Send, 
+  Sparkles,
+  PhoneCall
 } from 'lucide-react';
 
-type StudentTab = 'classroom' | 'lectures' | 'notes' | 'monthly-fee' | 'certificate' | 'support';
+type StudentTab = 'classroom' | 'lectures' | 'notes' | 'monthly-fee' | 'id-card' | 'certificate' | 'support';
 
 export default function DashboardPage() {
-  const { user, courses, enrollments, settings, signInWithGoogle, signOut } = useApp();
+  const { user, courses, enrollments, monthlyPayments, settings, signInWithGoogle, signOut, showToast } = useApp();
   const [activeTab, setActiveTab] = useState<StudentTab>('classroom');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<string>(courses[0]?.id || 'course-basic-foundation');
   
+  // Courier Address Submission state for Certificate
+  const [courierName, setCourierName] = useState(user?.fullName || '');
+  const [courierPhone, setCourierPhone] = useState(user?.phone || '');
+  const [courierAddress, setCourierAddress] = useState('');
+  const [isCourierSubmitted, setIsCourierSubmitted] = useState(false);
+
   // Track active playing lesson
   const currentCourse = courses.find((c) => c.id === selectedCourseId) || courses[0];
   const allLessons = currentCourse?.curriculum.flatMap((c) => c.lessons) || [];
@@ -70,6 +83,13 @@ export default function DashboardPage() {
   const progressPercent = allLessons.length > 0 
     ? Math.round((completedLessonIds.length / allLessons.length) * 100)
     : 0;
+
+  const handleCourierSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!courierAddress) return;
+    setIsCourierSubmitted(true);
+    showToast('আপনার সুন্দরবন কুরিয়ার ডেলিভারি ঠিকানা সফলভাবে সাবমিট হয়েছে!', 'success');
+  };
 
   // Not logged in screen
   if (!user) {
@@ -119,8 +139,9 @@ export default function DashboardPage() {
     { id: 'classroom', label: 'লাইভ ক্লাসরুম ও শিডিউল', icon: Video, badge: 'Live' },
     { id: 'lectures', label: 'ভিডিও লেকচার ও সিলেবাস', icon: PlayCircle },
     { id: 'notes', label: 'লেকচার শিট ও PDF নোটস', icon: FileText },
-    { id: 'monthly-fee', label: 'মাসিক ফি (৳৫০০/-) ও স্ট্যাটাস', icon: CreditCard },
-    { id: 'certificate', label: 'PTF সার্টিফিকেট ট্র্যাকিং', icon: Award },
+    { id: 'monthly-fee', label: 'মাসিক ফি (৳৫০০/-) ও রসিদ', icon: CreditCard },
+    { id: 'id-card', label: 'ভার্চুয়াল স্টুডেন্ট আইডি কার্ড', icon: QrCode },
+    { id: 'certificate', label: 'PTF সার্টিফিকেট ও কুরিয়ার', icon: Award },
     { id: 'support', label: 'হেল্পলাইন ও সাপোর্ট', icon: MessageCircle },
   ];
 
@@ -154,6 +175,16 @@ export default function DashboardPage() {
 
         {/* Right Quick Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <a
+            href={settings.googleMeetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-sm transition"
+          >
+            <Video className="w-3.5 h-3.5 animate-pulse" />
+            <span className="hidden sm:inline">আজকের লাইভ ক্লাস</span>
+          </a>
+
           <Link
             href="/"
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-700 transition"
@@ -338,7 +369,8 @@ export default function DashboardPage() {
                 {activeTab === 'classroom' && 'লাইভ গুগল মিট ক্লাস ও ক্লাসরুম শিডিউল'}
                 {activeTab === 'lectures' && 'ফুল HD ভিডিও লেকচার লাইব্রেরি'}
                 {activeTab === 'notes' && 'অধ্যায়ভিত্তিক PDF লেকচার শিট ও স্টাডি মেটেরিয়াল'}
-                {activeTab === 'monthly-fee' && 'মাসিক ফি (৳৫০০/-) পেমেন্ট ও TrxID সাবমিশন'}
+                {activeTab === 'monthly-fee' && 'মাসিক ফি (৳৫০০/-) পেমেন্ট ও রসিদ হিস্ট্রি'}
+                {activeTab === 'id-card' && 'ভার্চুয়াল শিক্ষার্থী ডিজিটাল পরিচয়পত্র (Student ID)'}
                 {activeTab === 'certificate' && 'PTF প্রফেশনাল সার্টিফিকেট ও কুরিয়ার ট্র্যাকিং'}
                 {activeTab === 'support' && 'একাডেমিক হেল্পলাইন ও সরাসরি সাপোর্ট'}
               </h1>
@@ -404,8 +436,8 @@ export default function DashboardPage() {
                       <span className="text-emerald-400 font-bold">{settings.classTime}</span>
                     </div>
                     <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
-                      <span className="font-bold">ক্লাস প্ল্যাটফর্ম:</span>
-                      <span className="text-slate-300 font-bold">Google Meet (HD Live)</span>
+                      <span className="font-bold">মর্নিং কেস সাপোর্ট:</span>
+                      <span className="text-amber-400 font-bold">{settings.morningSupportTime || 'সকাল ৮:০০ টা'}</span>
                     </div>
                     <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
                       <span className="font-bold">সাপ্তাহিক শিডিউল:</span>
@@ -573,14 +605,145 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* 4. Monthly Fee Tab */}
+          {/* 4. Monthly Fee Tab & Payment History */}
           {activeTab === 'monthly-fee' && (
             <div className="space-y-6">
               <MonthlyFeeStatus courseId={selectedCourseId} />
+
+              {/* Monthly Fee Invoices / History */}
+              <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-emerald-400" />
+                    আমার মাসিক ফি রসিদ ও হিস্ট্রি
+                  </h3>
+                  <span className="text-xs text-slate-400">প্রতি মাস ৫০০/- টাকা</span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="bg-slate-950 text-slate-400 font-bold uppercase">
+                        <th className="py-3 px-4 rounded-l-xl">মাস</th>
+                        <th className="py-3 px-4">পরিমাণ</th>
+                        <th className="py-3 px-4">TrxID ও মেথড</th>
+                        <th className="py-3 px-4">স্ট্যাটাস</th>
+                        <th className="py-3 px-4 text-right rounded-r-xl">রসিদ</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                      {monthlyPayments.filter((p) => p.studentId === user.id || p.studentPhone === user.phone).length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="py-6 text-center text-slate-500">
+                            এখনো কোনো মাসিক ফি রেকর্ড নেই। উপরের ফর্ম থেকে ট্রানজেকশন আইডি সাবমিট করুন।
+                          </td>
+                        </tr>
+                      ) : (
+                        monthlyPayments
+                          .filter((p) => p.studentId === user.id || p.studentPhone === user.phone)
+                          .map((p) => (
+                            <tr key={p.id} className="hover:bg-slate-950/40">
+                              <td className="py-3 px-4 font-bold text-white">{p.monthName}</td>
+                              <td className="py-3 px-4 font-black font-english text-amber-400">৳{p.amount}/-</td>
+                              <td className="py-3 px-4 font-mono text-slate-300">{p.trxId} ({p.paymentMethod})</td>
+                              <td className="py-3 px-4">
+                                {p.status === 'approved' ? (
+                                  <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold">পরিশোধিত</span>
+                                ) : (
+                                  <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold">যাচাইধীন</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-4 text-right">
+                                <button
+                                  onClick={() => window.print()}
+                                  className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg"
+                                  title="রসিদ প্রিন্ট করুন"
+                                >
+                                  <Printer className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* 5. PTF Certificate Tab */}
+          {/* 5. Virtual Student ID Card */}
+          {activeTab === 'id-card' && (
+            <div className="space-y-6">
+              <div className="max-w-lg mx-auto bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 border-2 border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center font-black text-white shadow">
+                      <GraduationCap className="w-6 h-6 text-amber-300" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-sm text-white">বিডি হোমিও প্রশিক্ষণ কেন্দ্র</h3>
+                      <p className="text-[10px] text-emerald-400 font-bold uppercase">Official Student Identity Card</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
+                    VALID 2026
+                  </span>
+                </div>
+
+                {/* Profile Details */}
+                <div className="flex items-center gap-5">
+                  <div className="relative w-20 h-24 rounded-2xl overflow-hidden bg-slate-950 border-2 border-emerald-500/50 shrink-0">
+                    {user.avatarUrl ? (
+                      <Image src={user.avatarUrl} alt={user.fullName} fill className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-2xl font-black text-white bg-emerald-700">
+                        {user.fullName.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1 min-w-0">
+                    <h4 className="font-black text-base text-white truncate">{user.fullName}</h4>
+                    <p className="text-xs text-slate-400 font-mono truncate">{user.email}</p>
+                    <p className="text-xs font-bold text-emerald-400 truncate">{currentCourse?.title}</p>
+                    <span className="inline-block text-[10px] font-mono text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                      ID: BDH-2026-{user.id.slice(0, 5).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Verification Bar */}
+                <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-500 block">প্রশিক্ষক</span>
+                    <span className="font-bold text-white">ডাঃ মোঃ গিয়াস উদ্দিন</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-500 block">স্ট্যাটাস</span>
+                    <span className="font-bold text-emerald-400 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> ভেরিফায়েড
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-center pt-2">
+                  <button
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl border border-slate-700 shadow transition"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>আইডি কার্ড প্রিন্ট / সেভ করুন</span>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* 6. PTF Certificate Tab */}
           {activeTab === 'certificate' && (
             <div className="space-y-6">
               <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-6">
@@ -605,7 +768,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
                     <span className="text-xs text-slate-400 font-bold">সার্টিফিকেট স্ট্যাটাস</span>
-                    <p className="text-lg font-black text-amber-400">কোর্স চলমান</p>
+                    <p className="text-lg font-black text-amber-400">কোর্স চলমান ({progressPercent}% সম্পন্ন)</p>
                   </div>
                   <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
                     <span className="text-xs text-slate-400 font-bold">ডেলিভারি মাধ্যম</span>
@@ -613,14 +776,72 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-emerald-950/40 rounded-2xl border border-emerald-500/30 text-xs text-emerald-200 leading-relaxed">
-                  💡 <strong>সার্টিফিকেট প্রাপ্তির নিয়ম:</strong> কোর্স সমাপ্তির পর আপনার সম্পূর্ণ নাম ও কুরিয়ার ডেলিভারি ঠিকানা অ্যাডমিনকে কনফার্ম করলে মূল হার্ডকপি সার্টিফিকেট কুরিয়ারে পাঠিয়ে দেওয়া হবে।
+                {/* Courier Delivery Form */}
+                <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800 space-y-4">
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-emerald-400" />
+                    সার্টিফিকেট পাওয়ার জন্য সুন্দরবন কুরিয়ার ঠিকানা সাবমিট করুন
+                  </h4>
+
+                  {isCourierSubmitted ? (
+                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs text-emerald-300 font-bold flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      আপনার কুরিয়ার ডেলিভারি তথ্য সফলভাবে সংরক্ষিত হয়েছে।
+                    </div>
+                  ) : (
+                    <form onSubmit={handleCourierSubmit} className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] text-slate-400 font-bold block mb-1">প্রাপকের পুরো নাম</label>
+                          <input
+                            type="text"
+                            required
+                            value={courierName}
+                            onChange={(e) => setCourierName(e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] text-slate-400 font-bold block mb-1">যোগাযোগের মোবাইল নম্বর</label>
+                          <input
+                            type="tel"
+                            required
+                            value={courierPhone}
+                            onChange={(e) => setCourierPhone(e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-emerald-500 font-mono"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="text-[11px] text-slate-400 font-bold block mb-1">
+                            সম্পূর্ণ কুরিয়ার ঠিকানা (জেলা, থানা ও নিকটস্থ সুন্দরবন কুরিয়ার শাখা)
+                          </label>
+                          <textarea
+                            rows={2}
+                            required
+                            value={courierAddress}
+                            onChange={(e) => setCourierAddress(e.target.value)}
+                            placeholder="যেমন: ডাঃ মোঃ ... , সুন্দরবন কুরিয়ার সার্ভিস, সদর ব্রাঞ্চ, বগুড়া।"
+                            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow transition"
+                      >
+                        ঠিকানা সংরক্ষণ করুন
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
-          {/* 6. Support Tab */}
+          {/* 7. Support Tab */}
           {activeTab === 'support' && (
             <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-6">
               <h3 className="text-xl font-black text-white flex items-center gap-2">

@@ -3,30 +3,38 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { TrustGallery } from '@/components/landing/TrustGallery';
+import { useApp } from '@/lib/store';
 import { 
   Award, 
   BookOpen, 
   Stethoscope, 
-  ArrowRight
+  GraduationCap, 
+  CheckCircle2, 
+  ShieldCheck, 
+  Sparkles, 
+  ArrowRight,
+  Clock,
+  MapPin,
+  HeartHandshake
 } from 'lucide-react';
 
 export default function AboutPage() {
+  const { settings } = useApp();
+
   return (
-    <div className="bg-white min-h-screen font-bangla">
+    <div className="font-bangla bg-white">
       
-      {/* Header Banner */}
-      <section className="bg-gradient-to-b from-emerald-950 via-emerald-900 to-slate-950 text-white py-16 lg:py-24 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-4">
-          <div className="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-xs font-bold px-4 py-1.5 rounded-full border border-amber-400/30">
-            <Award className="w-4 h-4" />
-            প্রতিষ্ঠাতা ও প্রধান প্রশিক্ষক
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight">
-            ডাঃ মোঃ গিয়াস উদ্দিন ও বিডি হোমিও পরিচিতি
+      {/* Hero Header Banner */}
+      <section className="bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 py-16 lg:py-24 text-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 relative z-10">
+          <span className="inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-black uppercase px-4 py-1.5 rounded-full">
+            আমাদের লক্ষ্য ও দর্শন
+          </span>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+            বিডি হোমিও প্রশিক্ষণ কেন্দ্র ও {settings.doctorName}
           </h1>
           <p className="text-sm sm:text-base text-emerald-100/90 max-w-2xl mx-auto">
-            ক্লাসিক্যাল হোমিওপ্যাথির খাঁটি দর্শন এবং বাংলাদেশে আধুনিক বিজ্ঞানসম্মত হোমিও চিকিৎসার রূপরেখা।
+            হোমিওপ্যাথির খাঁটি দর্শন প্রচার এবং বাংলাদেশের প্রতিটি জেলায় আত্মবিশ্বাসী ক্লাসিক্যাল প্র্যাকটিশনার গড়ে তোলার একাডেমিক আন্দোলন।
           </p>
         </div>
       </section>
@@ -40,8 +48,8 @@ export default function AboutPage() {
             <div className="lg:col-span-5 space-y-6">
               <div className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-100 bg-emerald-950">
                 <Image
-                  src="/assets/sir/sir-portrait.jpg"
-                  alt="ডাঃ মোঃ গিয়াস উদ্দিন"
+                  src={settings.doctorPortraitUrl || '/assets/sir/sir-portrait.jpg'}
+                  alt={settings.doctorName}
                   fill
                   className="object-cover"
                   priority
@@ -49,13 +57,14 @@ export default function AboutPage() {
               </div>
 
               <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 space-y-3">
-                <h3 className="text-lg font-black text-slate-900">একনজরে পরিচিতি</h3>
+                <h3 className="text-lg font-black text-slate-900">এক নজরে পরিচিতি</h3>
                 <div className="space-y-2 text-xs sm:text-sm text-slate-700">
-                  <p>• <strong>নাম:</strong> ডাঃ মোঃ গিয়াস উদ্দিন</p>
-                  <p>• <strong>পদবি:</strong> অভিজ্ঞ হোমিওপ্যাথিক চিকিৎসক ও গবেষক</p>
-                  <p>• <strong>প্রতিষ্ঠাতা:</strong> বিডি হোমিও প্রশিক্ষণ কেন্দ্র</p>
-                  <p>• <strong>সার্টিফিকেশন পার্টনার:</strong> PTF (Paramedical Technology Foundation)</p>
-                  <p>• <strong>ইউটিউব চ্যানেল:</strong> BD HOMEO (@bdhomeo)</p>
+                  <p>🔹 <strong>নাম:</strong> {settings.doctorName}</p>
+                  <p>🔹 <strong>পদবী:</strong> {settings.doctorTitle}</p>
+                  <p>🔹 <strong>যোগ্যতা:</strong> {settings.doctorDegrees}</p>
+                  <p>🔹 <strong>অভিজ্ঞতা:</strong> {settings.doctorExperience}</p>
+                  <p>🔹 <strong>সার্টিফিকেশন পার্টনার:</strong> PTF (Paramedical Technology Foundation)</p>
+                  <p>🔹 <strong>চেম্বার:</strong> {settings.chamberAddress || 'ঢাকা, বাংলাদেশ'}</p>
                 </div>
               </div>
             </div>
@@ -65,35 +74,35 @@ export default function AboutPage() {
               
               <div className="space-y-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                  আমাদের গল্প ও লক্ষ্য
+                  একাডেমির প্রতিষ্ঠা ও উদ্দেশ্য
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
-                  সঠিক হোমিওপ্যাথি শিক্ষার মাধ্যমে আত্মবিশ্বাসী চিকিৎসক গড়ে তোলার প্রয়াস
+                  খাঁটি হোমিওপ্যাথিক জ্ঞান ছড়িয়ে দেওয়ার প্রত্যয়ে একটি অনন্য শিক্ষা প্রতিষ্ঠান
                 </h2>
               </div>
 
               <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-                ডাঃ মোঃ গিয়াস উদ্দিন দীর্ঘ এক দশকেরও বেশি সময় ধরে বাংলাদেশে ক্লাসিক্যাল হোমিওপ্যাথি প্র্যাকটিস ও গবেষণার সাথে নিবিড়ভাবে জড়িত। হোমিওপ্যাথিক চিকিৎসা জগতে বিভ্রান্তি দূর করে মহাত্মা স্যামুয়েল হ্যানিম্যানের মূলনীতি অনুসারে সঠিক লক্ষণ সংগ্রহ ও প্রেসক্রিপশন শেখাতে তিনি প্রতিষ্ঠা করেছেন <strong>"বিডি হোমিও প্রশিক্ষণ কেন্দ্র"</strong>।
+                ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি নির্দেশনায় বিডি হোমিও প্রশিক্ষণ কেন্দ্র পরিচালিত হচ্ছে। বহু শিক্ষার্থী প্রাতিষ্ঠানিক ডিগ্রি অর্জনের পরও বাস্তব চেম্বারে রোগী আরোগ্যের ক্ষেত্রে দ্বিধাদ্বন্দ্বে পড়েন। এই ঘাটতি দূর করতেই অর্গানন অব মেডিসিনের মৌলিক নীতিমালা, মেটেরিয়া মেডিকার ড্রাগ পিকচার ও রেপার্টরির সঠিক ব্যবহারিক সমন্বয়ে চালু করা হয়েছে <strong>বিডি হোমিও প্রশিক্ষণ কেন্দ্র</strong>।
               </p>
 
               <div className="space-y-4 pt-2">
                 <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-5 space-y-2">
                   <h4 className="text-base font-bold text-emerald-950 flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-emerald-700" />
-                    শিক্ষাদানের বিশেষত্ব
+                    ক্লাসিক্যাল মেটেরিয়া মেডিকা ও ড্রাগ পিকচার
                   </h4>
                   <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    মেটেরিয়া মেডিকার জটিল লক্ষণগুলোকে কেবল মুখস্থ করানোর পরিবর্তে ওষুধের অন্তর্নিহিত অনুভূতি ও কোর সেনসেশন (Core Sensation) ধরিয়ে দেওয়া হয়, যেন চেম্বারে রোগী দেখামাত্রই সঠিক ওষুধের ছবি চোখের সামনে ভেসে ওঠে।
+                    ওষুধের লক্ষণাবলি কেবল তোতাপাখির মতো মুখস্থ না করে রোগীর মানসিক অনুভূতির সাথে ওষুধের কেন্দ্রীয় বৈশিষ্ট্য (Core Sensation) মিলিয়ে ওষুধ নির্বাচন করা শেখানো হয়।
                   </p>
                 </div>
 
                 <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 space-y-2">
                   <h4 className="text-base font-bold text-amber-950 flex items-center gap-2">
                     <Stethoscope className="w-5 h-5 text-amber-700" />
-                    সরাসরি মর্নিং সাপোর্ট ও জবাবদিহিতা
+                    সকালের মর্নিং কেস ডিসকাশন ও সরাসরি সমাধান
                   </h4>
                   <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    সপ্তাহে ৬ দিন সকালের বিশেষ লাইভ সেশনে শিক্ষার্থীরা তাদের চেম্বারের জটিল ও গোলমেলে কেসগুলো সরাসরি স্যারের সাথে আলোচনা করে সঠিক সমাধান খুঁজে পান।
+                    সপ্তাহে ৬ দিন সকাল ৮:০০ টায় সরাসরি লাইভ ক্লাসে চিকিৎসকদের চেম্বারে আসা জটিল ও নতুন রোগীদের কেস অ্যানালাইসিস করে ওষুধ ও পটেন্সি নির্ধারণ করে দেওয়া হয়।
                   </p>
                 </div>
               </div>
@@ -104,7 +113,7 @@ export default function AboutPage() {
                   href="/courses"
                   className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm px-7 py-3.5 rounded-xl shadow transition flex items-center gap-2"
                 >
-                  <span>চলমান কোর্সসমূহ দেখুন</span>
+                  <span>সকল কোর্স দেখুন</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
@@ -120,11 +129,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      {/* Trust Gallery Component */}
-      <div id="gallery">
-        <TrustGallery />
-      </div>
 
     </div>
   );
