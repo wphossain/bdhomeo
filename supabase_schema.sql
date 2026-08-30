@@ -1,4 +1,4 @@
--- BD Homeo Database Schema
+-- BD Homeo Complete Supabase Schema
 -- Run this in your Supabase SQL Editor: https://kcbettnkbbjnekbewzcu.supabase.co
 
 -- 1. Profiles Table (Extends Supabase Auth)
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS public.orientation_leads (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Row Level Security (RLS) Policies
+-- Enable Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
@@ -114,9 +114,32 @@ ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.monthly_payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orientation_leads ENABLE ROW LEVEL SECURITY;
 
--- Allow public read access to active site settings and courses
+-- Drop existing policies if any to prevent conflict
+DROP POLICY IF EXISTS "Public can read profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Public can read site settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Public can read courses" ON public.courses;
+DROP POLICY IF EXISTS "Anyone can insert enrollment" ON public.enrollments;
+DROP POLICY IF EXISTS "Anyone can insert monthly payment" ON public.monthly_payments;
+DROP POLICY IF EXISTS "Anyone can insert lead" ON public.orientation_leads;
+
+-- Profiles Policies
+CREATE POLICY "Public can read profiles" ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Users can insert their own profile" ON public.profiles FOR INSERT WITH CHECK (true);
+CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+
+-- Site Settings & Courses
 CREATE POLICY "Public can read site settings" ON public.site_settings FOR SELECT USING (true);
 CREATE POLICY "Public can read courses" ON public.courses FOR SELECT USING (true);
+
+-- Forms & Transactions Policies
+CREATE POLICY "Anyone can insert enrollment" ON public.enrollments FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can read enrollments" ON public.enrollments FOR SELECT USING (true);
+CREATE POLICY "Anyone can insert monthly payment" ON public.monthly_payments FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can read monthly payments" ON public.monthly_payments FOR SELECT USING (true);
+CREATE POLICY "Anyone can insert lead" ON public.orientation_leads FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can read leads" ON public.orientation_leads FOR SELECT USING (true);
 
 -- Insert initial default settings
 INSERT INTO public.site_settings (id, bkash_number, bkash_type, nagad_number, nagad_type, whatsapp_number, helpline_number)

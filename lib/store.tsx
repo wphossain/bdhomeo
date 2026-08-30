@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Course, SiteSettings, UserProfile, Enrollment, MonthlyPayment, OrientationLead, UserRole } from './types';
 import { initialCourses, initialSiteSettings } from './data';
-import { supabase, isInitialAdminEmail } from './supabase';
+import { supabase } from './supabase';
 
 interface AppContextType {
   user: UserProfile | null;
@@ -60,30 +60,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     let role: UserRole = 'student';
 
     try {
-      // 1. Check Supabase profiles table for assigned role
+      // Fetch role strictly from Supabase 'profiles' table
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', sessionUser.id)
         .maybeSingle();
 
-      if (profile && profile.role) {
-        role = profile.role === 'admin' ? 'admin' : 'student';
-      } else if (isInitialAdminEmail(email)) {
+      if (profile && profile.role === 'admin') {
         role = 'admin';
-        // Auto upsert admin role in profiles table
-        await supabase.from('profiles').upsert({
-          id: sessionUser.id,
-          email,
-          full_name: fullName,
-          avatar_url: avatarUrl,
-          role: 'admin',
-          updated_at: new Date().toISOString(),
-        });
       } else {
-        // Any new user is saved as 'student' in Supabase
         role = 'student';
-        await supabase.from('profiles').upsert({
+      }
+
+      // If user profile is not present in Supabase table yet, create as student
+      if (!profile) {
+        await supabase.from('profiles').insert({
           id: sessionUser.id,
           email,
           full_name: fullName,
@@ -93,8 +85,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } catch (err) {
-      console.warn('Could not query profiles from Supabase, falling back:', err);
-      role = isInitialAdminEmail(email) ? 'admin' : 'student';
+      console.warn('Supabase profile query note:', err);
+      role = 'student';
     }
 
     const userProfile: UserProfile = {
@@ -212,7 +204,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const demoUser: UserProfile = role === 'admin'
       ? {
           id: 'demo-admin-id',
-          email: 'mikailhossain3747@gmail.com',
+          email: 'admin@bdhomeo.com',
           fullName: 'ডাঃ মোঃ গিয়াস উদ্দিন (Admin)',
           role: 'admin',
           createdAt: new Date().toISOString(),
@@ -256,7 +248,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setEnrollments(updated);
     localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
 
-    // Also persist to Supabase if table exists
     try {
       await supabase.from('enrollments').insert({
         id: newEnrollment.id,
