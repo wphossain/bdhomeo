@@ -1,30 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '@/lib/store';
-import { Sparkles, X, Megaphone } from 'lucide-react';
+import { Megaphone, Phone } from 'lucide-react';
 
 export function AnnouncementBar() {
   const { settings } = useApp();
-  const [isVisible, setIsVisible] = useState(true);
 
-  if (!settings.noticeText || !isVisible) return null;
+  if (!settings.noticeText) return null;
 
   return (
-    <div className="bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 text-slate-950 px-4 py-2 text-xs sm:text-sm font-bold font-bangla shadow-sm border-b border-amber-600/30 flex items-center justify-between transition-all">
-      <div className="max-w-7xl mx-auto flex items-center gap-2 truncate">
-        <div className="p-1 bg-slate-950 text-amber-300 rounded-md shrink-0">
-          <Megaphone className="w-3.5 h-3.5" />
+    <div className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 text-xs py-2 px-4 font-bangla font-semibold shadow-inner border-b border-amber-600/30">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        
+        <div className="flex items-center gap-2 overflow-hidden">
+          <span className="bg-slate-950 text-amber-300 text-[10px] uppercase font-black px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1 shadow-sm">
+            <Megaphone className="w-3 h-3 text-amber-300" />
+            জরুরি নোটিশ
+          </span>
+          <p className="truncate text-xs sm:text-[13px] font-bold text-slate-950">
+            {settings.noticeText}
+          </p>
         </div>
-        <span className="truncate">{settings.noticeText}</span>
+
+        <div className="hidden md:flex items-center gap-4 shrink-0 text-xs font-bold text-slate-900">
+          <a
+            href={`tel:${settings.helplineNumber ? settings.helplineNumber.replace(/[^0-9]/g, '') : '01811123993'}`}
+            className="flex items-center gap-1 hover:underline"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            <span>হেল্পলাইন: {settings.helplineNumber || '01811-123993'}</span>
+          </a>
+        </div>
+
       </div>
-      <button
-        onClick={() => setIsVisible(false)}
-        className="p-1 hover:bg-black/10 rounded-md transition text-slate-900 shrink-0"
-        aria-label="Close Notice"
-      >
-        <X className="w-3.5 h-3.5" />
-      </button>
     </div>
   );
 }

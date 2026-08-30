@@ -9,181 +9,157 @@ import {
   MessageCircle, 
   Youtube, 
   Facebook, 
+  AlertTriangle, 
   Award, 
-  AlertTriangle
+  Clock,
+  Heart
 } from 'lucide-react';
 
 export function Footer() {
   const { settings } = useApp();
 
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t border-emerald-950/80 pt-16 pb-12 font-bangla">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Important Warning Banner */}
-        <div className="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-4 sm:p-6 mb-12 flex flex-col sm:flex-row items-start sm:items-center gap-4 text-amber-200">
-          <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400 shrink-0">
-            <AlertTriangle className="w-6 h-6" />
-          </div>
-          <div>
-            <h4 className="text-base font-bold text-amber-300 mb-1">
-              জরুরি আইনি ও পেশাগত নোটিশ
-            </h4>
-            <p className="text-xs sm:text-sm text-amber-200/90 leading-relaxed">
-              বিডি হোমিও প্রশিক্ষণ কেন্দ্র সম্পূর্ণভাবে একটি একাডেমিক ও পেশাগত দক্ষতা উন্নয়ন প্রতিষ্ঠান। 
-              <span className="font-bold underline ml-1">
-                এখানে কোনো প্রকার অনলাইন রোগী দেখা হয় না এবং কোনো প্রকার চিকিৎসা পরামর্শ প্রদান করা হয় না।
-              </span>
-            </p>
-          </div>
+    <footer className="bg-slate-950 text-slate-300 font-bangla border-t border-slate-800">
+      
+      {/* Upper Disclaimer Bar */}
+      <div className="bg-amber-950/40 border-b border-amber-900/30 py-4 px-4 sm:px-6 lg:px-8 text-xs text-amber-200/90 text-center">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>
+            <strong>আইনি নোটিশ:</strong> বিডি হোমিও প্রশিক্ষণ কেন্দ্র সম্পূর্ণ শিক্ষামূলক ও হোমিওপ্যাথিক একাডেমিক প্রশিক্ষণ প্রতিষ্ঠান। এখানে অনলাইনে কোনো প্রকার রোগী দেখা বা চিকিৎসা পরামর্শ দেওয়া হয় না।
+          </span>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
+      {/* Main Footer Links */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           
-          {/* Col 1: Brand Info */}
+          {/* Col 1: Brand & Sir's Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-lg border border-emerald-700/50">
-                <Image src="/assets/logo.png" alt="বিডি হোমিও" fill className="object-cover" />
+              <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-white p-1 border border-emerald-500/30">
+                <Image
+                  src="/assets/logo.png"
+                  alt="বিডি হোমিও লোগো"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white tracking-tight">বিডি হোমিও</h3>
-                <p className="text-xs text-emerald-400 font-semibold">প্রশিক্ষণ কেন্দ্র</p>
+                <h3 className="text-lg font-black text-white leading-tight">
+                  {settings.siteTitle || 'বিডি হোমিও প্রশিক্ষণ কেন্দ্র'}
+                </h3>
+                <p className="text-xs text-amber-400 font-semibold">{settings.slogan || 'Right Homeopath, Right Homeopathy'}</p>
               </div>
             </div>
+
             <p className="text-xs text-slate-400 leading-relaxed">
-              সঠিক নিয়মে হোমিওপ্যাথি শিক্ষা, অর্গানন অব মেডিসিন, মেটেরিয়া মেডিকা ও রেপার্টরি ভিত্তিক প্রেসক্রিপশন তৈরির বিশ্বস্ত একাডেমি।
+              ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি নির্দেশনায় বিশুদ্ধ ক্লাসিক্যাল অর্গানন ও মেটেরিয়া মেডিকা ভিত্তিক প্রফেশনাল হোমিওপ্যাথি প্রশিক্ষণ।
             </p>
-            <div className="flex items-center gap-2 pt-2">
-              <span className="inline-flex items-center gap-1.5 bg-emerald-950/80 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-800">
-                <Award className="w-4 h-4 text-amber-400" />
-                PTF অনুমোদিত একাডেমি
-              </span>
+
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href={settings.youtubeUrl || 'https://www.youtube.com/@bdhomeo/videos'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white flex items-center justify-center transition border border-red-500/30"
+                title="YouTube"
+              >
+                <Youtube className="w-4 h-4" />
+              </a>
+              <a
+                href={settings.facebookUrl || 'https://www.facebook.com/geaus.uddin.81099'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white flex items-center justify-center transition border border-blue-500/30"
+                title="Facebook Profile"
+              >
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a
+                href={`https://wa.me/880${settings.whatsappNumber ? settings.whatsappNumber.replace(/[^0-9]/g, '') : '01811123993'}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366] text-[#25D366] hover:text-white flex items-center justify-center transition border border-[#25D366]/30"
+                title="WhatsApp Support"
+              >
+                <MessageCircle className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
           {/* Col 2: Quick Links */}
-          <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-l-2 border-amber-400 pl-2">
-              গুরুত্বপূর্ণ লিঙ্কসমূহ
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-emerald-500 pl-2.5">
+              কোর্স ও কারিকুলাম
             </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm">
+            <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/" className="hover:text-emerald-400 transition flex items-center gap-1.5">
-                  › হোমপেজ
+                <Link href="/courses/basic-homeopathy-foundation" className="hover:text-emerald-400 transition">
+                  • বেসিক হোমিওপ্যাথি ফাউন্ডেশন (৬ মাস)
                 </Link>
               </li>
               <li>
-                <Link href="/courses" className="hover:text-emerald-400 transition flex items-center gap-1.5">
-                  › চলমান সকল কোর্স ও ব্যাচ
+                <Link href="/courses/advance-clinical-repertory" className="hover:text-emerald-400 transition">
+                  • এডভান্সড ক্লিনিক্যাল রেপার্টরি কোর্স
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-emerald-400 transition flex items-center gap-1.5">
-                  › ডা. মোঃ গিয়াস উদ্দিন স্যারের জীবনী
+                <Link href="/about#gallery" className="hover:text-emerald-400 transition">
+                  • কর্মশালা ও সেমিনার গ্যালারি
                 </Link>
               </li>
               <li>
-                <Link href="/about#gallery" className="hover:text-emerald-400 transition flex items-center gap-1.5">
-                  › কর্মশালা ও সার্টিফিকেট বিতরণ গ্যালারি
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-emerald-400 transition flex items-center gap-1.5">
-                  › যোগাযোগ ও চেম্বার নির্দেশিকা
+                <Link href="/dashboard" className="hover:text-emerald-400 transition">
+                  • স্টুডেন্ট ক্লাসরুম লগইন
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Academic Highlights */}
-          <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-l-2 border-emerald-400 pl-2">
-              একাডেমিক সুবিধাসমূহ
+          {/* Col 3: Certification & Fees */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-emerald-500 pl-2.5">
+              সার্টিফিকেশন ও পেমেন্ট
             </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-slate-400">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                সাপ্তাহিক ২টি লাইভ ক্লাস (Google Meet)
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                সপ্তাহে ৬ দিন সকালের মর্নিং কেস সাপোর্ট
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                অধ্যায়ভিত্তিক রিচ PDF লেকচার শিট
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                কোর্স শেষে কুরিয়ারে PTF সার্টিফিকেট
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                আনলিস্টেড ফুল HD রেকর্ডেড ক্লাস লাইব্রেরি
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 4: Contact & Socials */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-emerald-400 pl-2">
-              সরাসরি যোগাযোগ
-            </h4>
-            <div className="space-y-2 text-xs">
-              <p className="text-slate-300">
-                <strong className="text-white">হেল্পলাইন / হোয়াটসঅ্যাপ:</strong>
-                <br />
-                <a href={`tel:${settings.whatsappNumber}`} className="text-emerald-400 hover:underline font-bold text-sm">
-                  {settings.whatsappNumber}
-                </a>
-              </p>
-              <p className="text-slate-400">
-                বিকাশ/নগদ পেমেন্ট নম্বর: <span className="text-amber-300 font-mono">{settings.bkashNumber}</span>
-              </p>
+            <div className="space-y-2 text-xs text-slate-400">
+              <p>• <strong>সনদ:</strong> PTF অনুমোদিত হার্ডকপি সার্টিফিকেট</p>
+              <p>• <strong>ডেলিভারি:</strong> সারা বাংলাদেশে কুরিয়ার সার্ভিস</p>
+              <p>• <strong>বিকাশ:</strong> {settings.bkashNumber} ({settings.bkashType})</p>
+              <p>• <strong>নগদ:</strong> {settings.nagadNumber} ({settings.nagadType})</p>
             </div>
+          </div>
 
-            {/* Social Icons */}
-            <div className="flex items-center gap-3 pt-2">
-              <a
-                href="https://www.youtube.com/@bdhomeo/videos"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white flex items-center justify-center transition"
-                title="BD Homeo YouTube Channel"
-              >
-                <Youtube className="w-5 h-5" />
-              </a>
-              <a
-                href="https://www.facebook.com/geaus.uddin.81099"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white flex items-center justify-center transition"
-                title="ডাঃ মোঃ গিয়াস উদ্দিন Facebook Profile"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href={`https://wa.me/880${settings.whatsappNumber.replace(/[^0-9]/g, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white flex items-center justify-center transition"
-                title="WhatsApp Group Helpline"
-              >
-                <MessageCircle className="w-5 h-5" />
-              </a>
+          {/* Col 4: Contact & Help */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-emerald-500 pl-2.5">
+              হেল্পলাইন ও সহায়তা
+            </h4>
+            <div className="space-y-2.5 text-xs">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-emerald-400" />
+                <span>সরাসরি কল: {settings.helplineNumber}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                <span>হোয়াটসঅ্যাপ: {settings.whatsappNumber}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-400" />
+                <span>লাইভ ক্লাস: {settings.classTime}</span>
+              </div>
             </div>
           </div>
 
         </div>
 
-        {/* Copyright & Policy Links */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} বিডি হোমিও (BD Homeo) • সর্বস্বত্ব সংরক্ষিত।</p>
-          <div className="flex items-center gap-6">
+        {/* Bottom Copyright */}
+        <div className="mt-12 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <p>© {new Date().getFullYear()} বিডি হোমিও প্রশিক্ষণ কেন্দ্র (BD Homeo) • সর্বস্বত্ব সংরক্ষিত</p>
+          <div className="flex items-center gap-4">
             <Link href="/privacy" className="hover:text-slate-300 transition">প্রাইভেসি পলিসি</Link>
             <Link href="/terms" className="hover:text-slate-300 transition">শর্তাবলী ও রিফান্ড নীতি</Link>
-            <span className="text-emerald-500 font-semibold font-english">Domain: bdhomeo.com</span>
           </div>
         </div>
 

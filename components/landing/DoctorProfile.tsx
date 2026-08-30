@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useApp } from '@/lib/store';
 import { 
   CheckCircle2, 
   Award, 
@@ -14,6 +15,8 @@ import {
 } from 'lucide-react';
 
 export function DoctorProfile() {
+  const { settings } = useApp();
+
   const highlights = [
     'মহাত্মা স্যামুয়েল হ্যানিম্যানের খাঁটি অর্গানন অব মেডিসিনের নীতিতে পাঠদান',
     'মেটেরিয়া মেডিকার ওষুধের তুলনামূলক ও ক্লিনিক্যাল চিত্র আত্মস্থকরণ',
@@ -45,8 +48,8 @@ export function DoctorProfile() {
                     <Award className="w-6 h-6 text-amber-400" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-sm sm:text-base leading-tight">ডাঃ মোঃ গিয়াস উদ্দিন</h4>
-                    <p className="text-xs text-slate-600 font-semibold">প্রতিষ্ঠাতা ও প্রধান প্রশিক্ষক, BD Homeo</p>
+                    <h4 className="font-extrabold text-sm sm:text-base leading-tight">{settings.doctorName || 'ডাঃ মোঃ গিয়াস উদ্দিন'}</h4>
+                    <p className="text-xs text-slate-600 font-semibold">{settings.doctorTitle || 'প্রতিষ্ঠাতা ও প্রধান প্রশিক্ষক, BD Homeo'}</p>
                   </div>
                 </div>
               </div>
@@ -71,12 +74,12 @@ export function DoctorProfile() {
               </h2>
             </div>
 
-            <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-              প্রিয় সহকর্মী চিকিৎসকবৃন্দ ও শিক্ষার্থী বন্ধুরা, আধুনিক সময়ে অনেকেই মেটেরিয়া মেডিকার লক্ষণ মুখস্থ করতে গিয়ে বিভ্রান্ত হয়ে পড়েন। সঠিক রেপার্টরাইজেশন এবং অর্গাননের মূলনীতি জানা থাকলে রোগী দেখামাত্র সঠিক ওষুধ নির্বাচন করা অত্যন্ত সহজ ও আনন্দদায়ক হয়ে ওঠে।
+            <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-medium bg-emerald-50/60 p-4 rounded-2xl border-l-4 border-emerald-600">
+              {settings.doctorMessage || 'আমাদের লক্ষ্য— প্রতিটি শিক্ষার্থী যেন কেবল তাত্ত্বিক জ্ঞান নয়, বরং চেম্বারে রোগী আরোগ্যের পূর্ণ আত্মবিশ্বাস নিয়ে চিকিৎসা সেবা প্রদান করতে পারেন।'}
             </p>
 
-            <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-medium bg-emerald-50/60 p-4 rounded-2xl border-l-4 border-emerald-600">
-              আমাদের লক্ষ্য— প্রতিটি শিক্ষার্থী যেন কেবল তাত্ত্বিক জ্ঞান নয়, বরং চেম্বারে রোগী আরোগ্যের পূর্ণ আত্মবিশ্বাস নিয়ে চিকিৎসা সেবা প্রদান করতে পারেন।
+            <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
+              প্রিয় সহকর্মী চিকিৎসকবৃন্দ ও শিক্ষার্থী বন্ধুরা, আধুনিক সময়ে অনেকেই মেটেরিয়া মেডিকার লক্ষণ মুখস্থ করতে গিয়ে বিভ্রান্ত হয়ে পড়েন। সঠিক রেপার্টরাইজেশন এবং অর্গাননের মূলনীতি জানা থাকলে রোগী দেখামাত্র সঠিক ওষুধ নির্বাচন করা অত্যন্ত সহজ ও আনন্দদায়ক হয়ে ওঠে।
             </p>
 
             {/* Key Value Points */}

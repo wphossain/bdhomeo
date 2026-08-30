@@ -13,7 +13,7 @@ export function VideoShowcase() {
       title: 'সালফার (Sulphur) এর লক্ষণ ও গভীর মনোদৈহিক বিশ্লেষণ',
       subtitle: 'হ্যানিম্যানের অর্গানন ও মেটেরিয়া মেডিকার আলোকে পলিক্রেস্ট ড্রাগ স্টাডি',
       thumbnail: '/assets/courses/materia-medica.jpg',
-      youtubeId: 'p9kLm8x0Wq1',
+      youtubeId: '3JZ_D3ELwOQ',
       tag: 'মেটেরিয়া মেডিকা'
     },
     {
@@ -21,7 +21,7 @@ export function VideoShowcase() {
       title: 'হোমিও রেপার্টরি শিক্ষা — মাত্র ৩/৪ মাসে গভীর জ্ঞান অর্জন',
       subtitle: 'রোগীর প্রধান রুব্রিক্স শনাক্তকরণ ও রেপার্টরাইজেশন কৌশল',
       thumbnail: '/assets/courses/repertory-mastery.jpg',
-      youtubeId: 'kLp901xW8zQ',
+      youtubeId: 'M7lc1UVf-VE',
       tag: 'রেপার্টরি মাস্টারি'
     },
     {
@@ -29,7 +29,7 @@ export function VideoShowcase() {
       title: 'নাক্স ভমিকা (Nux Vomica) — এম্ব্রিও স্টাডি উইথ সায়েন্স',
       subtitle: 'দৈনন্দিন প্র্যাকটিসে নাক্স ভমিকার সঠিক লক্ষণ নির্বাচন',
       thumbnail: '/assets/courses/basic-batch.jpg',
-      youtubeId: 'a7z8Rkp90Lw',
+      youtubeId: 'LXb3EKWsInQ',
       tag: 'ক্লিনিক্যাল স্টাডি'
     },
     {
@@ -37,7 +37,7 @@ export function VideoShowcase() {
       title: 'বন্ধ্যাত্ব ও জরায়ু টিউমারের সফল হোমিওপ্যাথিক ব্যবস্থাপনা',
       subtitle: 'এডভান্স ব্যাচের প্র্যাকটিক্যাল কেস স্টাডি ও ফলাফল আলোচনা',
       thumbnail: '/assets/courses/advance-batch.jpg',
-      youtubeId: 'q8zL01kP9Mw',
+      youtubeId: 'fJ9rUzIMcZQ',
       tag: 'কেস অ্যানালাইসিস'
     }
   ];

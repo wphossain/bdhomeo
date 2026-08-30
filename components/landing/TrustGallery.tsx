@@ -7,25 +7,25 @@ import { Camera, Award, Sparkles, Users } from 'lucide-react';
 export function TrustGallery() {
   const galleryItems = [
     {
-      src: '/assets/gallery/ptf-certificate-distribution.jpg',
+      src: '/assets/gallery/certificate-ptf-1.jpg',
       title: 'কৃতি শিক্ষার্থীদের PTF সার্টিফিকেট বিতরণী',
       category: 'সার্টিফিকেশন',
       desc: 'কোর্স সমাপনী ব্যাচের শিক্ষার্থীদের সম্মাননা ও সনদ প্রদান'
     },
     {
-      src: '/assets/gallery/real-workshop-seminar.jpg',
+      src: '/assets/gallery/workshop-practical.jpg',
       title: 'হোমিওপ্যাথিক কেস স্টাডি ও বাস্তব কর্মশালা',
       category: 'কর্মশালা',
       desc: 'ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি ক্লিনিক্যাল ক্লাস'
     },
     {
-      src: '/assets/gallery/workshop-discussion.jpg',
+      src: '/assets/gallery/seminar-session.jpg',
       title: 'চিকিৎসকদের সাথে মতবিনিময় ও গ্রুপ স্টাডি',
       category: 'আলোচনা সভা',
       desc: 'বিভিন্ন জেলা থেকে আগত চিকিৎসকদের মতবিনিময় ও অভিজ্ঞতা শেয়ার'
     },
     {
-      src: '/assets/gallery/clinical-book-session.jpg',
+      src: '/assets/gallery/clinical-books.jpg',
       title: 'হ্যানিম্যানের মূলগ্রন্থ ও রেপার্টরি গবেষণা',
       category: 'একাডেমিক সেশন',
       desc: 'ক্লাসিক্যাল নীতিমালার প্র্যাকটিক্যাল ব্যবহার'

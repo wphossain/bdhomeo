@@ -2,7 +2,20 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/lib/store';
-import { Settings, Save, CheckCircle2, Phone, Megaphone, Video, Clock } from 'lucide-react';
+import { 
+  Settings, 
+  Save, 
+  Phone, 
+  Megaphone, 
+  Video, 
+  Clock, 
+  Globe, 
+  Youtube, 
+  Facebook, 
+  CreditCard,
+  User,
+  Sparkles
+} from 'lucide-react';
 
 export function SiteSettingsForm() {
   const { settings, updateSettings } = useApp();
@@ -17,37 +30,40 @@ export function SiteSettingsForm() {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm font-bangla space-y-6">
+    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm font-bangla space-y-8">
       
       <div className="border-b border-slate-100 pb-4">
         <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
           <Settings className="w-5 h-5 text-emerald-700" />
-          সাইট সেটিংস ও ডাইনামিক নোটিশ কন্ট্রোল
+          সাইট কনটেন্ট, হেডার, ফুটার ও ডাইনামিক সিএমএস কন্ট্রোল
         </h3>
         <p className="text-xs text-slate-500 mt-1">
-          বিকাশ/নগদ নম্বর, ক্লাসের সময় বা নোটিশ পরিবর্তন করলে তা সাথে সাথে পুরো ওয়েবসাইটে আপডেট হয়ে যাবে।
+          বিকাশ/নগদ নম্বর, ফোন নম্বর, ইউটিউব ও ফেসবুক লিংক, নোটিশ এবং ল্যান্ডিং পেজের কনটেন্ট পরিবর্তন করুন।
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-8">
         
-        {/* Payment Numbers */}
+        {/* 1. Official Payment Settings */}
         <div className="space-y-4">
-          <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider text-emerald-800">
-            ১. অফিসিয়াল পেমেন্ট নম্বর সেটিংস
-          </h4>
+          <div className="flex items-center gap-2 text-emerald-900 border-b border-emerald-100 pb-2">
+            <CreditCard className="w-4 h-4 text-emerald-700" />
+            <h4 className="font-black text-sm uppercase tracking-wider">
+              ১. অফিসিয়াল পেমেন্ট নম্বর সেটিংস (bKash & Nagad)
+            </h4>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* bKash */}
-            <div className="space-y-2 p-4 bg-pink-50/50 rounded-2xl border border-pink-200">
+            <div className="space-y-2 p-4 bg-pink-50/60 rounded-2xl border border-pink-200">
               <label className="block text-xs font-bold text-pink-900">
-                বিকাশ নম্বর
+                বিকাশ নম্বর (বর্তমান পেমেন্ট নম্বর)
               </label>
               <input
                 type="text"
                 value={formData.bkashNumber}
                 onChange={(e) => setFormData({ ...formData, bkashNumber: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-pink-300 text-sm font-mono font-bold bg-white"
+                className="w-full px-3.5 py-2 rounded-xl border border-pink-300 text-sm font-mono font-black bg-white text-pink-950"
               />
               <div className="flex items-center gap-4 text-xs pt-1">
                 <label className="flex items-center gap-1.5 cursor-pointer">
@@ -72,7 +88,7 @@ export function SiteSettingsForm() {
             </div>
 
             {/* Nagad */}
-            <div className="space-y-2 p-4 bg-orange-50/50 rounded-2xl border border-orange-200">
+            <div className="space-y-2 p-4 bg-orange-50/60 rounded-2xl border border-orange-200">
               <label className="block text-xs font-bold text-orange-900">
                 নগদ নম্বর
               </label>
@@ -80,7 +96,7 @@ export function SiteSettingsForm() {
                 type="text"
                 value={formData.nagadNumber}
                 onChange={(e) => setFormData({ ...formData, nagadNumber: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-orange-300 text-sm font-mono font-bold bg-white"
+                className="w-full px-3.5 py-2 rounded-xl border border-orange-300 text-sm font-mono font-black bg-white text-orange-950"
               />
               <div className="flex items-center gap-4 text-xs pt-1">
                 <label className="flex items-center gap-1.5 cursor-pointer">
@@ -90,7 +106,7 @@ export function SiteSettingsForm() {
                     checked={formData.nagadType === 'Personal'}
                     onChange={() => setFormData({ ...formData, nagadType: 'Personal' })}
                   />
-                  <span>Personal</span>
+                  <span>Personal (Send Money)</span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <input
@@ -99,54 +115,84 @@ export function SiteSettingsForm() {
                     checked={formData.nagadType === 'Merchant'}
                     onChange={() => setFormData({ ...formData, nagadType: 'Merchant' })}
                   />
-                  <span>Merchant</span>
+                  <span>Merchant (Payment)</span>
                 </label>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Helpline & Schedule */}
-        <div className="space-y-4 pt-2">
-          <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider text-emerald-800">
-            ২. হেল্পলাইন ও ক্লাস ইনফো
-          </h4>
+        {/* 2. Helpline, WhatsApp & Social Links */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-emerald-900 border-b border-emerald-100 pb-2">
+            <Phone className="w-4 h-4 text-emerald-700" />
+            <h4 className="font-black text-sm uppercase tracking-wider">
+              ২. হেল্পলাইন, হোয়াটসঅ্যাপ ও সোশ্যাল মিডিয়া লিংক
+            </h4>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                হোয়াটসঅ্যাপ / হেল্পলাইন নম্বর
+                হোয়াটসঅ্যাপ নম্বর (Floating Button ও সাপোর্ট)
               </label>
               <input
                 type="text"
                 value={formData.whatsappNumber}
                 onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono font-bold bg-white"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                ক্লাসের সময়সূচি
+                সরাসরি ফোন কল হেল্পলাইন
               </label>
               <input
                 type="text"
-                value={formData.classTime}
-                onChange={(e) => setFormData({ ...formData, classTime: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm"
+                value={formData.helplineNumber}
+                onChange={(e) => setFormData({ ...formData, helplineNumber: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono font-bold bg-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                ইউটিউব চ্যানেল লিংক (YouTube Channel URL)
+              </label>
+              <input
+                type="url"
+                value={formData.youtubeUrl}
+                onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono bg-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                স্যারের ফেসবুক প্রোফাইল লিংক (Facebook Profile URL)
+              </label>
+              <input
+                type="url"
+                value={formData.facebookUrl}
+                onChange={(e) => setFormData({ ...formData, facebookUrl: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono bg-white"
               />
             </div>
           </div>
         </div>
 
-        {/* Live Meet Link & Notice Bar */}
-        <div className="space-y-4 pt-2">
-          <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider text-emerald-800">
-            ৩. গুগল মিট লিংক ও নোটিশ বার
-          </h4>
+        {/* 3. Live Class Google Meet & Notice Bar */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-emerald-900 border-b border-emerald-100 pb-2">
+            <Megaphone className="w-4 h-4 text-emerald-700" />
+            <h4 className="font-black text-sm uppercase tracking-wider">
+              ৩. গুগল মিট লাইভ ক্লাসরুম ও শীর্ষ ঘোষণা নোটিশ
+            </h4>
+          </div>
 
-          <div className="space-y-3">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2">
               <label className="block text-xs font-bold text-slate-700 mb-1">
                 গুগল মিট (Google Meet) ক্লাসরুম লিংক
               </label>
@@ -154,34 +200,105 @@ export function SiteSettingsForm() {
                 type="url"
                 value={formData.googleMeetUrl}
                 onChange={(e) => setFormData({ ...formData, googleMeetUrl: e.target.value })}
-                placeholder="https://meet.google.com/xyz-abcd-efg"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono font-bold text-emerald-900 bg-white"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                শীর্ষ ঘোষণা নোটিশ (Announcement Banner)
+                ক্লাসের সময়সূচি টেক্সট
               </label>
               <input
                 type="text"
+                value={formData.classTime}
+                onChange={(e) => setFormData({ ...formData, classTime: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                প্রতিষ্ঠানের স্লোগান
+              </label>
+              <input
+                type="text"
+                value={formData.slogan}
+                onChange={(e) => setFormData({ ...formData, slogan: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                শীর্ষ ঘোষণা নোটিশ (Announcement Bar Marquee)
+              </label>
+              <textarea
+                rows={2}
                 value={formData.noticeText}
                 onChange={(e) => setFormData({ ...formData, noticeText: e.target.value })}
-                placeholder="যেমন: আগামী ব্যাচের ভর্তি চলছে..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"
               />
             </div>
           </div>
         </div>
 
+        {/* 4. Hero Section & Doctor Profile Text */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-emerald-900 border-b border-emerald-100 pb-2">
+            <Globe className="w-4 h-4 text-emerald-700" />
+            <h4 className="font-black text-sm uppercase tracking-wider">
+              ৪. হোমপেজ হিরো সেকশন ও স্যারের বার্তা
+            </h4>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                হিরো সেকশনের মূল হেডলাইন
+              </label>
+              <input
+                type="text"
+                value={formData.heroHeadline}
+                onChange={(e) => setFormData({ ...formData, heroHeadline: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold bg-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                হিরো সাব-হেডলাইন বিবরণ
+              </label>
+              <textarea
+                rows={2}
+                value={formData.heroSubheadline}
+                onChange={(e) => setFormData({ ...formData, heroSubheadline: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                ডাঃ মোঃ গিয়াস উদ্দিন স্যারের অনুপ্রেরণামূলক বার্তা
+              </label>
+              <textarea
+                rows={3}
+                value={formData.doctorMessage}
+                onChange={(e) => setFormData({ ...formData, doctorMessage: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Submit */}
         <div className="pt-4 border-t border-slate-100 flex items-center justify-end">
           <button
             type="submit"
             disabled={isSaving}
-            className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm px-7 py-3 rounded-xl shadow-lg transition"
+            className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm px-8 py-3.5 rounded-2xl shadow-xl transition"
           >
             <Save className="w-4 h-4" />
-            <span>{isSaving ? 'সংরক্ষণ হচ্ছে...' : 'সেটিংস সেভ করুন'}</span>
+            <span>{isSaving ? 'সংরক্ষণ হচ্ছে...' : 'সকল কনটেন্ট ও সেটিংস সংরক্ষণ করুন'}</span>
           </button>
         </div>
 

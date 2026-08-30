@@ -3,16 +3,13 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useApp } from '@/lib/store';
 import { 
   Sparkles, 
   Award, 
   BookOpen, 
   CheckCircle, 
   ArrowRight, 
-  Play, 
-  Calendar, 
-  Users, 
-  ShieldCheck, 
   Flame 
 } from 'lucide-react';
 
@@ -21,6 +18,8 @@ interface HeroProps {
 }
 
 export function Hero({ onOpenOrientation }: HeroProps) {
+  const { settings } = useApp();
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-brand-900 to-slate-950 text-white font-bangla pt-10 pb-20 lg:pt-16 lg:pb-28">
       
@@ -37,21 +36,17 @@ export function Hero({ onOpenOrientation }: HeroProps) {
             {/* Top Badge */}
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400/20 via-emerald-500/20 to-teal-500/20 border border-amber-400/40 px-4 py-1.5 rounded-full text-xs font-bold text-amber-300 backdrop-blur-md">
               <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>Right Homeopath, Right Homeopathy • বিডি হোমিও</span>
+              <span>{settings.slogan || 'Right Homeopath, Right Homeopathy'} • বিডি হোমিও</span>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-[1.2] text-white">
-              হোমিওপ্যাথির খাঁটি দর্শনে{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-yellow-400">
-                আত্মবিশ্বাসী প্র্যাকটিশনার
-              </span>{' '}
-              হওয়ার ৬ মাসের মাস্টার একাডেমি
+              {settings.heroHeadline || 'হোমিওপ্যাথির খাঁটি দর্শনে আত্মবিশ্বাসী প্র্যাকটিশনার হওয়ার ৬ মাসের মাস্টার একাডেমি'}
             </h1>
 
             {/* Subtitle */}
             <p className="text-sm sm:text-base lg:text-lg text-emerald-100/90 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-normal">
-              ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি নির্দেশনায় অর্গানন অব মেডিসিন, মেটেরিয়া মেডিকা ও রেপার্টরি ভিত্তিক সপ্তাহে ২টি লাইভ ক্লাস ও ৬ দিন মর্নিং কেস সাপোর্ট।
+              {settings.heroSubheadline || 'ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি নির্দেশনায় অর্গানন অব মেডিসিন, মেটেরিয়া মেডিকা ও রেপার্টরি ভিত্তিক সপ্তাহে ২টি লাইভ ক্লাস ও ৬ দিন মর্নিং কেস সাপোর্ট।'}
             </p>
 
             {/* Key USPs / Badges */}
@@ -113,8 +108,8 @@ export function Hero({ onOpenOrientation }: HeroProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-amber-400 text-xs font-bold uppercase tracking-wider">প্রধান প্রশিক্ষক ও গবেষক</p>
-                      <h3 className="text-base sm:text-lg font-black text-white leading-tight">ডাঃ মোঃ গিয়াস উদ্দিন</h3>
-                      <p className="text-slate-300 text-xs mt-0.5">বিডি হোমিও প্রশিক্ষণ কেন্দ্র</p>
+                      <h3 className="text-base sm:text-lg font-black text-white leading-tight">{settings.doctorName || 'ডাঃ মোঃ গিয়াস উদ্দিন'}</h3>
+                      <p className="text-slate-300 text-xs mt-0.5">{settings.doctorTitle || 'বিডি হোমিও প্রশিক্ষণ কেন্দ্র'}</p>
                     </div>
                     <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center border border-amber-400/40">
                       <Award className="w-5 h-5" />

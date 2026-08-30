@@ -46,6 +46,13 @@ export interface Course {
 }
 
 export interface SiteSettings {
+  siteTitle: string;
+  slogan: string;
+  heroHeadline: string;
+  heroSubheadline: string;
+  doctorName: string;
+  doctorTitle: string;
+  doctorMessage: string;
   bkashNumber: string;
   bkashType: 'Personal' | 'Merchant';
   nagadNumber: string;
@@ -55,6 +62,8 @@ export interface SiteSettings {
   classTime: string;
   googleMeetUrl: string;
   noticeText: string;
+  youtubeUrl: string;
+  facebookUrl: string;
 }
 
 export interface Enrollment {

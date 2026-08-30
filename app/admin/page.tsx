@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/lib/store';
+import { CourseManager } from '@/components/admin/CourseManager';
+import { SiteSettingsForm } from '@/components/admin/SiteSettingsForm';
 import { EnrollmentApprovals } from '@/components/admin/EnrollmentApprovals';
 import { MonthlyFeeApprovals } from '@/components/admin/MonthlyFeeApprovals';
 import { LeadManager } from '@/components/admin/LeadManager';
-import { SiteSettingsForm } from '@/components/admin/SiteSettingsForm';
 import { 
   ShieldCheck, 
   Users, 
@@ -14,12 +15,16 @@ import {
   MessageSquare, 
   Settings, 
   CheckCircle2, 
-  Clock
+  Clock,
+  BookOpen,
+  Globe,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 export default function AdminPage() {
   const { user, enrollments, monthlyPayments, leads, demoLogin, signInWithGoogle } = useApp();
-  const [activeTab, setActiveTab] = useState<'enrollments' | 'payments' | 'leads' | 'settings'>('enrollments');
+  const [activeTab, setActiveTab] = useState<'courses' | 'settings' | 'enrollments' | 'payments' | 'leads'>('courses');
 
   // Check if Admin
   if (!user || user.role !== 'admin') {
@@ -80,7 +85,7 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-black tracking-tight">
-                  অ্যাডমিন কন্ট্রোল সেন্টার
+                  অ্যাডমিন কন্ট্রোল সেন্টার (Full CMS)
                 </h1>
                 <span className="bg-amber-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full">
                   Super Admin
@@ -158,6 +163,30 @@ export default function AdminPage() {
         <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2">
           
           <button
+            onClick={() => setActiveTab('courses')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition ${
+              activeTab === 'courses'
+                ? 'bg-emerald-800 text-white shadow-md'
+                : 'bg-white text-slate-700 hover:bg-slate-200/70 border border-slate-200'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>কোর্স ও ভিডিও লেকচার সিএমএস</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition ${
+              activeTab === 'settings'
+                ? 'bg-emerald-800 text-white shadow-md'
+                : 'bg-white text-slate-700 hover:bg-slate-200/70 border border-slate-200'
+            }`}
+          >
+            <Settings className="w-4 h-4" />
+            <span>সাইট কনটেন্ট, নম্বর ও লিংকস</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('enrollments')}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition ${
               activeTab === 'enrollments'
@@ -193,25 +222,14 @@ export default function AdminPage() {
             <span>ওরিয়েন্টেশন লিড ({leads.length})</span>
           </button>
 
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm transition ${
-              activeTab === 'settings'
-                ? 'bg-emerald-800 text-white shadow-md'
-                : 'bg-white text-slate-700 hover:bg-slate-200/70 border border-slate-200'
-            }`}
-          >
-            <Settings className="w-4 h-4" />
-            <span>সাইট সেটিংস ও নোটিশ</span>
-          </button>
-
         </div>
 
         {/* Tab Content */}
+        {activeTab === 'courses' && <CourseManager />}
+        {activeTab === 'settings' && <SiteSettingsForm />}
         {activeTab === 'enrollments' && <EnrollmentApprovals />}
         {activeTab === 'payments' && <MonthlyFeeApprovals />}
         {activeTab === 'leads' && <LeadManager />}
-        {activeTab === 'settings' && <SiteSettingsForm />}
 
       </div>
 

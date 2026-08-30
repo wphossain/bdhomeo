@@ -20,6 +20,8 @@ interface AppContextType {
   submitMonthlyPayment: (data: { courseId: string; monthName: string; trxId: string; senderPhone: string; paymentMethod: 'bkash' | 'nagad' }) => Promise<boolean>;
   submitOrientationLead: (data: { name: string; phone: string; email?: string; homeoBackground: string }) => Promise<boolean>;
   updateSettings: (newSettings: Partial<SiteSettings>) => Promise<boolean>;
+  updateCourses: (updatedCourses: Course[]) => Promise<boolean>;
+  saveCourse: (course: Course) => Promise<boolean>;
   approveEnrollment: (enrollmentId: string) => Promise<void>;
   approveMonthlyPayment: (paymentId: string) => Promise<void>;
   updateLeadStatus: (leadId: string, status: 'contacted' | 'joined') => Promise<void>;
@@ -46,16 +48,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
+      const savedCourses = localStorage.getItem('bdhomeo_courses');
+      if (savedCourses) {
+        setCourses(JSON.parse(savedCourses));
+      } else {
+        setCourses(initialCourses);
+        localStorage.setItem('bdhomeo_courses', JSON.stringify(initialCourses));
+      }
+
       const savedSettings = localStorage.getItem('bdhomeo_settings');
       if (savedSettings) {
         const parsed = JSON.parse(savedSettings);
-        // If cached settings has corrupted ??? notice, fall back to initial
-        if (parsed.noticeText && parsed.noticeText.includes('???')) {
+        // If old number or ??? exists, update to fresh verified initial settings
+        if (
+          !parsed.bkashNumber ||
+          parsed.bkashNumber.includes('01971') ||
+          parsed.whatsappNumber?.includes('01971') ||
+          (parsed.noticeText && parsed.noticeText.includes('???'))
+        ) {
           setSettings(initialSiteSettings);
           localStorage.setItem('bdhomeo_settings', JSON.stringify(initialSiteSettings));
         } else {
           setSettings({ ...initialSiteSettings, ...parsed });
         }
+      } else {
+        setSettings(initialSiteSettings);
+        localStorage.setItem('bdhomeo_settings', JSON.stringify(initialSiteSettings));
       }
 
       const savedEnrollments = localStorage.getItem('bdhomeo_enrollments');
@@ -150,7 +168,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           id: 'demo-student-id',
           email: 'student@bdhomeo.com',
           fullName: 'ডাঃ মোঃ আরিফুল ইসলাম (Student)',
-          phone: '01711223344',
+          phone: '01811-123993',
           role: 'student',
           createdAt: new Date().toISOString(),
         };
@@ -239,7 +257,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
     localStorage.setItem('bdhomeo_settings', JSON.stringify(updated));
-    showToast('ওয়েবসাইটের সেটিংস সফলভাবে আপডেট হয়েছে!', 'success');
+    showToast('ওয়েবসাইটের কনটেন্ট ও সেটিংস সফলভাবে আপডেট হয়েছে!', 'success');
+    return true;
+  };
+
+  const updateCourses = async (updatedCourses: Course[]) => {
+    setCourses(updatedCourses);
+    localStorage.setItem('bdhomeo_courses', JSON.stringify(updatedCourses));
+    showToast('কোর্স ও সিলেবাস সফলভাবে আপডেট হয়েছে!', 'success');
+    return true;
+  };
+
+  const saveCourse = async (course: Course) => {
+    const exists = courses.some((c) => c.id === course.id);
+    const updated = exists
+      ? courses.map((c) => (c.id === course.id ? course : c))
+      : [...courses, course];
+    setCourses(updated);
+    localStorage.setItem('bdhomeo_courses', JSON.stringify(updated));
+    showToast(`'${course.title}' কোর্স সফলভাবে সেভ হয়েছে!`, 'success');
     return true;
   };
 
@@ -285,6 +321,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         submitMonthlyPayment,
         submitOrientationLead,
         updateSettings,
+        updateCourses,
+        saveCourse,
         approveEnrollment,
         approveMonthlyPayment,
         updateLeadStatus,
