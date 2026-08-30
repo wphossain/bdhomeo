@@ -10,15 +10,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-// Admin list emails
-export const ADMIN_EMAILS = [
+// Admin emails (Only Sir and your email can be initial admins)
+export const DEFAULT_ADMIN_EMAILS = [
   'mikailhossain3747@gmail.com',
   'geaus.uddin.81099@gmail.com',
   'bdhomeo@gmail.com',
-  'wphossain@gmail.com'
 ];
 
-export function isAdminUser(email?: string | null): boolean {
+export function isInitialAdminEmail(email?: string | null): boolean {
   if (!email) return false;
-  return ADMIN_EMAILS.includes(email.toLowerCase().trim());
+  return DEFAULT_ADMIN_EMAILS.includes(email.toLowerCase().trim());
 }

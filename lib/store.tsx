@@ -1,9 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Course, SiteSettings, UserProfile, Enrollment, MonthlyPayment, OrientationLead } from './types';
+import { Course, SiteSettings, UserProfile, Enrollment, MonthlyPayment, OrientationLead, UserRole } from './types';
 import { initialCourses, initialSiteSettings } from './data';
-import { supabase, isAdminUser } from './supabase';
+import { supabase, isInitialAdminEmail } from './supabase';
 
 interface AppContextType {
   user: UserProfile | null;
@@ -46,6 +46,70 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => setToast(null), 4000);
   };
 
+  const syncUserProfile = async (sessionUser: any) => {
+    if (!sessionUser) {
+      setUser(null);
+      localStorage.removeItem('bdhomeo_user');
+      return;
+    }
+
+    const email = sessionUser.email || '';
+    const fullName = sessionUser.user_metadata?.full_name || email.split('@')[0];
+    const avatarUrl = sessionUser.user_metadata?.avatar_url;
+
+    let role: UserRole = 'student';
+
+    try {
+      // 1. Check Supabase profiles table for assigned role
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', sessionUser.id)
+        .maybeSingle();
+
+      if (profile && profile.role) {
+        role = profile.role === 'admin' ? 'admin' : 'student';
+      } else if (isInitialAdminEmail(email)) {
+        role = 'admin';
+        // Auto upsert admin role in profiles table
+        await supabase.from('profiles').upsert({
+          id: sessionUser.id,
+          email,
+          full_name: fullName,
+          avatar_url: avatarUrl,
+          role: 'admin',
+          updated_at: new Date().toISOString(),
+        });
+      } else {
+        // Any new user is saved as 'student' in Supabase
+        role = 'student';
+        await supabase.from('profiles').upsert({
+          id: sessionUser.id,
+          email,
+          full_name: fullName,
+          avatar_url: avatarUrl,
+          role: 'student',
+          updated_at: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      console.warn('Could not query profiles from Supabase, falling back:', err);
+      role = isInitialAdminEmail(email) ? 'admin' : 'student';
+    }
+
+    const userProfile: UserProfile = {
+      id: sessionUser.id,
+      email,
+      fullName,
+      avatarUrl,
+      role,
+      createdAt: sessionUser.created_at || new Date().toISOString(),
+    };
+
+    setUser(userProfile);
+    localStorage.setItem('bdhomeo_user', JSON.stringify(userProfile));
+  };
+
   useEffect(() => {
     try {
       const savedCourses = localStorage.getItem('bdhomeo_courses');
@@ -59,13 +123,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const savedSettings = localStorage.getItem('bdhomeo_settings');
       if (savedSettings) {
         const parsed = JSON.parse(savedSettings);
-        // Force-migrate to verified official numbers
         if (
           !parsed.bkashNumber ||
           parsed.bkashNumber !== '01815-883101' ||
           parsed.bkashType !== 'Merchant' ||
-          parsed.whatsappNumber !== '01811-123993' ||
-          (parsed.noticeText && parsed.noticeText.includes('???'))
+          parsed.whatsappNumber !== '01811-123993'
         ) {
           const merged = {
             ...initialSiteSettings,
@@ -75,7 +137,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             whatsappNumber: '01811-123993',
             helplineNumber: '01811-123993',
             nagadNumber: '01811-123993',
-            noticeText: initialSiteSettings.noticeText,
           };
           setSettings(merged);
           localStorage.setItem('bdhomeo_settings', JSON.stringify(merged));
@@ -102,38 +163,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       console.warn('LocalStorage error:', e);
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        const email = session.user.email || '';
-        const role = isAdminUser(email) ? 'admin' : 'student';
-        const profile: UserProfile = {
-          id: session.user.id,
-          email,
-          fullName: session.user.user_metadata?.full_name || email.split('@')[0],
-          avatarUrl: session.user.user_metadata?.avatar_url,
-          role,
-          createdAt: session.user.created_at,
-        };
-        setUser(profile);
-        localStorage.setItem('bdhomeo_user', JSON.stringify(profile));
+        await syncUserProfile(session.user);
       }
       setIsAuthLoading(false);
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        const email = session.user.email || '';
-        const role = isAdminUser(email) ? 'admin' : 'student';
-        const profile: UserProfile = {
-          id: session.user.id,
-          email,
-          fullName: session.user.user_metadata?.full_name || email.split('@')[0],
-          avatarUrl: session.user.user_metadata?.avatar_url,
-          role,
-          createdAt: session.user.created_at,
-        };
-        setUser(profile);
-        localStorage.setItem('bdhomeo_user', JSON.stringify(profile));
+        await syncUserProfile(session.user);
+      } else {
+        setUser(null);
+        localStorage.removeItem('bdhomeo_user');
       }
     });
 
@@ -213,6 +255,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updated = [newEnrollment, ...enrollments];
     setEnrollments(updated);
     localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
+
+    // Also persist to Supabase if table exists
+    try {
+      await supabase.from('enrollments').insert({
+        id: newEnrollment.id,
+        student_id: user.id,
+        student_name: user.fullName,
+        student_email: user.email,
+        student_phone: data.senderPhone,
+        course_id: data.courseId,
+        course_title: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
+        batch_type: targetCourse?.batchType || 'basic',
+        admission_status: 'pending',
+        trx_id: data.trxId,
+        sender_phone: data.senderPhone,
+        payment_method: data.paymentMethod,
+      });
+    } catch (e) {
+      console.warn('Supabase enrollment sync:', e);
+    }
+
     showToast('আপনার ভর্তির আবেদন সফলভাবে জমা হয়েছে! অ্যাডমিন যাচাই করার পর ক্লাস আনলক হবে।', 'success');
     return true;
   };
@@ -242,6 +305,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updated = [newPayment, ...monthlyPayments];
     setMonthlyPayments(updated);
     localStorage.setItem('bdhomeo_payments', JSON.stringify(updated));
+
+    try {
+      await supabase.from('monthly_payments').insert({
+        id: newPayment.id,
+        student_id: user.id,
+        student_name: user.fullName,
+        student_phone: data.senderPhone,
+        course_id: data.courseId,
+        course_title: targetCourse?.title || 'হোমিওপ্যাথি কোর্স',
+        month_name: data.monthName,
+        amount: 500,
+        trx_id: data.trxId,
+        sender_phone: data.senderPhone,
+        payment_method: data.paymentMethod,
+        status: 'pending',
+      });
+    } catch (e) {
+      console.warn('Supabase monthly payment sync:', e);
+    }
+
     showToast(`${data.monthName} মাসের ৫০০/- টাকা ফি ট্রানজেকশন সফলভাবে সাবমিট হয়েছে!`, 'success');
     return true;
   };
@@ -260,6 +343,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updated = [newLead, ...leads];
     setLeads(updated);
     localStorage.setItem('bdhomeo_leads', JSON.stringify(updated));
+
+    try {
+      await supabase.from('orientation_leads').insert({
+        id: newLead.id,
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        homeo_background: data.homeoBackground,
+        status: 'new',
+      });
+    } catch (e) {
+      console.warn('Supabase orientation lead sync:', e);
+    }
+
     showToast('ধন্যবাদ! ফ্রি ওরিয়েন্টেশন ক্লাসের রেজিস্ট্রেশন সফল হয়েছে।', 'success');
     return true;
   };
@@ -268,6 +365,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
     localStorage.setItem('bdhomeo_settings', JSON.stringify(updated));
+
+    try {
+      await supabase.from('site_settings').upsert({
+        id: 'global_settings',
+        ...updated,
+        updated_at: new Date().toISOString(),
+      });
+    } catch (e) {
+      console.warn('Supabase site_settings sync:', e);
+    }
+
     showToast('ওয়েবসাইটের কনটেন্ট ও সেটিংস সফলভাবে আপডেট হয়েছে!', 'success');
     return true;
   };
@@ -296,6 +404,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
     setEnrollments(updated);
     localStorage.setItem('bdhomeo_enrollments', JSON.stringify(updated));
+
+    try {
+      await supabase
+        .from('enrollments')
+        .update({ admission_status: 'approved' })
+        .eq('id', enrollmentId);
+    } catch (e) {
+      console.warn('Supabase enrollment approve sync:', e);
+    }
+
     showToast('শিক্ষার্থীর কোর্স এনরোলমেন্ট সফলভাবে অনুমোদিত হয়েছে!', 'success');
   };
 
@@ -305,6 +423,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
     setMonthlyPayments(updated);
     localStorage.setItem('bdhomeo_payments', JSON.stringify(updated));
+
+    try {
+      await supabase
+        .from('monthly_payments')
+        .update({ status: 'approved' })
+        .eq('id', paymentId);
+    } catch (e) {
+      console.warn('Supabase monthly payment approve sync:', e);
+    }
+
     showToast('মাসিক ফি পেমেন্ট সফলভাবে অনুমোদিত হয়েছে!', 'success');
   };
 
@@ -312,6 +440,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updated = leads.map((l) => (l.id === leadId ? { ...l, status } : l));
     setLeads(updated);
     localStorage.setItem('bdhomeo_leads', JSON.stringify(updated));
+
+    try {
+      await supabase
+        .from('orientation_leads')
+        .update({ status })
+        .eq('id', leadId);
+    } catch (e) {
+      console.warn('Supabase lead status sync:', e);
+    }
+
     showToast('লিড স্ট্যাটাস আপডেট হয়েছে!', 'info');
   };
 

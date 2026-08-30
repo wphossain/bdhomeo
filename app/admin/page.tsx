@@ -19,7 +19,9 @@ import {
   Clock,
   BookOpen,
   Image as ImageIcon,
-  Sparkles
+  Sparkles,
+  Lock,
+  GraduationCap
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -31,8 +33,8 @@ export default function AdminPage() {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4 bg-slate-50 font-bangla">
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border-2 border-emerald-500/40 shadow-2xl text-center space-y-6">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto shadow-inner">
-            <ShieldCheck className="w-8 h-8" />
+          <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto shadow-inner">
+            <Lock className="w-8 h-8 text-amber-700" />
           </div>
           <div>
             <h2 className="text-2xl font-black text-slate-900">
@@ -43,15 +45,32 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <button
-            onClick={signInWithGoogle}
-            className="w-full flex items-center justify-center gap-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm py-3.5 rounded-xl shadow-md transition"
-          >
-            <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
-              <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
-            </svg>
-            <span>Admin Google Account দিয়ে সাইন-ইন</span>
-          </button>
+          {user ? (
+            <div className="space-y-4">
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1">
+                <p>আপনি বর্তমানে <strong>{user.fullName}</strong> ({user.email}) হিসেবে লগইন আছেন।</p>
+                <p className="text-amber-800 font-bold">আপনার বর্তমান রোল: Student (শিক্ষার্থী)</p>
+              </div>
+
+              <Link
+                href="/dashboard"
+                className="w-full flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm py-3.5 rounded-xl shadow transition"
+              >
+                <GraduationCap className="w-4 h-4" />
+                <span>আমার ক্লাসরুম ও কোর্সে যান</span>
+              </Link>
+            </div>
+          ) : (
+            <button
+              onClick={signInWithGoogle}
+              className="w-full flex items-center justify-center gap-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-sm py-3.5 rounded-xl shadow-md transition"
+            >
+              <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
+                <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
+              </svg>
+              <span>Admin Google Account দিয়ে সাইন-ইন</span>
+            </button>
+          )}
 
           <div className="pt-2 border-t border-slate-100">
             <p className="text-[11px] text-slate-400 mb-2">বা দ্রুত অ্যাডমিন ভিউ টেস্ট করুন:</p>
