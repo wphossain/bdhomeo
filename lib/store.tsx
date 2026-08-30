@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Course, SiteSettings, UserProfile, Enrollment, MonthlyPayment, OrientationLead, UserRole } from './types';
 import { initialCourses, initialSiteSettings } from './data';
-import { supabase } from './supabase';
+import { supabase, isAdminEmail } from './supabase';
 
 interface AppContextType {
   user: UserProfile | null;
@@ -50,7 +50,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('bdhomeo_user');
-      // Clean any Supabase cached tokens from localStorage
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
           localStorage.removeItem(key);
@@ -59,47 +58,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const syncUserProfile = async (sessionUser: any) => {
+  const syncUserProfile = (sessionUser: any) => {
     if (!sessionUser || !sessionUser.id) {
       purgeLocalAuth();
       return;
     }
 
-    const email = sessionUser.email || '';
+    const email = (sessionUser.email || '').toLowerCase().trim();
     const fullName = sessionUser.user_metadata?.full_name || email.split('@')[0];
     const avatarUrl = sessionUser.user_metadata?.avatar_url;
 
-    let role: UserRole = 'student';
-
-    try {
-      // Query role strictly from Supabase 'profiles' table with fresh server validation
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', sessionUser.id)
-        .maybeSingle();
-
-      if (profile && profile.role === 'admin') {
-        role = 'admin';
-      } else {
-        role = 'student';
-      }
-
-      // If user profile is not present in Supabase table yet, create as student
-      if (!profile) {
-        await supabase.from('profiles').insert({
-          id: sessionUser.id,
-          email,
-          full_name: fullName,
-          avatar_url: avatarUrl,
-          role: 'student',
-          updated_at: new Date().toISOString(),
-        });
-      }
-    } catch (err) {
-      console.warn('Supabase profile check error:', err);
-      role = 'student';
-    }
+    // Strict role resolution: only specified admin email gets admin, everyone else is student
+    const role: UserRole = isAdminEmail(email) ? 'admin' : 'student';
 
     const userProfile: UserProfile = {
       id: sessionUser.id,
@@ -164,13 +134,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       console.warn('LocalStorage initialization warning:', e);
     }
 
-    // Use live server-validated getUser() instead of getSession() to reject deleted users
-    supabase.auth.getUser().then(async ({ data: { user: verifiedUser }, error }) => {
+    // Live auth check from Supabase
+    supabase.auth.getUser().then(({ data: { user: verifiedUser }, error }) => {
       if (error || !verifiedUser) {
-        // User was deleted on Supabase server or session is invalid -> purge local storage
         purgeLocalAuth();
       } else {
-        await syncUserProfile(verifiedUser);
+        syncUserProfile(verifiedUser);
       }
       setIsAuthLoading(false);
     }).catch(() => {
@@ -178,20 +147,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setIsAuthLoading(false);
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || !session?.user) {
         purgeLocalAuth();
         setIsAuthLoading(false);
         return;
       }
-
-      // Re-verify with server
-      const { data: { user: verifiedUser }, error } = await supabase.auth.getUser();
-      if (error || !verifiedUser) {
-        purgeLocalAuth();
-      } else {
-        await syncUserProfile(verifiedUser);
-      }
+      syncUserProfile(session.user);
       setIsAuthLoading(false);
     });
 
@@ -235,7 +197,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const demoUser: UserProfile = role === 'admin'
       ? {
           id: 'demo-admin-id',
-          email: 'admin@bdhomeo.com',
+          email: 'mikailhossain3747@gmail.com',
           fullName: 'ডাঃ মোঃ গিয়াস উদ্দিন (Admin)',
           role: 'admin',
           createdAt: new Date().toISOString(),

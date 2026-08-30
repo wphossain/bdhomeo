@@ -1,4 +1,4 @@
-﻿-- BD Homeo Supabase Database Schema with Automatic User Profile Trigger
+-- BD Homeo Supabase Database Schema with Automatic User Profile Trigger
 -- Run this in your Supabase SQL Editor: https://kcbettnkbbjnekbewzcu.supabase.co
 
 -- 1. Profiles Table (Extends Supabase Auth)
