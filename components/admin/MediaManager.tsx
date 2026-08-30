@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useApp } from '@/lib/store';
 import { GalleryItem } from '@/lib/types';
-import { uploadImageToSupabase } from '@/lib/supabase';
 import { 
   ImageIcon, 
   Plus, 
@@ -18,8 +17,7 @@ import {
   CheckCircle2,
   Calendar,
   Eye,
-  RefreshCw,
-  Award
+  RefreshCw
 } from 'lucide-react';
 
 export function MediaManager() {
@@ -29,66 +27,35 @@ export function MediaManager() {
   const [ptfImg, setPtfImg] = useState(settings.ptfCertificateImageUrl || '/assets/gallery/certificate-ptf-1.jpg');
   const [galleryList, setGalleryList] = useState<GalleryItem[]>(settings.galleryImages || []);
   const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
-  // File Upload Helper to Supabase Storage
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+  // File Upload Helper
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    showToast('ছবি আপলোড হচ্ছে...', 'info');
-
-    try {
-      const publicUrl = await uploadImageToSupabase(file, 'banners');
-      if (publicUrl) {
-        setter(publicUrl);
-        showToast('ছবি ক্লাউডে সফলভাবে আপলোড হয়েছে!', 'success');
-      } else {
-        // Fallback to Data URL if storage bucket is not configured
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === 'string') {
-            setter(reader.result);
-            showToast('ছবি লোকাল প্রিভিউতে সেট হয়েছে!', 'success');
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    } catch (err: any) {
-      showToast('আপলোড ত্রুটি: ' + err.message, 'error');
-    } finally {
-      setIsUploading(false);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setter(reader.result);
+          showToast('ছবি সফলভাবে যুক্ত হয়েছে!', 'success');
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleGalleryFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, itemId: string) => {
+  const handleGalleryFileUpload = (e: React.ChangeEvent<HTMLInputElement>, itemId: string) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    showToast('গ্যালারি ছবি আপলোড হচ্ছে...', 'info');
-
-    try {
-      const publicUrl = await uploadImageToSupabase(file, 'gallery');
-      if (publicUrl) {
-        handleUpdateGalleryItem(itemId, 'src', publicUrl);
-        showToast('গ্যালারি ছবি ক্লাউডে আপলোড হয়েছে!', 'success');
-      } else {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === 'string') {
-            handleUpdateGalleryItem(itemId, 'src', reader.result);
-            showToast('গ্যালারি ছবি প্রিভিউতে সেট হয়েছে!', 'success');
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    } catch (err: any) {
-      showToast('আপলোড ত্রুটি: ' + err.message, 'error');
-    } finally {
-      setIsUploading(false);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          handleUpdateGalleryItem(itemId, 'src', reader.result);
+          showToast('গ্যালারি ছবি যুক্ত হয়েছে!', 'success');
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -99,13 +66,13 @@ export function MediaManager() {
       src: '/assets/gallery/ptf-certificate-distribution.jpg',
       title: 'নতুন কর্মশালার ছবি',
       subtitle: 'বিডি হোমিও একাডেমি প্রশিক্ষণ ব্যাচ',
-      category: 'কর্মশালা ও সেমিনার',
+      category: 'কর্মশালা',
       desc: 'শিক্ষার্থীদের সরাসরি অংশগ্রহণে ক্লিনিক্যাল প্রশিক্ষণ কর্মশালা।',
       date: '২০২৬',
       showOnHome: false,
     };
     setGalleryList([newItem, ...galleryList]);
-    showToast('নতুন গ্যালারি আইটেম যোগ হয়েছে!', 'info');
+    showToast('নতুন ছবি যোগ হয়েছে!', 'info');
   };
 
   const handleUpdateGalleryItem = (id: string, field: keyof GalleryItem, value: any) => {
@@ -116,7 +83,7 @@ export function MediaManager() {
 
   const handleDeleteGalleryItem = (id: string) => {
     setGalleryList((prev) => prev.filter((item) => item.id !== id));
-    showToast('গ্যালারি আইটেমটি মুছে ফেলা হয়েছে।', 'info');
+    showToast('ছবি মুছে ফেলা হয়েছে।', 'info');
   };
 
   // Save All Media to Supabase
@@ -146,27 +113,28 @@ export function MediaManager() {
     const matchesSearch =
       (item.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.subtitle || '').toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
+    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
+    return matchesSearch && matchesCategory;
   });
 
   return (
     <div className="space-y-8 font-bangla text-slate-100 pb-12">
       
-      {/* Header & Save Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 p-6 rounded-3xl border border-slate-800">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
+      {/* Top Banner & Save Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-950 p-6 rounded-3xl border border-slate-800 shadow-xl">
+        <div>
+          <h2 className="text-xl font-black text-white flex items-center gap-2">
             <ImageIcon className="w-5 h-5 text-emerald-400" />
-            <h2 className="text-lg font-black text-white">গ্যালারি ও সাইট মিডিয়া ম্যানেজার</h2>
-          </div>
-          <p className="text-xs text-slate-400">
+            গ্যালারি ও সাইট মিডিয়া লাইব্রেরি
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">
             হোমপেজের ব্যানার, স্যারের ছবি এবং ৪-কলাম কর্মশালা অ্যালবাম পরিচালনা করুন।
           </p>
         </div>
 
         <button
           onClick={handleSaveAll}
-          disabled={isSaving || isUploading}
+          disabled={isSaving}
           className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-3.5 rounded-2xl shadow-lg transition"
         >
           {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -174,8 +142,8 @@ export function MediaManager() {
         </button>
       </div>
 
-      {/* 1. KEY SITE BANNERS & PROFILE IMAGES */}
-      <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
+      {/* SECTION 1: KEY SITE IMAGES */}
+      <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
         <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
           <Sparkles className="w-4 h-4 text-amber-400" />
           <h3 className="font-bold text-sm text-white">মূল সাইটের ৩টি প্রধান ব্যানার ও ছবি</h3>
@@ -184,9 +152,9 @@ export function MediaManager() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Hero Doctor Image */}
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
             <span className="text-xs font-bold text-emerald-400 block">১. হোমপেজ Hero ব্যানার ছবি</span>
-            <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-slate-900 border border-slate-800">
+            <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
               <Image src={heroImg} alt="Hero Banner" fill sizes="300px" className="object-cover" />
             </div>
             <input
@@ -194,7 +162,7 @@ export function MediaManager() {
               value={heroImg}
               onChange={(e) => setHeroImg(e.target.value)}
               placeholder="ছবির URL বা পাথ..."
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-white font-mono outline-none"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-white font-mono outline-none"
             />
             <label className="cursor-pointer block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2 rounded-xl border border-slate-700 transition">
               <Upload className="w-3.5 h-3.5 inline mr-1" />
@@ -204,9 +172,9 @@ export function MediaManager() {
           </div>
 
           {/* About Doctor Portrait */}
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
             <span className="text-xs font-bold text-emerald-400 block">২. স্যারের পরিচিতি পোর্ট্রেট</span>
-            <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-slate-900 border border-slate-800">
+            <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
               <Image src={portraitImg} alt="Doctor Portrait" fill sizes="300px" className="object-cover" />
             </div>
             <input
@@ -214,7 +182,7 @@ export function MediaManager() {
               value={portraitImg}
               onChange={(e) => setPortraitImg(e.target.value)}
               placeholder="ছবির URL বা পাথ..."
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-white font-mono outline-none"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-white font-mono outline-none"
             />
             <label className="cursor-pointer block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2 rounded-xl border border-slate-700 transition">
               <Upload className="w-3.5 h-3.5 inline mr-1" />
@@ -224,9 +192,9 @@ export function MediaManager() {
           </div>
 
           {/* PTF Certificate Frame */}
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+          <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
             <span className="text-xs font-bold text-amber-400 block">৩. PTF সনদপত্র প্রদর্শনী ছবি</span>
-            <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-slate-900 border border-slate-800">
+            <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
               <Image src={ptfImg} alt="PTF Certificate" fill sizes="300px" className="object-cover" />
             </div>
             <input
@@ -234,7 +202,7 @@ export function MediaManager() {
               value={ptfImg}
               onChange={(e) => setPtfImg(e.target.value)}
               placeholder="ছবির URL বা পাথ..."
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-white font-mono outline-none"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-white font-mono outline-none"
             />
             <label className="cursor-pointer block text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2 rounded-xl border border-slate-700 transition">
               <Upload className="w-3.5 h-3.5 inline mr-1" />
@@ -246,8 +214,8 @@ export function MediaManager() {
         </div>
       </div>
 
-      {/* 2. PHOTO GALLERY ALBUM MANAGER */}
-      <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
+      {/* SECTION 2: PHOTO GALLERY ALBUM */}
+      <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
           <div className="space-y-1">
@@ -260,15 +228,13 @@ export function MediaManager() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleAddGalleryItem}
-              className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition"
-            >
-              <Plus className="w-4 h-4" />
-              <span>নতুন ছবি যোগ করুন</span>
-            </button>
-          </div>
+          <button
+            onClick={handleAddGalleryItem}
+            className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition"
+          >
+            <Plus className="w-4 h-4" />
+            <span>নতুন ছবি যোগ করুন</span>
+          </button>
         </div>
 
         {/* Gallery Cards Grid */}
@@ -276,10 +242,10 @@ export function MediaManager() {
           {filteredGallery.map((item, idx) => (
             <div
               key={item.id || idx}
-              className="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4 hover:border-slate-700 transition"
+              className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4 hover:border-slate-700 transition"
             >
               <div className="flex items-start gap-4">
-                <div className="relative w-28 h-24 rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shrink-0">
+                <div className="relative w-28 h-24 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0">
                   <Image src={item.src} alt={item.title} fill sizes="120px" className="object-cover" />
                 </div>
 
@@ -303,7 +269,7 @@ export function MediaManager() {
                     value={item.title}
                     onChange={(e) => handleUpdateGalleryItem(item.id, 'title', e.target.value)}
                     placeholder="ছবির শিরোনাম..."
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-bold focus:border-emerald-500 outline-none"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-bold focus:border-emerald-500 outline-none"
                   />
                 </div>
               </div>
@@ -316,7 +282,7 @@ export function MediaManager() {
                     value={item.category || ''}
                     onChange={(e) => handleUpdateGalleryItem(item.id, 'category', e.target.value)}
                     placeholder="যেমন: কর্মশালা ও সেমিনার"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white outline-none"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white outline-none"
                   />
                 </div>
 
@@ -327,7 +293,7 @@ export function MediaManager() {
                     value={item.date || ''}
                     onChange={(e) => handleUpdateGalleryItem(item.id, 'date', e.target.value)}
                     placeholder="যেমন: ২০২৬ ব্যাচ"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white outline-none"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white outline-none"
                   />
                 </div>
               </div>
@@ -339,7 +305,7 @@ export function MediaManager() {
                     type="text"
                     value={item.src}
                     onChange={(e) => handleUpdateGalleryItem(item.id, 'src', e.target.value)}
-                    className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-[11px] text-slate-300 font-mono outline-none"
+                    className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-[11px] text-slate-300 font-mono outline-none"
                   />
                   <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 text-xs font-bold transition flex items-center gap-1 shrink-0">
                     <Upload className="w-3.5 h-3.5" />
