@@ -46,12 +46,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => setToast(null), 4000);
   };
 
+  const purgeLocalAuth = () => {
+    setUser(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('bdhomeo_user');
+      // Clean any Supabase cached tokens from localStorage
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          localStorage.removeItem(key);
+        }
+      });
+    }
+  };
+
   const syncUserProfile = async (sessionUser: any) => {
-    if (!sessionUser) {
-      setUser(null);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('bdhomeo_user');
-      }
+    if (!sessionUser || !sessionUser.id) {
+      purgeLocalAuth();
       return;
     }
 
@@ -62,7 +72,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     let role: UserRole = 'student';
 
     try {
-      // Query role strictly from Supabase 'profiles' table
+      // Query role strictly from Supabase 'profiles' table with fresh server validation
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
@@ -87,7 +97,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } catch (err) {
-      console.warn('Supabase profile check:', err);
+      console.warn('Supabase profile check error:', err);
       role = 'student';
     }
 
@@ -154,27 +164,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       console.warn('LocalStorage initialization warning:', e);
     }
 
-    // Initialize session directly from Supabase
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        await syncUserProfile(session.user);
+    // Use live server-validated getUser() instead of getSession() to reject deleted users
+    supabase.auth.getUser().then(async ({ data: { user: verifiedUser }, error }) => {
+      if (error || !verifiedUser) {
+        // User was deleted on Supabase server or session is invalid -> purge local storage
+        purgeLocalAuth();
       } else {
-        setUser(null);
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('bdhomeo_user');
-        }
+        await syncUserProfile(verifiedUser);
       }
+      setIsAuthLoading(false);
+    }).catch(() => {
+      purgeLocalAuth();
       setIsAuthLoading(false);
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        await syncUserProfile(session.user);
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT' || !session?.user) {
+        purgeLocalAuth();
+        setIsAuthLoading(false);
+        return;
+      }
+
+      // Re-verify with server
+      const { data: { user: verifiedUser }, error } = await supabase.auth.getUser();
+      if (error || !verifiedUser) {
+        purgeLocalAuth();
       } else {
-        setUser(null);
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('bdhomeo_user');
-        }
+        await syncUserProfile(verifiedUser);
       }
       setIsAuthLoading(false);
     });
@@ -206,11 +222,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('bdhomeo_user');
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch (e) {
+      console.warn('Signout error:', e);
     }
+    purgeLocalAuth();
     showToast('সফলভাবে লগআউট করা হয়েছে।', 'info');
   };
 
