@@ -23,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/courses/advance-clinical-repertory`,
+      url: `${baseUrl}/courses/advanced-clinical-repertory`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,

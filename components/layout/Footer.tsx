@@ -106,7 +106,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/courses/advance-clinical-repertory" className="hover:text-emerald-400 transition">
+                <Link href="/courses/advanced-clinical-repertory" className="hover:text-emerald-400 transition">
                   🔹 এডভান্সড ক্লিনিক্যাল রেপার্টরি কোর্স
                 </Link>
               </li>

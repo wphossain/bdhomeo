@@ -34,7 +34,7 @@ export default function CourseDetailPage() {
   const { courses, settings, user, submitEnrollment, signInWithGoogle, showToast } = useApp();
   const slug = params?.slug as string;
 
-  const course = courses.find((c) => c.slug === slug);
+  const course = courses.find((c) => c.slug === slug || (slug === 'advance-clinical-repertory' && c.slug === 'advanced-clinical-repertory') || (slug === 'advanced-clinical-repertory' && c.slug === 'advance-clinical-repertory'));
 
   // If slug is invalid, render official 404 page
   if (!course) {
