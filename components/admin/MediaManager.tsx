@@ -9,13 +9,8 @@ import {
   Plus, 
   Trash2, 
   Save, 
-  Eye, 
-  Upload, 
   Sparkles, 
-  Award, 
-  User, 
-  Layers,
-  Edit2
+  User
 } from 'lucide-react';
 
 export function MediaManager() {
@@ -35,16 +30,16 @@ export function MediaManager() {
       galleryImages: galleryList,
     });
     setIsSaving(false);
-    showToast('à¦¸à¦•à¦² à¦›à¦¬à¦¿ à¦“ à¦—à§à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦•à¦¨à¦Ÿà§‡à¦¨à§à¦Ÿ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¸à§‡à¦­ à¦¹à§Ÿà§‡à¦›à§‡!', 'success');
+    showToast('সকল ছবি ও গ্যালারি কনটেন্ট সফলভাবে সেভ হয়েছে!', 'success');
   };
 
   const handleAddGalleryItem = () => {
     const newItem: GalleryItem = {
       id: `g-${Date.now()}`,
       src: '/assets/gallery/workshop-practical.jpg',
-      title: 'à¦¨à¦¤à§à¦¨ à¦•à¦°à§à¦®à¦¶à¦¾à¦²à¦¾ à¦“ à¦•à§‡à¦¸ à¦¸à§à¦Ÿà¦¾à¦¡à¦¿ à¦¸à§‡à¦¶à¦¨',
-      category: 'à¦•à¦°à§à¦®à¦¶à¦¾à¦²à¦¾',
-      desc: 'à¦¡à¦¾à¦ƒ à¦®à§‹à¦ƒ à¦—à¦¿à§Ÿà¦¾à¦¸ à¦‰à¦¦à§à¦¦à¦¿à¦¨ à¦¸à§à¦¯à¦¾à¦°à§‡à¦° à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦•à§à¦²à¦¿à¦¨à¦¿à¦•à§à¦¯à¦¾à¦² à¦•à§à¦²à¦¾à¦¸',
+      title: 'নতুন কর্মশালা ও কেস স্টাডি সেশন',
+      category: 'কর্মশালা',
+      desc: 'ডাঃ মোঃ গিয়াস উদ্দিন স্যারের সরাসরি ক্লিনিক্যাল ক্লাস',
     };
     setGalleryList([...galleryList, newItem]);
   };
@@ -65,10 +60,10 @@ export function MediaManager() {
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
             <ImageIcon className="w-6 h-6 text-emerald-400" />
-            à¦›à¦¬à¦¿ à¦“ à¦®à¦¿à¦¡à¦¿à§Ÿà¦¾ à¦®à§à¦¯à¦¾à¦¨à§‡à¦œà¦¾à¦° (Media & Gallery CMS)
+            ছবি ও মিডিয়া ম্যানেজার (Media & Gallery CMS)
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            à¦¹à¦¿à¦°à§‹ à¦‡à¦®à§‡à¦œ, à¦¸à§à¦¯à¦¾à¦°à§‡à¦° à¦ªà§‹à¦°à§à¦Ÿà§à¦°à§‡à¦Ÿ, PTF à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦“ à¦“à§Ÿà¦¾à¦°à§à¦•à¦¶à¦ª à¦«à¦Ÿà§‹à¦—à§à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨ à¦•à¦°à§à¦¨à¥¤
+            হিরো ইমেজ, স্যারের পোর্ট্রেট, PTF সার্টিফিকেট ও ওয়ার্কশপ ফটোগ্যালারি পরিবর্তন করুন।
           </p>
         </div>
 
@@ -78,7 +73,7 @@ export function MediaManager() {
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg transition shrink-0"
         >
           <Save className="w-4 h-4" />
-          <span>{isSaving ? 'à¦¸à¦‚à¦°à¦•à§à¦·à¦£ à¦¹à¦šà§à¦›à§‡...' : 'à¦›à¦¬à¦¿ à¦“ à¦—à§à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦¸à§‡à¦­ à¦•à¦°à§à¦¨'}</span>
+          <span>{isSaving ? 'সংরক্ষণ হচ্ছে...' : 'ছবি ও গ্যালারি সেভ করুন'}</span>
         </button>
       </div>
 
@@ -86,7 +81,7 @@ export function MediaManager() {
       <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
         <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
           <User className="w-5 h-5 text-emerald-400" />
-          à§§. à¦ªà§à¦°à¦§à¦¾à¦¨ à¦¬à§à¦°à¦¾à¦¨à§à¦¡à¦¿à¦‚ à¦‡à¦®à§‡à¦œ (Hero, Doctor Bio & PTF Certificate)
+          ১. প্রধান ব্রান্ডিং ইমেজ (Hero, Doctor Bio & PTF Certificate)
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -97,7 +92,7 @@ export function MediaManager() {
               <Image src={heroImg} alt="Hero Banner" fill className="object-cover" />
             </div>
             <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">à¦¹à¦¿à¦°à§‹ à¦¬à§à¦¯à¦¾à¦¨à¦¾à¦° à¦‡à¦®à§‡à¦œ à¦ªà¦¾à¦¥ (URL)</label>
+              <label className="text-xs font-bold text-slate-300 block mb-1">হিরো ব্যানার ইমেজ পাথ (URL)</label>
               <input
                 type="text"
                 value={heroImg}
@@ -113,7 +108,7 @@ export function MediaManager() {
               <Image src={portraitImg} alt="Doctor Portrait" fill className="object-cover" />
             </div>
             <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">à¦¸à§à¦¯à¦¾à¦°à§‡à¦° à¦ªà§à¦°à§‹à¦«à¦¾à¦‡à¦² à¦«à¦Ÿà§‹ à¦ªà¦¾à¦¥ (URL)</label>
+              <label className="text-xs font-bold text-slate-300 block mb-1">স্যারের প্রোফাইল ফটো পাথ (URL)</label>
               <input
                 type="text"
                 value={portraitImg}
@@ -129,7 +124,7 @@ export function MediaManager() {
               <Image src={ptfImg} alt="PTF Certificate" fill className="object-cover" />
             </div>
             <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">PTF à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦‡à¦®à§‡à¦œ à¦ªà¦¾à¦¥ (URL)</label>
+              <label className="text-xs font-bold text-slate-300 block mb-1">PTF সার্টিফিকেট ইমেজ পাথ (URL)</label>
               <input
                 type="text"
                 value={ptfImg}
@@ -149,10 +144,10 @@ export function MediaManager() {
           <div>
             <h3 className="text-base font-black text-white flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-emerald-400" />
-              à§¨. à¦«à¦Ÿà§‹ à¦—à§à¦¯à¦¾à¦²à¦¾à¦°à¦¿ à¦“ à¦•à¦°à§à¦®à¦¶à¦¾à¦²à¦¾ à¦…à§à¦¯à¦¾à¦²à¦¬à¦¾à¦® ({galleryList.length} à¦Ÿà¦¿ à¦›à¦¬à¦¿)
+              ২. ফটো গ্যালারি ও কর্মশালা অ্যালবাম ({galleryList.length} টি ছবি)
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              à¦“à§Ÿà§‡à¦¬à¦¸à¦¾à¦‡à¦Ÿà§‡ à¦ªà§à¦°à¦¦à¦°à§à¦¶à¦¿à¦¤ à¦•à¦°à§à¦®à¦¶à¦¾à¦²à¦¾, à¦¸à§‡à¦®à¦¿à¦¨à¦¾à¦° à¦“ à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦¬à¦¿à¦¤à¦°à¦£à§€ à¦«à¦Ÿà§‹à¦—à§à¦²à§‹ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à§à¦¨à¥¤
+              ওয়েবসাইটে প্রদর্শিত কর্মশালা, সেমিনার ও সার্টিফিকেট বিতরণী ফটোগুলো আপডেট করুন।
             </p>
           </div>
 
@@ -161,7 +156,7 @@ export function MediaManager() {
             className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition"
           >
             <Plus className="w-4 h-4" />
-            <span>à¦¨à¦¤à§à¦¨ à¦›à¦¬à¦¿ à¦¯à§‹à¦— à¦•à¦°à§à¦¨</span>
+            <span>নতুন ছবি যোগ করুন</span>
           </button>
         </div>
 
@@ -181,7 +176,7 @@ export function MediaManager() {
                     type="text"
                     value={item.title}
                     onChange={(e) => handleUpdateGalleryItem(item.id, 'title', e.target.value)}
-                    placeholder="à¦›à¦¬à¦¿à¦° à¦•à§à¦¯à¦¾à¦ªà¦¶à¦¨ / à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦®"
+                    placeholder="ছবির ক্যাপশন / শিরোনাম"
                     className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-white font-bold focus:border-emerald-500 outline-none"
                   />
 
@@ -190,7 +185,7 @@ export function MediaManager() {
                       type="text"
                       value={item.category}
                       onChange={(e) => handleUpdateGalleryItem(item.id, 'category', e.target.value)}
-                      placeholder="à¦•à§à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿"
+                      placeholder="ক্যাটাগরি"
                       className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs text-slate-300 outline-none"
                     />
 
@@ -198,7 +193,7 @@ export function MediaManager() {
                       type="text"
                       value={item.src}
                       onChange={(e) => handleUpdateGalleryItem(item.id, 'src', e.target.value)}
-                      placeholder="à¦‡à¦®à§‡à¦œ à¦ªà¦¾à¦¥ (/assets/...)"
+                      placeholder="ইমেজ পাথ (/assets/...)"
                       className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs font-mono text-emerald-300 outline-none"
                     />
                   </div>
@@ -211,7 +206,7 @@ export function MediaManager() {
                   className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 font-bold"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>à¦®à§à¦›à§‡ à¦«à§‡à¦²à§à¦¨</span>
+                  <span>মুছে ফেলুন</span>
                 </button>
               </div>
             </div>

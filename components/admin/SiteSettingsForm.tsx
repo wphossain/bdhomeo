@@ -7,14 +7,7 @@ import {
   Save, 
   Phone, 
   Megaphone, 
-  Video, 
-  Clock, 
-  Globe, 
-  Youtube, 
-  Facebook, 
-  CreditCard,
-  User,
-  Sparkles
+  CreditCard
 } from 'lucide-react';
 
 export function SiteSettingsForm() {
@@ -27,7 +20,7 @@ export function SiteSettingsForm() {
     setIsSaving(true);
     await updateSettings(formData);
     setIsSaving(false);
-    showToast('à¦“à§Ÿà§‡à¦¬à¦¸à¦¾à¦‡à¦Ÿà§‡à¦° à¦•à¦¨à¦Ÿà§‡à¦¨à§à¦Ÿ à¦“ à¦¨à¦®à§à¦¬à¦° à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¹à§Ÿà§‡à¦›à§‡!', 'success');
+    showToast('ওয়েবসাইটের কনটেন্ট ও নম্বর সফলভাবে আপডেট হয়েছে!', 'success');
   };
 
   return (
@@ -38,10 +31,10 @@ export function SiteSettingsForm() {
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
             <Settings className="w-6 h-6 text-emerald-400" />
-            à¦¸à¦¾à¦‡à¦Ÿ à¦•à¦¨à¦Ÿà§‡à¦¨à§à¦Ÿ à¦“ à¦¨à¦®à§à¦¬à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ (Site Settings CMS)
+            সাইট কনটেন্ট ও নম্বর সেটিংস (Site Settings CMS)
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            à¦¬à¦¿à¦•à¦¾à¦¶ à¦®à¦¾à¦°à§à¦šà§‡à¦¨à§à¦Ÿ à¦¨à¦®à§à¦¬à¦°, à¦¹à§‹à§Ÿà¦¾à¦Ÿà¦¸à¦…à§à¦¯à¦¾à¦ª à¦¨à¦®à§à¦¬à¦°, à¦¹à§‡à¦²à§à¦ªà¦²à¦¾à¦‡à¦¨, à¦¨à§‹à¦Ÿà¦¿à¦¶ à¦à¦¬à¦‚ à¦²à§à¦¯à¦¾à¦¨à§à¦¡à¦¿à¦‚ à¦ªà§‡à¦œà§‡à¦° à¦¬à¦¿à¦¬à¦°à¦£ à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨ à¦•à¦°à§à¦¨à¥¤
+            বিকাশ মার্চেন্ট নম্বর, হোয়াটসঅ্যাপ নম্বর, হেল্পলাইন, নোটিশ এবং ল্যান্ডিং পেজের বিবরণ পরিবর্তন করুন।
           </p>
         </div>
 
@@ -51,7 +44,7 @@ export function SiteSettingsForm() {
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-lg transition shrink-0"
         >
           <Save className="w-4 h-4" />
-          <span>{isSaving ? 'à¦¸à¦‚à¦°à¦•à§à¦·à¦£ à¦¹à¦šà§à¦›à§‡...' : 'à¦¸à¦•à¦² à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦¸à¦‚à¦°à¦•à§à¦·à¦£ à¦•à¦°à§à¦¨'}</span>
+          <span>{isSaving ? 'সংরক্ষণ হচ্ছে...' : 'সকল সেটিংস সংরক্ষণ করুন'}</span>
         </button>
       </div>
 
@@ -61,7 +54,7 @@ export function SiteSettingsForm() {
         <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
           <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
             <CreditCard className="w-5 h-5 text-emerald-400" />
-            à§§. à¦…à¦«à¦¿à¦¸à¦¿à§Ÿà¦¾à¦² à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ à¦¨à¦®à§à¦¬à¦° à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ (bKash Merchant & Nagad)
+            ১. অফিসিয়াল পেমেন্ট নম্বর সেটিংস (bKash Merchant & Nagad)
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -70,7 +63,7 @@ export function SiteSettingsForm() {
             <div className="space-y-3 p-4 bg-slate-900 rounded-2xl border border-pink-500/30">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-pink-400">
-                  à¦¬à¦¿à¦•à¦¾à¦¶ à¦®à¦¾à¦°à§à¦šà§‡à¦¨à§à¦Ÿ à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ à¦¨à¦®à§à¦¬à¦° (Payment Option)
+                  বিকাশ মার্চেন্ট পেমেন্ট নম্বর (Payment Option)
                 </label>
                 <span className="bg-pink-500/20 text-pink-300 text-[10px] font-black px-2 py-0.5 rounded">
                   Merchant
@@ -107,7 +100,7 @@ export function SiteSettingsForm() {
             {/* Nagad */}
             <div className="space-y-3 p-4 bg-slate-900 rounded-2xl border border-orange-500/30">
               <label className="text-xs font-bold text-orange-400 block">
-                à¦¨à¦—à¦¦ à¦¨à¦®à§à¦¬à¦° (Send Money / Payment)
+                নগদ নম্বর (Send Money / Payment)
               </label>
               <input
                 type="text"
@@ -144,13 +137,13 @@ export function SiteSettingsForm() {
         <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
           <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
             <Phone className="w-5 h-5 text-emerald-400" />
-            à§¨. à¦¸à§à¦¯à¦¾à¦°à§‡à¦° à¦®à§‚à¦² à¦¹à§‡à¦²à§à¦ªà¦²à¦¾à¦‡à¦¨, à¦¹à§‹à§Ÿà¦¾à¦Ÿà¦¸à¦…à§à¦¯à¦¾à¦ª à¦“ à¦¸à§‹à¦¶à§à¦¯à¦¾à¦² à¦²à¦¿à¦‚à¦•
+            ২. স্যারের মূল হেল্পলাইন, হোয়াটসঅ্যাপ ও সোশ্যাল লিংক
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-slate-900 rounded-2xl border border-emerald-500/30 space-y-2">
               <label className="text-xs font-bold text-emerald-400 block">
-                à¦¹à§‹à§Ÿà¦¾à¦Ÿà¦¸à¦…à§à¦¯à¦¾à¦ª à¦¨à¦®à§à¦¬à¦° (WhatsApp Floating à¦“ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ)
+                হোয়াটসঅ্যাপ নম্বর (WhatsApp Floating ও সাপোর্ট)
               </label>
               <input
                 type="text"
@@ -158,12 +151,12 @@ export function SiteSettingsForm() {
                 onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
                 className="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-white outline-none focus:border-emerald-500"
               />
-              <p className="text-[11px] text-slate-400">à¦¡à¦¿à¦«à¦²à§à¦Ÿ: 01811-123993</p>
+              <p className="text-[11px] text-slate-400">ডিফল্ট: 01811-123993</p>
             </div>
 
             <div className="p-4 bg-slate-900 rounded-2xl border border-emerald-500/30 space-y-2">
               <label className="text-xs font-bold text-emerald-400 block">
-                à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦«à§‹à¦¨ à¦•à¦² à¦“ à¦¹à§‡à¦²à§à¦ªà¦²à¦¾à¦‡à¦¨ à¦¨à¦®à§à¦¬à¦°
+                সরাসরি ফোন কল ও হেল্পলাইন নম্বর
               </label>
               <input
                 type="text"
@@ -171,11 +164,11 @@ export function SiteSettingsForm() {
                 onChange={(e) => setFormData({ ...formData, helplineNumber: e.target.value })}
                 className="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-white outline-none focus:border-emerald-500"
               />
-              <p className="text-[11px] text-slate-400">à¦¡à¦¿à¦«à¦²à§à¦Ÿ: 01811-123993</p>
+              <p className="text-[11px] text-slate-400">ডিফল্ট: 01811-123993</p>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 block">à¦‡à¦‰à¦Ÿà¦¿à¦‰à¦¬ à¦šà§à¦¯à¦¾à¦¨à§‡à¦² à¦²à¦¿à¦‚à¦• (YouTube URL)</label>
+              <label className="text-xs font-bold text-slate-400 block">ইউটিউব চ্যানেল লিংক (YouTube URL)</label>
               <input
                 type="url"
                 value={formData.youtubeUrl}
@@ -185,7 +178,7 @@ export function SiteSettingsForm() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 block">à¦¸à§à¦¯à¦¾à¦°à§‡à¦° à¦«à§‡à¦¸à¦¬à§à¦• à¦ªà§à¦°à§‹à¦«à¦¾à¦‡à¦² à¦²à¦¿à¦‚à¦• (Facebook URL)</label>
+              <label className="text-xs font-bold text-slate-400 block">স্যারের ফেসবুক প্রোফাইল লিংক (Facebook URL)</label>
               <input
                 type="url"
                 value={formData.facebookUrl}
@@ -200,12 +193,12 @@ export function SiteSettingsForm() {
         <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
           <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
             <Megaphone className="w-5 h-5 text-emerald-400" />
-            à§©. à¦—à§à¦—à¦² à¦®à¦¿à¦Ÿ à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸à¦°à§à¦® à¦“ à¦¶à§€à¦°à§à¦· à¦˜à§‹à¦·à¦£à¦¾ à¦¨à§‹à¦Ÿà¦¿à¦¶
+            ৩. গুগল মিট লাইভ ক্লাসরুম ও শীর্ষ ঘোষণা নোটিশ
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2 space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 block">à¦—à§à¦—à¦² à¦®à¦¿à¦Ÿ (Google Meet) à¦•à§à¦²à¦¾à¦¸à¦°à§à¦® à¦²à¦¿à¦‚à¦•</label>
+              <label className="text-xs font-bold text-slate-400 block">গুগল মিট (Google Meet) ক্লাসরুম লিংক</label>
               <input
                 type="url"
                 value={formData.googleMeetUrl}
@@ -215,7 +208,7 @@ export function SiteSettingsForm() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 block">à¦•à§à¦²à¦¾à¦¸à§‡à¦° à¦¸à¦®à§Ÿà¦¸à§‚à¦šà¦¿ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿ</label>
+              <label className="text-xs font-bold text-slate-400 block">ক্লাসের সময়সূচি টেক্সট</label>
               <input
                 type="text"
                 value={formData.classTime}
@@ -225,7 +218,7 @@ export function SiteSettingsForm() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 block">à¦ªà§à¦°à¦¤à¦¿à¦·à§à¦ à¦¾à¦¨à§‡à¦° à¦¸à§à¦²à§‹à¦—à¦¾à¦¨</label>
+              <label className="text-xs font-bold text-slate-400 block">প্রতিষ্ঠানের স্লোগান</label>
               <input
                 type="text"
                 value={formData.slogan}
@@ -235,7 +228,7 @@ export function SiteSettingsForm() {
             </div>
 
             <div className="md:col-span-2 space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 block">à¦¶à§€à¦°à§à¦· à¦˜à§‹à¦·à¦£à¦¾ à¦¨à§‹à¦Ÿà¦¿à¦¶ (Announcement Marquee)</label>
+              <label className="text-xs font-bold text-slate-400 block">শীর্ষ ঘোষণা নোটিশ (Announcement Marquee)</label>
               <textarea
                 rows={2}
                 value={formData.noticeText}

@@ -65,32 +65,32 @@ export function CourseManager() {
     const newCourse: Course = {
       id: `course-${Date.now()}`,
       slug: `new-homeopathy-course-${Date.now()}`,
-      title: 'à¦¨à¦¤à§à¦¨ à¦¹à§‹à¦®à¦¿à¦“à¦ªà§à¦¯à¦¾à¦¥à¦¿à¦• à¦¸à§à¦ªà§‡à¦¶à¦¾à¦² à¦•à§‹à¦°à§à¦¸',
-      subtitle: 'à¦¡à¦¾à¦ƒ à¦®à§‹à¦ƒ à¦—à¦¿à§Ÿà¦¾à¦¸ à¦‰à¦¦à§à¦¦à¦¿à¦¨ à¦¸à§à¦¯à¦¾à¦°à§‡à¦° à¦¬à¦¿à¦¶à§‡à¦· à¦ªà§à¦°à¦¶à¦¿à¦•à§à¦·à¦£ à¦•à¦°à§à¦®à¦¶à¦¾à¦²à¦¾ à¦“ à¦à¦•à¦¾à¦¡à§‡à¦®à¦¿à¦• à¦•à§‹à¦°à§à¦¸',
+      title: 'নতুন হোমিওপ্যাথিক স্পেশাল কোর্স',
+      subtitle: 'ডাঃ মোঃ গিয়াস উদ্দিন স্যারের বিশেষ প্রশিক্ষণ কর্মশালা ও একাডেমিক কোর্স',
       batchType: 'basic',
       durationMonths: 6,
       admissionFee: 1000,
       monthlyFee: 500,
-      liveSchedule: 'à¦¸à¦ªà§à¦¤à¦¾à¦¹à§‡ à§¨ à¦¦à¦¿à¦¨ à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸ (à¦°à¦¾à¦¤ à§¯:à§©à§¦)',
-      morningSupport: 'à¦¸à¦ªà§à¦¤à¦¾à¦¹à§‡ à§¬ à¦¦à¦¿à¦¨ à¦¸à¦•à¦¾à¦² à§®:à§¦à§¦ à¦Ÿà¦¾à§Ÿ à¦²à¦¾à¦‡à¦­ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ',
+      liveSchedule: 'সপ্তাহে ২ দিন লাইভ ক্লাস (রাত ৯:৩০)',
+      morningSupport: 'সপ্তাহে ৬ দিন সকাল ৮:০০ টায় লাইভ সাপোর্ট',
       thumbnailUrl: '/assets/courses/basic-batch.jpg',
-      description: 'à¦à¦‡ à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦®à¦¾à¦§à§à¦¯à¦®à§‡ à¦¹à§‹à¦®à¦¿à¦“à¦ªà§à¦¯à¦¾à¦¥à¦¿à¦• à¦…à¦°à§à¦—à¦¾à¦¨à¦¨, à¦®à§‡à¦Ÿà§‡à¦°à¦¿à§Ÿà¦¾ à¦®à§‡à¦¡à¦¿à¦•à¦¾ à¦“ à¦°à§‡à¦ªà¦¾à¦°à§à¦Ÿà¦°à¦¿à¦° à¦ªà§‚à¦°à§à¦£à¦¾à¦™à§à¦— à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦¿à¦• à¦œà§à¦žà¦¾à¦¨ à¦…à¦°à§à¦œà¦¨ à¦•à¦°à¦¾ à¦¯à¦¾à¦¬à§‡à¥¤',
+      description: 'এই কোর্সের মাধ্যমে হোমিওপ্যাথিক অর্গানন, মেটেরিয়া মেডিকা ও রেপার্টরির পূর্ণাঙ্গ ব্যবহারিক জ্ঞান অর্জন করা যাবে।',
       features: [
-        'à¦¸à¦¾à¦ªà§à¦¤à¦¾à¦¹à¦¿à¦• à§¨à¦Ÿà¦¿ à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸ (Google Meet)',
-        'à¦¸à¦ªà§à¦¤à¦¾à¦¹à§‡ à§¬ à¦¦à¦¿à¦¨ à¦®à¦°à§à¦¨à¦¿à¦‚ à¦•à§‡à¦¸ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ',
-        'à¦…à¦§à§à¦¯à¦¾à§Ÿà¦­à¦¿à¦¤à§à¦¤à¦¿à¦• à¦¸à¦¾à¦œà¦¾à¦¨à§‹ PDF à¦²à§‡à¦•à¦šà¦¾à¦° à¦¶à¦¿à¦Ÿ',
-        'PTF à¦…à¦¨à§à¦®à§‹à¦¦à¦¿à¦¤ à¦ªà§à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ',
+        'সাপ্তাহিক ২টি লাইভ ক্লাস (Google Meet)',
+        'সপ্তাহে ৬ দিন মর্নিং কেস সাপোর্ট',
+        'অধ্যায়ভিত্তিক সাজানো PDF লেকচার শিট',
+        'PTF অনুমোদিত প্রফেশনাল সার্টিফিকেট',
       ],
       curriculum: [
         {
           id: `c-${Date.now()}`,
           chapterNo: 1,
-          title: 'à¦…à¦§à§à¦¯à¦¾à¦¯à¦¼ à§§: à¦®à§Œà¦²à¦¿à¦• à¦­à¦¿à¦¤à§à¦¤à¦¿ à¦“ à¦•à§à¦²à¦¾à¦¸à¦¿à¦•à§à¦¯à¦¾à¦² à¦¦à¦°à§à¦¶à¦¨',
-          description: 'à¦¹à§‹à¦®à¦¿à¦“à¦ªà§à¦¯à¦¾à¦¥à¦¿à¦• à¦¨à§€à¦¤à¦¿à¦®à¦¾à¦²à¦¾à¦° à¦—à¦­à§€à¦° à¦¬à¦¿à¦¶à§à¦²à§‡à¦·à¦£ à¦“ à¦ªà§à¦°à¦¾à¦¥à¦®à¦¿à¦• à¦ªà¦¾à¦ ',
+          title: 'অধ্যায় ১: মৌলিক ভিত্তি ও ক্লাসিক্যাল দর্শন',
+          description: 'হোমিওপ্যাথিক নীতিমালার গভীর বিশ্লেষণ ও প্রাথমিক পাঠ',
           lessons: [
             {
               id: `l-${Date.now()}`,
-              title: 'à§§.à§§ à¦ªà¦°à¦¿à¦šà¦¿à¦¤à¦¿ à¦“ à¦“à¦°à¦¿à§Ÿà§‡à¦¨à§à¦Ÿà§‡à¦¶à¦¨ à¦•à§à¦²à¦¾à¦¸',
+              title: '১.১ পরিচিতি ও ওরিয়েন্টেশন ক্লাস',
               durationMin: 45,
               isFreePreview: true,
               youtubeVideoId: 'M7lc1UVf-VE',
@@ -106,16 +106,16 @@ export function CourseManager() {
     setCourseList(updated);
     setEditingCourseId(newCourse.id);
     updateCourses(updated);
-    showToast('à¦¨à¦¤à§à¦¨ à¦•à§‹à¦°à§à¦¸ à¦¤à§ˆà¦°à¦¿ à¦¹à§Ÿà§‡à¦›à§‡! à¦à¦–à¦¨ à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦¤à¦¥à§à¦¯ à¦“ à¦¸à¦¿à¦²à§‡à¦¬à¦¾à¦¸ à¦¸à¦¾à¦œà¦¾à¦¨à¥¤', 'success');
+    showToast('নতুন কোর্স তৈরি হয়েছে! এখন বিস্তারিত তথ্য ও সিলেবাস সাজান।', 'success');
   };
 
   const handleDeleteCourse = (courseId: string) => {
-    if (confirm('à¦†à¦ªà¦¨à¦¿ à¦•à¦¿ à¦¨à¦¿à¦¶à§à¦šà¦¿à¦¤à¦­à¦¾à¦¬à§‡ à¦à¦‡ à¦•à§‹à¦°à§à¦¸à¦Ÿà¦¿ à¦¡à¦¿à¦²à¦¿à¦Ÿ à¦•à¦°à¦¤à§‡ à¦šà¦¾à¦¨?')) {
+    if (confirm('আপনি কি নিশ্চিতভাবে এই কোর্সটি ডিলিট করতে চান?')) {
       const updated = courseList.filter((c) => c.id !== courseId);
       setCourseList(updated);
       if (editingCourseId === courseId) setEditingCourseId(null);
       updateCourses(updated);
-      showToast('à¦•à§‹à¦°à§à¦¸ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¡à¦¿à¦²à¦¿à¦Ÿ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡à¥¤', 'info');
+      showToast('কোর্স সফলভাবে ডিলিট করা হয়েছে।', 'info');
     }
   };
 
@@ -124,19 +124,19 @@ export function CourseManager() {
       ...course,
       id: `course-${Date.now()}`,
       slug: `${course.slug}-copy-${Date.now().toString().slice(-4)}`,
-      title: `${course.title} (à¦•à¦ªà¦¿)`,
+      title: `${course.title} (কপি)`,
     };
     const updated = [duplicated, ...courseList];
     setCourseList(updated);
     updateCourses(updated);
-    showToast(`'${course.title}' à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦•à¦ªà¦¿ à¦¤à§ˆà¦°à¦¿ à¦¹à§Ÿà§‡à¦›à§‡!`, 'success');
+    showToast(`'${course.title}' কোর্সের কপি তৈরি হয়েছে!`, 'success');
   };
 
   const handleSaveCourse = (updatedCourse: Course) => {
     const updatedList = courseList.map((c) => (c.id === updatedCourse.id ? updatedCourse : c));
     setCourseList(updatedList);
     updateCourses(updatedList);
-    showToast('à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦¸à¦•à¦² à¦¤à¦¥à§à¦¯ à¦“ à¦¸à¦¿à¦²à§‡à¦¬à¦¾à¦¸ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¸à§‡à¦­ à¦¹à§Ÿà§‡à¦›à§‡!', 'success');
+    showToast('কোর্সের সকল তথ্য ও সিলেবাস সফলভাবে সেভ হয়েছে!', 'success');
   };
 
   // Add Chapter
@@ -146,12 +146,12 @@ export function CourseManager() {
     const newChapter: Chapter = {
       id: `c-${Date.now()}`,
       chapterNo: newChapterNo,
-      title: `à¦…à¦§à§à¦¯à¦¾à¦¯à¦¼ ${newChapterNo}: à¦¨à¦¤à§à¦¨ à¦…à¦§à§à¦¯à¦¾à§Ÿà§‡à¦° à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦®`,
-      description: 'à¦à¦‡ à¦…à¦§à§à¦¯à¦¾à§Ÿà§‡à¦° à¦¸à¦‚à¦•à§à¦·à§‡à¦ªà¦¿à¦¤ à¦¬à¦¿à¦¬à¦°à¦£ à¦“ à¦•à§à¦²à¦¾à¦¸à§‡à¦° à¦‰à¦¦à§à¦¦à§‡à¦¶à§à¦¯',
+      title: `অধ্যায় ${newChapterNo}: নতুন অধ্যায়ের শিরোনাম`,
+      description: 'এই অধ্যায়ের সংক্ষেপিত বিবরণ ও ক্লাসের উদ্দেশ্য',
       lessons: [
         {
           id: `l-${Date.now()}`,
-          title: `${newChapterNo}.à§§ à¦ªà§à¦°à¦¥à¦® à¦²à§‡à¦•à¦šà¦¾à¦°`,
+          title: `${newChapterNo}.১ প্রথম লেকচার`,
           durationMin: 50,
           isFreePreview: false,
           youtubeVideoId: 'M7lc1UVf-VE',
@@ -169,7 +169,7 @@ export function CourseManager() {
   // Delete Chapter
   const deleteChapter = (chapterId: string) => {
     if (!editingCourse) return;
-    if (confirm('à¦†à¦ªà¦¨à¦¿ à¦•à¦¿ à¦à¦‡ à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦…à¦§à§à¦¯à¦¾à§Ÿà¦Ÿà¦¿ à¦®à§à¦›à§‡ à¦«à§‡à¦²à¦¤à§‡ à¦šà¦¾à¦¨?')) {
+    if (confirm('আপনি কি এই সম্পূর্ণ অধ্যায়টি মুছে ফেলতে চান?')) {
       const updatedCurriculum = editingCourse.curriculum
         .filter((c) => c.id !== chapterId)
         .map((c, idx) => ({ ...c, chapterNo: idx + 1 }));
@@ -187,7 +187,7 @@ export function CourseManager() {
     const newLessonNo = chapter.lessons.length + 1;
     const newLesson: Lesson = {
       id: `l-${Date.now()}`,
-      title: `${chapter.chapterNo}.${newLessonNo} à¦¨à¦¤à§à¦¨ à¦­à¦¿à¦¡à¦¿à¦“ à¦²à§‡à¦•à¦šà¦¾à¦°`,
+      title: `${chapter.chapterNo}.${newLessonNo} নতুন ভিডিও লেকচার`,
       durationMin: 50,
       isFreePreview: false,
       youtubeVideoId: 'M7lc1UVf-VE',
@@ -251,10 +251,10 @@ export function CourseManager() {
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
               <BookOpen className="w-6 h-6 text-emerald-400" />
-              à¦•à§‹à¦°à§à¦¸ à¦“ à¦¸à¦¿à¦²à§‡à¦¬à¦¾à¦¸ à¦¸à¦¿à¦à¦®à¦à¦¸ (Course Management)
+              কোর্স ও সিলেবাস সিএমএস (Course Management)
             </h2>
             <p className="text-xs text-slate-400 mt-1">
-              à¦¸à¦•à¦² à¦•à§‹à¦°à§à¦¸, à¦¬à§à¦¯à¦¾à¦š à¦Ÿà¦¾à¦‡à¦ª, à¦­à¦°à§à¦¤à¦¿ à¦«à¦¿, à¦®à¦¾à¦¸à¦¿à¦• à¦«à¦¿ à¦“ à¦…à¦§à§à¦¯à¦¾à§Ÿà¦­à¦¿à¦¤à§à¦¤à¦¿à¦• à¦­à¦¿à¦¡à¦¿à¦“ à¦²à§‡à¦•à¦šà¦¾à¦° à¦ªà¦°à¦¿à¦šà¦¾à¦²à¦¨à¦¾ à¦•à¦°à§à¦¨à¥¤
+              সকল কোর্স, ব্যাচ টাইপ, ভর্তি ফি, মাসিক ফি ও অধ্যায়ভিত্তিক ভিডিও লেকচার পরিচালনা করুন।
             </p>
           </div>
 
@@ -263,7 +263,7 @@ export function CourseManager() {
             className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-lg transition shrink-0"
           >
             <Plus className="w-4 h-4" />
-            <span>à¦¨à¦¤à§à¦¨ à¦•à§‹à¦°à§à¦¸ à¦¯à§‹à¦— à¦•à¦°à§à¦¨</span>
+            <span>নতুন কোর্স যোগ করুন</span>
           </button>
         </div>
 
@@ -277,7 +277,7 @@ export function CourseManager() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦¨à¦¾à¦® à¦¦à¦¿à§Ÿà§‡ à¦–à§à¦à¦œà§à¦¨..."
+              placeholder="কোর্সের নাম দিয়ে খুঁজুন..."
               className="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-slate-500 outline-none focus:border-emerald-500"
             />
           </div>
@@ -291,24 +291,24 @@ export function CourseManager() {
                 onChange={(e) => setBatchFilter(e.target.value as any)}
                 className="bg-transparent text-xs text-slate-300 font-bold outline-none cursor-pointer"
               >
-                <option value="all">à¦¸à¦•à¦² à¦¬à§à¦¯à¦¾à¦š</option>
-                <option value="basic">à¦¬à§‡à¦¸à¦¿à¦• à¦«à¦¾à¦‰à¦¨à§à¦¡à§‡à¦¶à¦¨</option>
-                <option value="advance">à¦à¦¡à¦­à¦¾à¦¨à§à¦¸à¦¡ à¦•à§à¦²à¦¿à¦¨à¦¿à¦•à§à¦¯à¦¾à¦²</option>
-                <option value="special">à¦¸à§à¦ªà§‡à¦¶à¦¾à¦² à¦•à¦°à§à¦®à¦¶à¦¾à¦²à¦¾</option>
+                <option value="all">সকল ব্যাচ</option>
+                <option value="basic">বেসিক ফাউন্ডেশন</option>
+                <option value="advance">এডভান্সড ক্লিনিক্যাল</option>
+                <option value="special">স্পেশাল কর্মশালা</option>
               </select>
             </div>
 
             {/* Sort by */}
             <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-1.5">
-              <span className="text-[11px] text-slate-400 font-bold">à¦¸à¦°à§à¦Ÿ:</span>
+              <span className="text-[11px] text-slate-400 font-bold">সর্ট:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="bg-transparent text-xs text-slate-300 font-bold outline-none cursor-pointer"
               >
-                <option value="title">à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦¨à¦¾à¦®</option>
-                <option value="lessons">à¦®à§‹à¦Ÿ à¦•à§à¦²à¦¾à¦¸ à¦¸à¦‚à¦–à§à¦¯à¦¾</option>
-                <option value="fee">à¦­à¦°à§à¦¤à¦¿ à¦«à¦¿</option>
+                <option value="title">কোর্সের নাম</option>
+                <option value="lessons">মোট ক্লাস সংখ্যা</option>
+                <option value="fee">ভর্তি ফি</option>
               </select>
             </div>
           </div>
@@ -329,13 +329,13 @@ export function CourseManager() {
                   {/* Top Badges */}
                   <div className="flex items-center justify-between">
                     <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black uppercase px-3 py-1 rounded-full">
-                      {course.batchType === 'basic' && 'à¦¬à§‡à¦¸à¦¿à¦• à¦¬à§à¦¯à¦¾à¦š'}
-                      {course.batchType === 'advance' && 'à¦à¦¡à¦­à¦¾à¦¨à§à¦¸à¦¡ à¦•à§à¦²à¦¿à¦¨à¦¿à¦•à§à¦¯à¦¾à¦² à¦¬à§à¦¯à¦¾à¦š'}
-                      {course.batchType === 'special' && 'à¦¸à§à¦ªà§‡à¦¶à¦¾à¦² à¦•à¦°à§à¦®à¦¶à¦¾à¦²à¦¾'}
+                      {course.batchType === 'basic' && 'বেসিক ব্যাচ'}
+                      {course.batchType === 'advance' && 'এডভান্সড ক্লিনিক্যাল ব্যাচ'}
+                      {course.batchType === 'special' && 'স্পেশাল কর্মশালা'}
                     </span>
 
                     <span className="text-xs text-slate-400 font-english">
-                      {course.durationMonths} à¦®à¦¾à¦¸ à¦•à§‹à¦°à§à¦¸
+                      {course.durationMonths} মাস কোর্স
                     </span>
                   </div>
 
@@ -352,21 +352,21 @@ export function CourseManager() {
                   {/* Fee & Lessons Metrics */}
                   <div className="grid grid-cols-3 gap-2 text-center pt-2">
                     <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
-                      <span className="text-[10px] text-slate-400 uppercase font-bold block">à¦­à¦°à§à¦¤à¦¿ à¦«à¦¿</span>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">ভর্তি ফি</span>
                       <span className="text-sm font-black text-emerald-400 font-english mt-0.5 block">
-                        à§³{course.admissionFee}/-
+                        ৳{course.admissionFee}/-
                       </span>
                     </div>
                     <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
-                      <span className="text-[10px] text-slate-400 uppercase font-bold block">à¦®à¦¾à¦¸à¦¿à¦• à¦«à¦¿</span>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">মাসিক ফি</span>
                       <span className="text-sm font-black text-amber-400 font-english mt-0.5 block">
-                        à§³{course.monthlyFee}/-
+                        ৳{course.monthlyFee}/-
                       </span>
                     </div>
                     <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
-                      <span className="text-[10px] text-slate-400 uppercase font-bold block">à¦•à§à¦²à¦¾à¦¸ à¦¸à¦‚à¦–à§à¦¯à¦¾</span>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">ক্লাস সংখ্যা</span>
                       <span className="text-sm font-black text-white font-english mt-0.5 block">
-                        {totalLessons} à¦Ÿà¦¿
+                        {totalLessons} টি
                       </span>
                     </div>
                   </div>
@@ -380,12 +380,12 @@ export function CourseManager() {
                     className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition shadow"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
-                    <span>à¦¸à¦¿à¦²à§‡à¦¬à¦¾à¦¸ à¦“ à¦•à¦¨à¦Ÿà§‡à¦¨à§à¦Ÿ à¦à¦¡à¦¿à¦Ÿ</span>
+                    <span>সিলেবাস ও কনটেন্ট এডিট</span>
                   </button>
 
                   <button
                     onClick={() => handleDuplicateCourse(course)}
-                    title="à¦•à§‹à¦°à§à¦¸ à¦•à¦ªà¦¿ à¦•à¦°à§à¦¨"
+                    title="কোর্স কপি করুন"
                     className="p-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-800 transition"
                   >
                     <Copy className="w-4 h-4" />
@@ -394,7 +394,7 @@ export function CourseManager() {
                   <Link
                     href={`/courses/${course.slug}`}
                     target="_blank"
-                    title="à¦²à§à¦¯à¦¾à¦¨à§à¦¡à¦¿à¦‚ à¦ªà§‡à¦œà§‡ à¦¦à§‡à¦–à§à¦¨"
+                    title="ল্যান্ডিং পেজে দেখুন"
                     className="p-2.5 bg-slate-900 hover:bg-slate-800 text-emerald-400 rounded-xl border border-slate-800 transition"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -402,7 +402,7 @@ export function CourseManager() {
 
                   <button
                     onClick={() => handleDeleteCourse(course.id)}
-                    title="à¦•à§‹à¦°à§à¦¸ à¦¡à¦¿à¦²à¦¿à¦Ÿ à¦•à¦°à§à¦¨"
+                    title="কোর্স ডিলিট করুন"
                     className="p-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl border border-rose-500/30 transition"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -432,12 +432,12 @@ export function CourseManager() {
             className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs px-3.5 py-2.5 rounded-xl border border-slate-800 transition"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>à¦¸à¦•à¦² à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾</span>
+            <span>সকল কোর্সের তালিকা</span>
           </button>
 
           <div>
             <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">
-              à¦•à§‹à¦°à§à¦¸ à¦à¦¡à¦¿à¦Ÿà¦° à¦®à§‹à¦¡
+              কোর্স এডিটর মোড
             </span>
             <h2 className="text-lg sm:text-xl font-black text-white truncate max-w-md">
               {editingCourse.title}
@@ -452,7 +452,7 @@ export function CourseManager() {
             className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-emerald-400 font-bold text-xs px-4 py-2.5 rounded-xl border border-slate-800 transition"
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            <span>à¦ªà§à¦°à¦¿à¦­à¦¿à¦‰ à¦¦à§‡à¦–à§à¦¨</span>
+            <span>প্রিভিউ দেখুন</span>
           </Link>
 
           <button
@@ -460,7 +460,7 @@ export function CourseManager() {
             className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-lg transition"
           >
             <Save className="w-4 h-4" />
-            <span>à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨ à¦¸à¦‚à¦°à¦•à§à¦·à¦£ à¦•à¦°à§à¦¨</span>
+            <span>পরিবর্তন সংরক্ষণ করুন</span>
           </button>
         </div>
       </div>
@@ -469,12 +469,12 @@ export function CourseManager() {
       <div className="bg-slate-950 p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-6">
         <h3 className="text-base font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
           <Layers className="w-5 h-5 text-emerald-400" />
-          à§§. à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦®à§Œà¦²à¦¿à¦• à¦¤à¦¥à§à¦¯ à¦“ à¦«à¦¿ à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸
+          ১. কোর্সের মৌলিক তথ্য ও ফি সেটিংস
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400">à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦¨à¦¾à¦® / à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦®</label>
+            <label className="text-xs font-bold text-slate-400">কোর্সের নাম / শিরোনাম</label>
             <input
               type="text"
               value={editingCourse.title}
@@ -484,7 +484,7 @@ export function CourseManager() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400">à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦¸à¦¾à¦¬-à¦Ÿà¦¾à¦‡à¦Ÿà§‡à¦² / à¦¬à¦¿à¦¬à¦°à¦£</label>
+            <label className="text-xs font-bold text-slate-400">কোর্সের সাব-টাইটেল / বিবরণ</label>
             <input
               type="text"
               value={editingCourse.subtitle}
@@ -494,20 +494,20 @@ export function CourseManager() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400">à¦¬à§à¦¯à¦¾à¦š à¦Ÿà¦¾à¦‡à¦ª</label>
+            <label className="text-xs font-bold text-slate-400">ব্যাচ টাইপ</label>
             <select
               value={editingCourse.batchType}
               onChange={(e) => handleSaveCourse({ ...editingCourse, batchType: e.target.value as any })}
               className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-white font-bold focus:border-emerald-500 outline-none"
             >
-              <option value="basic">à¦¬à§‡à¦¸à¦¿à¦• à¦«à¦¾à¦‰à¦¨à§à¦¡à§‡à¦¶à¦¨ à¦•à§‹à¦°à§à¦¸</option>
-              <option value="advance">à¦à¦¡à¦­à¦¾à¦¨à§à¦¸à¦¡ à¦•à§à¦²à¦¿à¦¨à¦¿à¦•à§à¦¯à¦¾à¦² à¦°à§‡à¦ªà¦¾à¦°à§à¦Ÿà¦°à¦¿ à¦•à§‹à¦°à§à¦¸</option>
-              <option value="special">à¦¸à§à¦ªà§‡à¦¶à¦¾à¦² à¦•à¦°à§à¦®à¦¶à¦¾à¦²à¦¾</option>
+              <option value="basic">বেসিক ফাউন্ডেশন কোর্স</option>
+              <option value="advance">এডভান্সড ক্লিনিক্যাল রেপার্টরি কোর্স</option>
+              <option value="special">স্পেশাল কর্মশালা</option>
             </select>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400">à¦•à§‹à¦°à§à¦¸ à¦®à§‡à§Ÿà¦¾à¦¦ (à¦®à¦¾à¦¸à§‡)</label>
+            <label className="text-xs font-bold text-slate-400">কোর্স মেয়াদ (মাসে)</label>
             <input
               type="number"
               value={editingCourse.durationMonths}
@@ -517,7 +517,7 @@ export function CourseManager() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400">à¦à¦•à¦•à¦¾à¦²à§€à¦¨ à¦­à¦°à§à¦¤à¦¿ à¦«à¦¿ (à¦Ÿà¦¾à¦•à¦¾)</label>
+            <label className="text-xs font-bold text-slate-400">এককালীন ভর্তি ফি (টাকা)</label>
             <input
               type="number"
               value={editingCourse.admissionFee}
@@ -527,7 +527,7 @@ export function CourseManager() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400">à¦®à¦¾à¦¸à¦¿à¦• à¦«à¦¿ (à¦Ÿà¦¾à¦•à¦¾)</label>
+            <label className="text-xs font-bold text-slate-400">মাসিক ফি (টাকা)</label>
             <input
               type="number"
               value={editingCourse.monthlyFee}
@@ -537,7 +537,7 @@ export function CourseManager() {
           </div>
 
           <div className="space-y-1.5 md:col-span-2">
-            <label className="text-xs font-bold text-slate-400">à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸à§‡à¦° à¦¸à¦®à§Ÿà¦¸à§‚à¦šà¦¿ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿ</label>
+            <label className="text-xs font-bold text-slate-400">লাইভ ক্লাসের সময়সূচি টেক্সট</label>
             <input
               type="text"
               value={editingCourse.liveSchedule}
@@ -555,10 +555,10 @@ export function CourseManager() {
           <div>
             <h3 className="text-base font-black text-white flex items-center gap-2">
               <Video className="w-5 h-5 text-emerald-400" />
-              à§¨. à¦…à¦§à§à¦¯à¦¾à§Ÿ à¦“ à¦­à¦¿à¦¡à¦¿à¦“ à¦²à§‡à¦•à¦šà¦¾à¦° à¦•à¦¾à¦°à¦¿à¦•à§à¦²à¦¾à¦® ({editingCourse.curriculum.length} à¦Ÿà¦¿ à¦…à¦§à§à¦¯à¦¾à§Ÿ)
+              ২. অধ্যায় ও ভিডিও লেকচার কারিকুলাম ({editingCourse.curriculum.length} টি অধ্যায়)
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              à¦…à¦§à§à¦¯à¦¾à§Ÿ à¦¯à§‹à¦— à¦•à¦°à§à¦¨, à¦†à¦¨à¦²à¦¿à¦¸à§à¦Ÿà§‡à¦¡ à¦‡à¦‰à¦Ÿà¦¿à¦‰à¦¬ à¦­à¦¿à¦¡à¦¿à¦“ à¦†à¦‡à¦¡à¦¿ à¦¬à¦¸à¦¾à¦¨ à¦à¦¬à¦‚ à¦«à§à¦°à¦¿ à¦ªà§à¦°à¦¿à¦­à¦¿à¦‰ à¦¨à¦¿à¦°à§à¦§à¦¾à¦°à¦£ à¦•à¦°à§à¦¨à¥¤
+              অধ্যায় যোগ করুন, আনলিস্টেড ইউটিউব ভিডিও আইডি বসান এবং ফ্রি প্রিভিউ নির্ধারণ করুন।
             </p>
           </div>
 
@@ -567,7 +567,7 @@ export function CourseManager() {
             className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition shrink-0"
           >
             <Plus className="w-4 h-4" />
-            <span>à¦¨à¦¤à§à¦¨ à¦…à¦§à§à¦¯à¦¾à§Ÿ à¦¯à§‹à¦— à¦•à¦°à§à¦¨</span>
+            <span>নতুন অধ্যায় যোগ করুন</span>
           </button>
         </div>
 
@@ -594,7 +594,7 @@ export function CourseManager() {
                         {chapter.title}
                       </h4>
                       <p className="text-[11px] text-slate-400 truncate">
-                        {chapter.lessons.length} à¦Ÿà¦¿ à¦­à¦¿à¦¡à¦¿à¦“ à¦•à§à¦²à¦¾à¦¸
+                        {chapter.lessons.length} টি ভিডিও ক্লাস
                       </p>
                     </div>
                   </div>
@@ -605,7 +605,7 @@ export function CourseManager() {
                       className="flex items-center gap-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1.5 rounded-lg transition"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>à¦•à§à¦²à¦¾à¦¸ à¦¯à§‹à¦— à¦•à¦°à§à¦¨</span>
+                      <span>ক্লাস যোগ করুন</span>
                     </button>
 
                     <button
@@ -631,7 +631,7 @@ export function CourseManager() {
                     {/* Chapter Edit Fields */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[11px] font-bold text-slate-400 block mb-1">à¦…à¦§à§à¦¯à¦¾à¦¯à¦¼à§‡à¦° à¦¶à¦¿à¦°à§‹à¦¨à¦¾à¦®</label>
+                        <label className="text-[11px] font-bold text-slate-400 block mb-1">অধ্যায়ের শিরোনাম</label>
                         <input
                           type="text"
                           value={chapter.title}
@@ -640,7 +640,7 @@ export function CourseManager() {
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-bold text-slate-400 block mb-1">à¦…à¦§à§à¦¯à¦¾à¦¯à¦¼à§‡à¦° à¦¸à¦‚à¦•à§à¦·à§‡à¦ªà¦¿à¦¤ à¦¬à¦¿à¦¬à¦°à¦£</label>
+                        <label className="text-[11px] font-bold text-slate-400 block mb-1">অধ্যায়ের সংক্ষেপিত বিবরণ</label>
                         <input
                           type="text"
                           value={chapter.description}
@@ -653,7 +653,7 @@ export function CourseManager() {
                     {/* Lessons List in Chapter */}
                     <div className="space-y-3 pt-2">
                       <p className="text-xs font-black uppercase text-emerald-400 tracking-wider">
-                        à¦­à¦¿à¦¡à¦¿à¦“ à¦•à§à¦²à¦¾à¦¸ à¦¤à¦¾à¦²à¦¿à¦•à¦¾:
+                        ভিডিও ক্লাস তালিকা:
                       </p>
 
                       {chapter.lessons.map((lesson) => (
@@ -665,7 +665,7 @@ export function CourseManager() {
                             
                             {/* Lesson Title */}
                             <div className="sm:col-span-5">
-                              <label className="text-[10px] text-slate-400 font-bold block mb-1">à¦•à§à¦²à¦¾à¦¸à§‡à¦° à¦¨à¦¾à¦®</label>
+                              <label className="text-[10px] text-slate-400 font-bold block mb-1">ক্লাসের নাম</label>
                               <input
                                 type="text"
                                 value={lesson.title}
@@ -689,7 +689,7 @@ export function CourseManager() {
 
                             {/* Duration */}
                             <div className="sm:col-span-2">
-                              <label className="text-[10px] text-slate-400 font-bold block mb-1">à¦¸à¦®à§Ÿ (à¦®à¦¿à¦¨à¦¿à¦Ÿ)</label>
+                              <label className="text-[10px] text-slate-400 font-bold block mb-1">সময় (মিনিট)</label>
                               <input
                                 type="number"
                                 value={lesson.durationMin}

@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useApp } from '@/lib/store';
-import { Course, Lesson, Chapter } from '@/lib/types';
-import { VideoPlayer } from '@/components/lms/VideoPlayer';
+import { Lesson } from '@/lib/types';
 import { MonthlyFeeStatus } from '@/components/lms/MonthlyFeeStatus';
 import { GoogleMeetLauncher } from '@/components/lms/GoogleMeetLauncher';
 import { MorningSupportBox } from '@/components/lms/MorningSupportBox';
@@ -18,20 +17,14 @@ import {
   Award, 
   CheckCircle2, 
   Clock, 
-  Download, 
   ExternalLink, 
   MessageCircle, 
-  AlertCircle, 
   ChevronRight, 
-  Sparkles, 
   PlayCircle,
   FileText,
   Lock,
-  Phone,
-  HelpCircle,
-  Menu,
+  Menu, 
   X,
-  Compass,
   CheckCircle,
   Home,
   LogOut,
@@ -41,7 +34,7 @@ import {
 type StudentTab = 'classroom' | 'lectures' | 'notes' | 'monthly-fee' | 'certificate' | 'support';
 
 export default function DashboardPage() {
-  const { user, courses, enrollments, settings, signInWithGoogle, demoLogin, signOut } = useApp();
+  const { user, courses, enrollments, settings, signInWithGoogle, signOut } = useApp();
   const [activeTab, setActiveTab] = useState<StudentTab>('classroom');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<string>(courses[0]?.id || 'course-basic-foundation');
@@ -51,7 +44,7 @@ export default function DashboardPage() {
   const allLessons = currentCourse?.curriculum.flatMap((c) => c.lessons) || [];
   const [activeLesson, setActiveLesson] = useState<Lesson>(allLessons[0] || {
     id: 'l1',
-    title: 'à§§.à§§ Organic Organon Basics (à¦«à§à¦°à¦¿ à¦“à¦°à¦¿à§Ÿà§‡à¦¨à§à¦Ÿà§‡à¦¶à¦¨ à¦•à§à¦²à¦¾à¦¸)',
+    title: '১.১ Organic Organon Basics (ফ্রি ওরিয়েন্টেশন ক্লাস)',
     durationMin: 45,
     isFreePreview: true,
     youtubeVideoId: 'M7lc1UVf-VE',
@@ -91,10 +84,10 @@ export default function DashboardPage() {
               Student LMS Portal
             </span>
             <h2 className="text-2xl font-black text-white mt-3">
-              à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€ à¦•à§à¦²à¦¾à¦¸à¦°à§à¦® à¦¡à§à¦¯à¦¾à¦¶à¦¬à§‹à¦°à§à¦¡
+              শিক্ষার্থী ক্লাসরুম ড্যাশবোর্ড
             </h2>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              à¦†à¦ªà¦¨à¦¾à¦° à¦•à§‹à¦°à§à¦¸à§‡à¦° à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸, à¦°à§‡à¦•à¦°à§à¦¡à§‡à¦¡ à¦­à¦¿à¦¡à¦¿à¦“ à¦²à¦¾à¦‡à¦¬à§à¦°à§‡à¦°à¦¿ à¦à¦¬à¦‚ PDF à¦²à§‡à¦•à¦šà¦¾à¦° à¦¶à¦¿à¦Ÿ à¦ªà§‡à¦¤à§‡ à¦—à§à¦—à¦² à¦¦à¦¿à§Ÿà§‡ à¦¸à¦¾à¦‡à¦¨-à¦‡à¦¨ à¦•à¦°à§à¦¨à¥¤
+              আপনার কোর্সের লাইভ ক্লাস, রেকর্ডেড ভিডিও লাইব্রেরি এবং PDF লেকচার শিট পেতে গুগল দিয়ে সাইন-ইন করুন।
             </p>
           </div>
 
@@ -105,7 +98,7 @@ export default function DashboardPage() {
             <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
               <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
             </svg>
-            <span>Google à¦…à§à¦¯à¦¾à¦•à¦¾à¦‰à¦¨à§à¦Ÿ à¦¦à¦¿à§Ÿà§‡ à¦ªà§à¦°à¦¬à§‡à¦¶ à¦•à¦°à§à¦¨</span>
+            <span>Google অ্যাকাউন্ট দিয়ে প্রবেশ করুন</span>
           </button>
 
           <div className="pt-2 border-t border-slate-800">
@@ -114,7 +107,7 @@ export default function DashboardPage() {
               className="text-xs text-slate-400 hover:text-emerald-400 font-bold flex items-center justify-center gap-1"
             >
               <Home className="w-3.5 h-3.5" />
-              <span>à¦®à§‚à¦² à¦¹à§‹à¦®à¦ªà§‡à¦œà§‡ à¦«à¦¿à¦°à§‡ à¦¯à¦¾à¦¨</span>
+              <span>মূল হোমপেজে ফিরে যান</span>
             </Link>
           </div>
         </div>
@@ -123,12 +116,12 @@ export default function DashboardPage() {
   }
 
   const studentNavItems: { id: StudentTab; label: string; icon: any; badge?: string }[] = [
-    { id: 'classroom', label: 'à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸à¦°à§à¦® à¦“ à¦¶à¦¿à¦¡à¦¿à¦‰à¦²', icon: Video, badge: 'Live' },
-    { id: 'lectures', label: 'à¦­à¦¿à¦¡à¦¿à¦“ à¦²à§‡à¦•à¦šà¦¾à¦° à¦“ à¦¸à¦¿à¦²à§‡à¦¬à¦¾à¦¸', icon: PlayCircle },
-    { id: 'notes', label: 'à¦²à§‡à¦•à¦šà¦¾à¦° à¦¶à¦¿à¦Ÿ à¦“ PDF à¦¨à§‹à¦Ÿà¦¸', icon: FileText },
-    { id: 'monthly-fee', label: 'à¦®à¦¾à¦¸à¦¿à¦• à¦«à¦¿ (à§³à§«à§¦à§¦/-) à¦“ à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸', icon: CreditCard },
-    { id: 'certificate', label: 'PTF à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦Ÿà§à¦°à§à¦¯à¦¾à¦•à¦¿à¦‚', icon: Award },
-    { id: 'support', label: 'à¦¹à§‡à¦²à§à¦ªà¦²à¦¾à¦‡à¦¨ à¦“ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ', icon: MessageCircle },
+    { id: 'classroom', label: 'লাইভ ক্লাসরুম ও শিডিউল', icon: Video, badge: 'Live' },
+    { id: 'lectures', label: 'ভিডিও লেকচার ও সিলেবাস', icon: PlayCircle },
+    { id: 'notes', label: 'লেকচার শিট ও PDF নোটস', icon: FileText },
+    { id: 'monthly-fee', label: 'মাসিক ফি (৳৫০০/-) ও স্ট্যাটাস', icon: CreditCard },
+    { id: 'certificate', label: 'PTF সার্টিফিকেট ট্র্যাকিং', icon: Award },
+    { id: 'support', label: 'হেল্পলাইন ও সাপোর্ট', icon: MessageCircle },
   ];
 
   return (
@@ -150,7 +143,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <span className="font-black text-sm text-white tracking-tight leading-none block">
-                à¦¬à¦¿à¦¡à¦¿ à¦¹à§‹à¦®à¦¿à¦“ à¦•à§à¦²à¦¾à¦¸à¦°à§à¦®
+                বিডি হোমিও ক্লাসরুম
               </span>
               <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mt-0.5">
                 Interactive Student LMS
@@ -166,7 +159,7 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-700 transition"
           >
             <Home className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">à¦®à§‚à¦² à¦“à§Ÿà§‡à¦¬à¦¸à¦¾à¦‡à¦Ÿ</span>
+            <span className="hidden sm:inline">মূল ওয়েবসাইট</span>
           </Link>
 
           {user.role === 'admin' && (
@@ -175,14 +168,14 @@ export default function DashboardPage() {
               className="flex items-center gap-1.5 bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 text-xs font-bold px-3.5 py-2 rounded-xl border border-amber-400/30 transition"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">à¦…à§à¦¯à¦¾à¦¡à¦®à¦¿à¦¨ à¦ªà§à¦¯à¦¾à¦¨à§‡à¦²</span>
+              <span className="hidden sm:inline">অ্যাডমিন প্যানেল</span>
             </Link>
           )}
 
           <button
             onClick={signOut}
             className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-xl transition"
-            title="à¦²à¦—à¦†à¦‰à¦Ÿ"
+            title="লগআউট"
           >
             <LogOut className="w-4 h-4" />
           </button>
@@ -220,18 +213,18 @@ export default function DashboardPage() {
 
               {/* Status Badge */}
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">à¦…à§à¦¯à¦¾à¦•à¦¾à¦¡à§‡à¦®à¦¿à¦• à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸:</span>
+                <span className="text-[11px] text-slate-400">অ্যাকাডেমিক স্ট্যাটাস:</span>
                 {isApprovedStudent ? (
                   <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" /> à¦¨à¦¿à§Ÿà¦®à¦¿à¦¤ à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" /> নিয়মিত শিক্ষার্থী
                   </span>
                 ) : isPendingStudent ? (
                   <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-amber-400" /> à¦­à¦°à§à¦¤à¦¿ à¦¯à¦¾à¦šà¦¾à¦‡à¦§à§€à¦¨
+                    <Clock className="w-3 h-3 text-amber-400" /> ভর্তি যাচাইধীন
                   </span>
                 ) : (
                   <span className="bg-slate-800 text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    à¦«à§à¦°à¦¿ à¦®à§‡à¦®à§à¦¬à¦¾à¦°
+                    ফ্রি মেম্বার
                   </span>
                 )}
               </div>
@@ -240,7 +233,7 @@ export default function DashboardPage() {
             {/* Course Selector Dropdown */}
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block px-1">
-                à¦†à¦®à¦¾à¦° à¦•à§‹à¦°à§à¦¸ à¦¸à¦¿à¦²à§‡à¦•à§à¦Ÿ à¦•à¦°à§à¦¨
+                আমার কোর্স সিলেক্ট করুন
               </label>
               <select
                 value={selectedCourseId}
@@ -258,7 +251,7 @@ export default function DashboardPage() {
             {/* Course Progress Card */}
             <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
               <div className="flex items-center justify-between text-xs font-bold">
-                <span className="text-slate-400">à¦•à§‹à¦°à§à¦¸ à¦…à¦—à§à¦°à¦—à¦¤à¦¿</span>
+                <span className="text-slate-400">কোর্স অগ্রগতি</span>
                 <span className="text-emerald-400 font-english">{progressPercent}%</span>
               </div>
               <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
@@ -268,14 +261,14 @@ export default function DashboardPage() {
                 />
               </div>
               <p className="text-[10px] text-slate-500 text-right">
-                {completedLessonIds.length} / {allLessons.length} à¦•à§à¦²à¦¾à¦¸ à¦¸à¦®à§à¦ªà¦¨à§à¦¨
+                {completedLessonIds.length} / {allLessons.length} ক্লাস সম্পন্ন
               </p>
             </div>
 
             {/* Student LMS Navigation */}
             <nav className="space-y-1">
               <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 pb-1">
-                à¦•à§à¦²à¦¾à¦¸à¦°à§à¦® à¦®à§‡à¦¨à§
+                ক্লাসরুম মেনু
               </p>
               {studentNavItems.map((item) => {
                 const Icon = item.icon;
@@ -322,7 +315,7 @@ export default function DashboardPage() {
             >
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4" />
-                <span>à¦¹à§‹à§Ÿà¦¾à¦Ÿà¦¸à¦…à§à¦¯à¦¾à¦ª à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ</span>
+                <span>হোয়াটসঅ্যাপ সাপোর্ট</span>
               </div>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
@@ -337,17 +330,17 @@ export default function DashboardPage() {
           <div className="bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs text-slate-400">
-                <span>à¦¬à¦¿à¦¡à¦¿ à¦¹à§‹à¦®à¦¿à¦“ à¦•à§à¦²à¦¾à¦¸à¦°à§à¦®</span>
+                <span>বিডি হোমিও ক্লাসরুম</span>
                 <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
                 <span className="text-emerald-400 font-bold">{currentCourse?.title}</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-white mt-1">
-                {activeTab === 'classroom' && 'à¦²à¦¾à¦‡à¦­ à¦—à§à¦—à¦² à¦®à¦¿à¦Ÿ à¦•à§à¦²à¦¾à¦¸ à¦“ à¦•à§à¦²à¦¾à¦¸à¦°à§à¦® à¦¶à¦¿à¦¡à¦¿à¦‰à¦²'}
-                {activeTab === 'lectures' && 'à¦«à§à¦² HD à¦­à¦¿à¦¡à¦¿à¦“ à¦²à§‡à¦•à¦šà¦¾à¦° à¦²à¦¾à¦‡à¦¬à§à¦°à§‡à¦°à¦¿'}
-                {activeTab === 'notes' && 'à¦…à¦§à§à¦¯à¦¾à§Ÿà¦­à¦¿à¦¤à§à¦¤à¦¿à¦• PDF à¦²à§‡à¦•à¦šà¦¾à¦° à¦¶à¦¿à¦Ÿ à¦“ à¦¸à§à¦Ÿà¦¾à¦¡à¦¿ à¦®à§‡à¦Ÿà§‡à¦°à¦¿à§Ÿà¦¾à¦²'}
-                {activeTab === 'monthly-fee' && 'à¦®à¦¾à¦¸à¦¿à¦• à¦«à¦¿ (à§³à§«à§¦à§¦/-) à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ à¦“ TrxID à¦¸à¦¾à¦¬à¦®à¦¿à¦¶à¦¨'}
-                {activeTab === 'certificate' && 'PTF à¦ªà§à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦“ à¦•à§à¦°à¦¿à§Ÿà¦¾à¦° à¦Ÿà§à¦°à§à¦¯à¦¾à¦•à¦¿à¦‚'}
-                {activeTab === 'support' && 'à¦à¦•à¦¾à¦¡à§‡à¦®à¦¿à¦• à¦¹à§‡à¦²à§à¦ªà¦²à¦¾à¦‡à¦¨ à¦“ à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ'}
+                {activeTab === 'classroom' && 'লাইভ গুগল মিট ক্লাস ও ক্লাসরুম শিডিউল'}
+                {activeTab === 'lectures' && 'ফুল HD ভিডিও লেকচার লাইব্রেরি'}
+                {activeTab === 'notes' && 'অধ্যায়ভিত্তিক PDF লেকচার শিট ও স্টাডি মেটেরিয়াল'}
+                {activeTab === 'monthly-fee' && 'মাসিক ফি (৳৫০০/-) পেমেন্ট ও TrxID সাবমিশন'}
+                {activeTab === 'certificate' && 'PTF প্রফেশনাল সার্টিফিকেট ও কুরিয়ার ট্র্যাকিং'}
+                {activeTab === 'support' && 'একাডেমিক হেল্পলাইন ও সরাসরি সাপোর্ট'}
               </h1>
             </div>
 
@@ -359,7 +352,7 @@ export default function DashboardPage() {
                 className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-lg transition"
               >
                 <Video className="w-4 h-4 animate-pulse" />
-                <span>à¦†à¦œà¦•à§‡à¦° à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸à§‡ à¦œà§Ÿà§‡à¦¨ à¦•à¦°à§à¦¨</span>
+                <span>আজকের লাইভ ক্লাসে জয়েন করুন</span>
               </a>
             </div>
           </div>
@@ -373,12 +366,12 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-amber-300">
-                    {isPendingStudent ? 'à¦†à¦ªà¦¨à¦¾à¦° à¦­à¦°à§à¦¤à¦¿ à¦†à¦¬à§‡à¦¦à¦¨ à¦¯à¦¾à¦šà¦¾à¦‡ à¦šà¦²à¦›à§‡' : 'à¦à¦‡ à¦•à§‹à¦°à§à¦¸à§‡ à¦†à¦ªà¦¨à¦¿ à¦à¦–à¦¨à§‹ à¦­à¦°à§à¦¤à¦¿ à¦¹à¦¨à¦¨à¦¿'}
+                    {isPendingStudent ? 'আপনার ভর্তি আবেদন যাচাই চলছে' : 'এই কোর্সে আপনি এখনো ভর্তি হননি'}
                   </h3>
                   <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                     {isPendingStudent
-                      ? 'à¦…à§à¦¯à¦¾à¦¡à¦®à¦¿à¦¨ à¦†à¦ªà¦¨à¦¾à¦° à¦¬à¦¿à¦•à¦¾à¦¶ à¦®à¦¾à¦°à§à¦šà§‡à¦¨à§à¦Ÿ à¦Ÿà§à¦°à¦¾à¦¨à¦œà§‡à¦•à¦¶à¦¨ à¦¯à¦¾à¦šà¦¾à¦‡ à¦•à¦°à¦¾à¦° à¦¸à¦¾à¦¥à§‡ à¦¸à¦¾à¦¥à§‡à¦‡ à¦ªà§à¦°à¦¿à¦®à¦¿à§Ÿà¦¾à¦® à¦•à§à¦²à¦¾à¦¸ à¦“ PDF à¦†à¦¨à¦²à¦• à¦¹à§Ÿà§‡ à¦¯à¦¾à¦¬à§‡à¥¤'
-                      : 'à¦¸à¦•à¦² à¦ªà§à¦°à¦¿à¦®à¦¿à§Ÿà¦¾à¦® à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸, à¦†à¦¨à¦²à¦¿à¦¸à§à¦Ÿà§‡à¦¡ à¦°à§‡à¦•à¦°à§à¦¡à§‡à¦¡ à¦•à§à¦²à¦¾à¦¸ à¦à¦¬à¦‚ PTF à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦†à¦¨à¦²à¦• à¦•à¦°à¦¤à§‡ à¦à¦•à¦•à¦¾à¦²à§€à¦¨ à¦­à¦°à§à¦¤à¦¿ à¦«à¦¿ à¦ªà¦°à¦¿à¦¶à§‹à¦§ à¦•à¦°à§à¦¨à¥¤'}
+                      ? 'অ্যাডমিন আপনার বিকাশ মার্চেন্ট ট্রানজেকশন যাচাই করার সাথে সাথেই প্রিমিয়াম ক্লাস ও PDF আনলক হয়ে যাবে।'
+                      : 'সকল প্রিমিয়াম লাইভ ক্লাস, আনলিস্টেড রেকর্ডেড ক্লাস এবং PTF সার্টিফিকেট আনলক করতে এককালীন ভর্তি ফি পরিশোধ করুন।'}
                   </p>
                 </div>
               </div>
@@ -388,7 +381,7 @@ export default function DashboardPage() {
                   href={`/courses/${currentCourse?.slug || 'basic-homeopathy-foundation'}`}
                   className="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs px-6 py-3.5 rounded-xl shadow-lg transition text-center shrink-0"
                 >
-                  à¦•à§‹à¦°à§à¦¸à§‡ à¦­à¦°à§à¦¤à¦¿ à¦¹à¦¨ (à§³à§§,à§¦à§¦à§¦/-)
+                  কোর্সে ভর্তি হন (৳১,০০০/-)
                 </Link>
               )}
             </div>
@@ -403,19 +396,19 @@ export default function DashboardPage() {
                 <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
                     <Clock className="w-5 h-5 text-emerald-400" />
-                    à¦¸à¦¾à¦ªà§à¦¤à¦¾à¦¹à¦¿à¦• à¦²à¦¾à¦‡à¦­ à¦•à§à¦²à¦¾à¦¸ à¦°à§à¦Ÿà¦¿à¦¨
+                    সাপ্তাহিক লাইভ ক্লাস রুটিন
                   </h3>
                   <div className="space-y-3 text-xs text-slate-300">
                     <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
-                      <span className="font-bold">à¦•à§à¦²à¦¾à¦¸à§‡à¦° à¦¸à¦®à§Ÿ:</span>
+                      <span className="font-bold">ক্লাসের সময়:</span>
                       <span className="text-emerald-400 font-bold">{settings.classTime}</span>
                     </div>
                     <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
-                      <span className="font-bold">à¦•à§à¦²à¦¾à¦¸ à¦ªà§à¦²à§à¦¯à¦¾à¦Ÿà¦«à¦°à§à¦®:</span>
+                      <span className="font-bold">ক্লাস প্ল্যাটফর্ম:</span>
                       <span className="text-slate-300 font-bold">Google Meet (HD Live)</span>
                     </div>
                     <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
-                      <span className="font-bold">à¦¸à¦¾à¦ªà§à¦¤à¦¾à¦¹à¦¿à¦• à¦¶à¦¿à¦¡à¦¿à¦‰à¦²:</span>
+                      <span className="font-bold">সাপ্তাহিক শিডিউল:</span>
                       <span className="text-slate-300 font-bold">{currentCourse?.liveSchedule}</span>
                     </div>
                   </div>
@@ -424,16 +417,16 @@ export default function DashboardPage() {
                 <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
                     <Award className="w-5 h-5 text-amber-400" />
-                    à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦¶à¦¨ à¦—à¦¾à¦‡à¦¡à¦²à¦¾à¦‡à¦¨
+                    সার্টিফিকেশন গাইডলাইন
                   </h3>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    à§¬ à¦®à¦¾à¦¸à§‡à¦° à¦•à§‹à¦°à§à¦¸ à¦¸à¦®à¦¾à¦ªà¦¨à§€ à¦ªà¦°à§€à¦•à§à¦·à¦¾à¦° à¦ªà¦° à¦ªà§à¦¯à¦¾à¦°à¦¾à¦®à§‡à¦¡à¦¿à¦•à§‡à¦² à¦Ÿà§‡à¦•à¦¨à§‹à¦²à¦œà¦¿ à¦«à¦¾à¦‰à¦¨à§à¦¡à§‡à¦¶à¦¨ (PTF) à¦…à¦¨à§à¦®à§‹à¦¦à¦¿à¦¤ à¦…à¦«à¦¿à¦¸à¦¿à§Ÿà¦¾à¦² à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦†à¦ªà¦¨à¦¾à¦° à¦ à¦¿à¦•à¦¾à¦¨à¦¾à§Ÿ à¦•à§à¦°à¦¿à§Ÿà¦¾à¦°à¦¯à§‹à¦—à§‡ à¦¹à§‹à¦® à¦¡à§‡à¦²à¦¿à¦­à¦¾à¦°à¦¿ à¦•à¦°à¦¾ à¦¹à¦¬à§‡à¥¤
+                    ৬ মাসের কোর্স সমাপনী পরীক্ষার পর প্যারামেডিকেল টেকনোলজি ফাউন্ডেশন (PTF) অনুমোদিত অফিসিয়াল সার্টিফিকেট আপনার ঠিকানায় কুরিয়ারযোগে হোম ডেলিভারি করা হবে।
                   </p>
                   <button
                     onClick={() => setActiveTab('certificate')}
                     className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
                   >
-                    <span>à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦Ÿà§à¦°à§à¦¯à¦¾à¦•à¦¾à¦° à¦¦à§‡à¦–à§à¦¨</span>
+                    <span>সার্টিফিকেট ট্র্যাকার দেখুন</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -450,7 +443,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800">
                   <div>
                     <span className="text-[10px] font-bold text-emerald-400 uppercase bg-emerald-500/10 px-2 py-0.5 rounded">
-                      à¦¬à¦°à§à¦¤à¦®à¦¾à¦¨à§‡ à¦ªà§à¦°à¦¦à¦°à§à¦¶à¦¿à¦¤ à¦•à§à¦²à¦¾à¦¸
+                      বর্তমানে প্রদর্শিত ক্লাস
                     </span>
                     <h2 className="text-base sm:text-lg font-black text-white mt-1">
                       {activeLesson.title}
@@ -467,7 +460,7 @@ export default function DashboardPage() {
                       }`}
                     >
                       <CheckCircle className="w-4 h-4" />
-                      <span>{completedLessonIds.includes(activeLesson.id) ? 'à¦•à§à¦²à¦¾à¦¸ à¦¸à¦®à§à¦ªà¦¨à§à¦¨ à¦¹à§Ÿà§‡à¦›à§‡' : 'Mark as Completed'}</span>
+                      <span>{completedLessonIds.includes(activeLesson.id) ? 'ক্লাস সম্পন্ন হয়েছে' : 'Mark as Completed'}</span>
                     </button>
                   </div>
                 </div>
@@ -489,16 +482,16 @@ export default function DashboardPage() {
                       <Lock className="w-7 h-7" />
                     </div>
                     <div className="max-w-md space-y-1">
-                      <h3 className="text-base font-bold text-white">à¦à¦‡ à¦•à§à¦²à¦¾à¦¸à¦Ÿà¦¿ à¦ªà§à¦°à¦¿à¦®à¦¿à§Ÿà¦¾à¦® à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€à¦¦à§‡à¦° à¦œà¦¨à§à¦¯ à¦¸à¦‚à¦°à¦•à§à¦·à¦¿à¦¤</h3>
+                      <h3 className="text-base font-bold text-white">এই ক্লাসটি প্রিমিয়াম শিক্ষার্থীদের জন্য সংরক্ষিত</h3>
                       <p className="text-xs text-slate-400">
-                        à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦•à¦¾à¦°à¦¿à¦•à§à¦²à¦¾à¦® à¦“ à¦­à¦¿à¦¡à¦¿à¦“ à¦²à§‡à¦•à¦šà¦¾à¦° à¦¦à§‡à¦–à¦¤à§‡ à¦à¦•à¦•à¦¾à¦²à§€à¦¨ à¦­à¦°à§à¦¤à¦¿ à¦«à¦¿ à¦ªà¦°à¦¿à¦¶à§‹à¦§ à¦•à¦°à§à¦¨à¥¤
+                        সম্পূর্ণ কারিকুলাম ও ভিডিও লেকচার দেখতে এককালীন ভর্তি ফি পরিশোধ করুন।
                       </p>
                     </div>
                     <Link
                       href={`/courses/${currentCourse?.slug || 'basic-homeopathy-foundation'}`}
                       className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-6 py-3 rounded-xl shadow transition"
                     >
-                      à¦­à¦°à§à¦¤à¦¿ à¦¸à¦®à§à¦ªà¦¨à§à¦¨ à¦•à¦°à§à¦¨ (à§³à§§,à§¦à§¦à§¦/-)
+                      ভর্তি সম্পন্ন করুন (৳১,০০০/-)
                     </Link>
                   </div>
                 )}
@@ -508,7 +501,7 @@ export default function DashboardPage() {
               <div className="bg-slate-900 rounded-3xl p-6 border border-slate-800 space-y-6">
                 <h3 className="text-base font-black text-white flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-emerald-400" />
-                  à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦•à§‹à¦°à§à¦¸ à¦•à¦¾à¦°à¦¿à¦•à§à¦²à¦¾à¦® à¦“ à¦²à§‡à¦•à¦šà¦¾à¦° à¦ªà§à¦²à§‡à¦²à¦¿à¦¸à§à¦Ÿ ({currentCourse?.title})
+                  সম্পূর্ণ কোর্স কারিকুলাম ও লেকচার প্লেলিস্ট ({currentCourse?.title})
                 </h3>
 
                 <div className="space-y-4">
@@ -516,10 +509,10 @@ export default function DashboardPage() {
                     <div key={chapter.id} className="bg-slate-950 rounded-2xl p-4 border border-slate-800 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <span className="text-[10px] font-bold text-emerald-400 uppercase">à¦…à¦§à§à¦¯à¦¾à§Ÿ {chapter.chapterNo}</span>
+                          <span className="text-[10px] font-bold text-emerald-400 uppercase">অধ্যায় {chapter.chapterNo}</span>
                           <h4 className="text-sm font-bold text-white mt-0.5">{chapter.title}</h4>
                         </div>
-                        <span className="text-xs text-slate-500">{chapter.lessons.length} à¦Ÿà¦¿ à¦•à§à¦²à¦¾à¦¸</span>
+                        <span className="text-xs text-slate-500">{chapter.lessons.length} টি ক্লাস</span>
                       </div>
 
                       <div className="space-y-1.5 pt-1">
@@ -597,31 +590,31 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-black text-white">
-                      à¦ªà§à¦¯à¦¾à¦°à¦¾à¦®à§‡à¦¡à¦¿à¦•à§‡à¦² à¦Ÿà§‡à¦•à¦¨à§‹à¦²à¦œà¦¿ à¦«à¦¾à¦‰à¦¨à§à¦¡à§‡à¦¶à¦¨ (PTF) à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ
+                      প্যারামেডিকেল টেকনোলজি ফাউন্ডেশন (PTF) সার্টিফিকেট
                     </h3>
                     <p className="text-xs text-slate-400">
-                      à¦—à¦­à¦°à§à¦¨à¦®à§‡à¦¨à§à¦Ÿ à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà¦¾à¦°à§à¦¡ à¦ªà§à¦°à¦«à§‡à¦¶à¦¨à¦¾à¦² à¦¹à§‹à¦®à¦¿à¦“à¦ªà§à¦¯à¦¾à¦¥à¦¿à¦• à¦ªà§à¦°à§à¦¯à¦¾à¦•à¦Ÿà¦¿à¦¶à¦¨à¦¾à¦° à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ
+                      গভর্নমেন্ট রেজিস্টার্ড প্রফেশনাল হোমিওপ্যাথিক প্র্যাকটিশনার সার্টিফিকেট
                     </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                   <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-                    <span className="text-xs text-slate-400 font-bold">à¦•à§‹à¦°à§à¦¸ à¦®à§‡à§Ÿà¦¾à¦¦</span>
-                    <p className="text-lg font-black text-white">à§¬ à¦®à¦¾à¦¸ à¦ªà§‚à¦°à§à¦£à¦¾à¦™à§à¦—</p>
+                    <span className="text-xs text-slate-400 font-bold">কোর্স মেয়াদ</span>
+                    <p className="text-lg font-black text-white">৬ মাস পূর্ণাঙ্গ</p>
                   </div>
                   <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-                    <span className="text-xs text-slate-400 font-bold">à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸</span>
-                    <p className="text-lg font-black text-amber-400">à¦•à§‹à¦°à§à¦¸ à¦šà¦²à¦®à¦¾à¦¨</p>
+                    <span className="text-xs text-slate-400 font-bold">সার্টিফিকেট স্ট্যাটাস</span>
+                    <p className="text-lg font-black text-amber-400">কোর্স চলমান</p>
                   </div>
                   <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-                    <span className="text-xs text-slate-400 font-bold">à¦¡à§‡à¦²à¦¿à¦­à¦¾à¦°à¦¿ à¦®à¦¾à¦§à§à¦¯à¦®</span>
-                    <p className="text-lg font-black text-emerald-400">à¦¸à§à¦¨à§à¦¦à¦°à¦¬à¦¨ à¦•à§à¦°à¦¿à§Ÿà¦¾à¦° à¦¸à¦¾à¦°à§à¦­à¦¿à¦¸</p>
+                    <span className="text-xs text-slate-400 font-bold">ডেলিভারি মাধ্যম</span>
+                    <p className="text-lg font-black text-emerald-400">সুন্দরবন কুরিয়ার সার্ভিস</p>
                   </div>
                 </div>
 
                 <div className="p-4 bg-emerald-950/40 rounded-2xl border border-emerald-500/30 text-xs text-emerald-200 leading-relaxed">
-                  ðŸ’¡ <strong>à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦ªà§à¦°à¦¾à¦ªà§à¦¤à¦¿à¦° à¦¨à¦¿à§Ÿà¦®:</strong> à¦•à§‹à¦°à§à¦¸ à¦¸à¦®à¦¾à¦ªà§à¦¤à¦¿à¦° à¦ªà¦° à¦†à¦ªà¦¨à¦¾à¦° à¦¸à¦®à§à¦ªà§‚à¦°à§à¦£ à¦¨à¦¾à¦® à¦“ à¦•à§à¦°à¦¿à§Ÿà¦¾à¦° à¦¡à§‡à¦²à¦¿à¦­à¦¾à¦°à¦¿ à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦…à§à¦¯à¦¾à¦¡à¦®à¦¿à¦¨à¦•à§‡ à¦•à¦¨à¦«à¦¾à¦°à§à¦® à¦•à¦°à¦²à§‡ à¦®à§‚à¦² à¦¹à¦¾à¦°à§à¦¡à¦•à¦ªà¦¿ à¦¸à¦¾à¦°à§à¦Ÿà¦¿à¦«à¦¿à¦•à§‡à¦Ÿ à¦•à§à¦°à¦¿à§Ÿà¦¾à¦°à§‡ à¦ªà¦¾à¦ à¦¿à§Ÿà§‡ à¦¦à§‡à¦“à§Ÿà¦¾ à¦¹à¦¬à§‡à¥¤
+                  💡 <strong>সার্টিফিকেট প্রাপ্তির নিয়ম:</strong> কোর্স সমাপ্তির পর আপনার সম্পূর্ণ নাম ও কুরিয়ার ডেলিভারি ঠিকানা অ্যাডমিনকে কনফার্ম করলে মূল হার্ডকপি সার্টিফিকেট কুরিয়ারে পাঠিয়ে দেওয়া হবে।
                 </div>
               </div>
             </div>
@@ -632,23 +625,23 @@ export default function DashboardPage() {
             <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-6">
               <h3 className="text-xl font-black text-white flex items-center gap-2">
                 <MessageCircle className="w-6 h-6 text-emerald-400" />
-                à¦à¦•à¦¾à¦¡à§‡à¦®à¦¿à¦• à¦¹à§‡à¦²à§à¦ªà¦²à¦¾à¦‡à¦¨ à¦“ à¦¸à§à¦¯à¦¾à¦°à§‡à¦° à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ
+                একাডেমিক হেল্পলাইন ও স্যারের সাপোর্ট
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold">à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦«à§‹à¦¨ à¦¹à§‡à¦²à§à¦ªà¦²à¦¾à¦‡à¦¨</span>
+                  <span className="text-xs text-slate-400 font-bold">সরাসরি ফোন হেল্পলাইন</span>
                   <p className="text-xl font-black text-white font-mono">{settings.helplineNumber}</p>
                   <a
                     href={`tel:${settings.helplineNumber.replace(/[^0-9]/g, '')}`}
                     className="inline-block text-xs font-bold text-emerald-400 hover:underline pt-1"
                   >
-                    à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦•à¦² à¦•à¦°à§à¦¨ â†’
+                    সরাসরি কল করুন →
                   </a>
                 </div>
 
                 <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold">à¦…à¦«à¦¿à¦¸à¦¿à§Ÿà¦¾à¦² à¦¹à§‹à§Ÿà¦¾à¦Ÿà¦¸à¦…à§à¦¯à¦¾à¦ª à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ</span>
+                  <span className="text-xs text-slate-400 font-bold">অফিসিয়াল হোয়াটসঅ্যাপ সাপোর্ট</span>
                   <p className="text-xl font-black text-[#25D366] font-mono">{settings.whatsappNumber}</p>
                   <a
                     href={`https://wa.me/880${settings.whatsappNumber.replace(/[^0-9]/g, '')}`}
@@ -656,7 +649,7 @@ export default function DashboardPage() {
                     rel="noopener noreferrer"
                     className="inline-block text-xs font-bold text-[#25D366] hover:underline pt-1"
                   >
-                    à¦¹à§‹à§Ÿà¦¾à¦Ÿà¦¸à¦…à§à¦¯à¦¾à¦ªà§‡ à¦®à§‡à¦¸à§‡à¦œ à¦ªà¦¾à¦ à¦¾à¦¨ â†’
+                    হোয়াটসঅ্যাপে মেসেজ পাঠান →
                   </a>
                 </div>
               </div>

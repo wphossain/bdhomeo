@@ -16,32 +16,24 @@ import {
   CreditCard, 
   MessageSquare, 
   Settings, 
-  CheckCircle2, 
-  Clock, 
   BookOpen, 
   ImageIcon, 
-  Sparkles, 
   Lock, 
   GraduationCap, 
   BarChart3, 
-  ExternalLink, 
-  ChevronRight, 
   LogOut, 
   Video, 
-  FileText, 
   Menu, 
   X,
-  Home,
-  ChevronDown
+  Home
 } from 'lucide-react';
 
 type AdminTab = 'courses' | 'media' | 'settings' | 'enrollments' | 'payments' | 'leads' | 'analytics';
 
 export default function AdminPage() {
-  const { user, enrollments, monthlyPayments, leads, courses, settings, demoLogin, signInWithGoogle, signOut } = useApp();
+  const { user, enrollments, monthlyPayments, leads, courses, settings, signInWithGoogle, signOut } = useApp();
   const [activeTab, setActiveTab] = useState<AdminTab>('courses');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isCourseSubmenuOpen, setIsCourseSubmenuOpen] = useState(true);
 
   // Check if Admin
   if (!user || user.role !== 'admin') {
@@ -56,18 +48,18 @@ export default function AdminPage() {
               Super Admin Access Only
             </span>
             <h2 className="text-2xl font-black text-white mt-3">
-              à¦…à§à¦¯à¦¾à¦¡à¦®à¦¿à¦¨ à¦•à¦¨à§à¦Ÿà§à¦°à§‹à¦² à¦ªà§à¦¯à¦¾à¦¨à§‡à¦²
+              অ্যাডমিন কন্ট্রোল প্যানেল
             </h2>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              à¦à¦‡ à¦ªà§‹à¦°à§à¦Ÿà¦¾à¦²à¦Ÿà¦¿ à¦¶à§à¦§à§à¦®à¦¾à¦¤à§à¦° à¦¡à¦¾à¦ƒ à¦®à§‹à¦ƒ à¦—à¦¿à§Ÿà¦¾à¦¸ à¦‰à¦¦à§à¦¦à¦¿à¦¨ à¦¸à§à¦¯à¦¾à¦° à¦à¦¬à¦‚ à¦¨à¦¿à¦°à§à¦¦à¦¿à¦·à§à¦Ÿ à¦…à§à¦¯à¦¾à¦¡à¦®à¦¿à¦¨à¦¦à§‡à¦° à¦œà¦¨à§à¦¯ à¦¸à§à¦°à¦•à§à¦·à¦¿à¦¤à¥¤
+              এই পোর্টালটি শুধুমাত্র ডাঃ মোঃ গিয়াস উদ্দিন স্যার এবং নির্দিষ্ট অ্যাডমিনদের জন্য সুরক্ষিত।
             </p>
           </div>
 
           {user ? (
             <div className="space-y-4">
               <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-400 space-y-1">
-                <p>à¦²à¦—à¦‡à¦¨ à¦‡à¦‰à¦œà¦¾à¦°: <strong className="text-white">{user.fullName}</strong></p>
-                <p className="text-emerald-400 font-bold">à¦°à§‹à¦²: Student (à¦¸à¦¾à¦§à¦¾à¦°à¦£ à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€)</p>
+                <p>লগইন ইউজার: <strong className="text-white">{user.fullName}</strong></p>
+                <p className="text-emerald-400 font-bold">রোল: Student (সাধারণ শিক্ষার্থী)</p>
               </div>
 
               <Link
@@ -75,7 +67,7 @@ export default function AdminPage() {
                 className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3.5 rounded-xl shadow transition"
               >
                 <GraduationCap className="w-4 h-4" />
-                <span>à¦†à¦®à¦¾à¦° à¦•à§à¦²à¦¾à¦¸à¦°à§à¦®à§‡ à¦¯à¦¾à¦¨</span>
+                <span>আমার ক্লাসরুমে যান</span>
               </Link>
             </div>
           ) : (
@@ -83,7 +75,7 @@ export default function AdminPage() {
               onClick={signInWithGoogle}
               className="w-full flex items-center justify-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3.5 rounded-xl shadow-md transition"
             >
-              <span>Admin Google Account à¦¦à¦¿à§Ÿà§‡ à¦¸à¦¾à¦‡à¦¨-à¦‡à¦¨</span>
+              <span>Admin Google Account দিয়ে সাইন-ইন</span>
             </button>
           )}
 
@@ -93,7 +85,7 @@ export default function AdminPage() {
               className="text-xs text-slate-400 hover:text-emerald-400 font-bold flex items-center justify-center gap-1"
             >
               <Home className="w-3.5 h-3.5" />
-              <span>à¦®à§‚à¦² à¦¹à§‹à¦®à¦ªà§‡à¦œà§‡ à¦«à¦¿à¦°à§‡ à¦¯à¦¾à¦¨</span>
+              <span>মূল হোমপেজে ফিরে যান</span>
             </Link>
           </div>
         </div>
@@ -108,13 +100,13 @@ export default function AdminPage() {
   const approvedPayments = monthlyPayments.filter((p) => p.status === 'approved');
 
   const navItems: { id: AdminTab; label: string; icon: any; count?: number; badgeColor?: string }[] = [
-    { id: 'courses', label: 'à¦•à§‹à¦°à§à¦¸ à¦“ à¦¸à¦¿à¦²à§‡à¦¬à¦¾à¦¸ à¦¸à¦¿à¦à¦®à¦à¦¸', icon: BookOpen },
-    { id: 'enrollments', label: 'à¦­à¦°à§à¦¤à¦¿à¦° à¦†à¦¬à§‡à¦¦à¦¨ à¦…à¦¨à§à¦®à§‹à¦¦à¦¨', icon: Users, count: pendingEnrollments.length, badgeColor: 'bg-amber-500 text-white' },
-    { id: 'payments', label: 'à¦®à¦¾à¦¸à¦¿à¦• à§«à§¦à§¦/- à¦«à¦¿ à¦¯à¦¾à¦šà¦¾à¦‡', icon: CreditCard, count: pendingPayments.length, badgeColor: 'bg-rose-500 text-white' },
-    { id: 'leads', label: 'à¦“à¦°à¦¿à§Ÿà§‡à¦¨à§à¦Ÿà§‡à¦¶à¦¨ à¦²à¦¿à¦¡ à¦¸à¦¿à¦†à¦°à¦à¦®', icon: MessageSquare, count: leads.length, badgeColor: 'bg-blue-500 text-white' },
-    { id: 'media', label: 'à¦›à¦¬à¦¿ à¦“ à¦®à¦¿à¦¡à¦¿à§Ÿà¦¾ à¦®à§à¦¯à¦¾à¦¨à§‡à¦œà¦¾à¦°', icon: ImageIcon },
-    { id: 'settings', label: 'à¦¸à¦¾à¦‡à¦Ÿ à¦•à¦¨à¦Ÿà§‡à¦¨à§à¦Ÿ à¦“ à¦¨à¦®à§à¦¬à¦°', icon: Settings },
-    { id: 'analytics', label: 'à¦‡à¦¨à¦¸à¦¾à¦‡à¦Ÿà¦¸ à¦“ à¦°à§‡à¦­à¦¿à¦¨à¦¿à¦‰', icon: BarChart3 },
+    { id: 'courses', label: 'কোর্স ও সিলেবাস সিএমএস', icon: BookOpen },
+    { id: 'enrollments', label: 'ভর্তির আবেদন অনুমোদন', icon: Users, count: pendingEnrollments.length, badgeColor: 'bg-amber-500 text-white' },
+    { id: 'payments', label: 'মাসিক ৫০০/- ফি যাচাই', icon: CreditCard, count: pendingPayments.length, badgeColor: 'bg-rose-500 text-white' },
+    { id: 'leads', label: 'ওরিয়েন্টেশন লিড সিআরএম', icon: MessageSquare, count: leads.length, badgeColor: 'bg-blue-500 text-white' },
+    { id: 'media', label: 'ছবি ও মিডিয়া ম্যানেজার', icon: ImageIcon },
+    { id: 'settings', label: 'সাইট কনটেন্ট ও নম্বর', icon: Settings },
+    { id: 'analytics', label: 'ইনসাইটস ও রেভিনিউ', icon: BarChart3 },
   ];
 
   return (
@@ -136,7 +128,7 @@ export default function AdminPage() {
             </div>
             <div>
               <span className="font-black text-sm text-white tracking-tight leading-none block">
-                à¦¬à¦¿à¦¡à¦¿ à¦¹à§‹à¦®à¦¿à¦“ à¦…à§à¦¯à¦¾à¦¡à¦®à¦¿à¦¨
+                বিডি হোমিও অ্যাডমিন
               </span>
               <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block mt-0.5">
                 Full CMS Control Hub
@@ -152,7 +144,7 @@ export default function AdminPage() {
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-700 transition"
           >
             <Home className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">à¦®à§‚à¦² à¦“à§Ÿà§‡à¦¬à¦¸à¦¾à¦‡à¦Ÿ</span>
+            <span className="hidden sm:inline">মূল ওয়েবসাইট</span>
           </Link>
 
           <Link
@@ -160,13 +152,13 @@ export default function AdminPage() {
             className="flex items-center gap-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-bold px-3.5 py-2 rounded-xl border border-emerald-500/30 transition"
           >
             <GraduationCap className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€ à¦•à§à¦²à¦¾à¦¸à¦°à§à¦®</span>
+            <span className="hidden sm:inline">শিক্ষার্থী ক্লাসরুম</span>
           </Link>
 
           <button
             onClick={signOut}
             className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-xl transition"
-            title="à¦²à¦—à¦†à¦‰à¦Ÿ"
+            title="লগআউট"
           >
             <LogOut className="w-4 h-4" />
           </button>
@@ -202,7 +194,7 @@ export default function AdminPage() {
             {/* Nav Menu */}
             <nav className="space-y-1">
               <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 pb-1">
-                à¦®à§à¦¯à¦¾à¦¨à§‡à¦œà¦®à§‡à¦¨à§à¦Ÿ à¦®à§‡à¦¨à§
+                ম্যানেজমেন্ট মেনু
               </p>
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -268,7 +260,7 @@ export default function AdminPage() {
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs py-2.5 rounded-xl shadow transition"
             >
               <Video className="w-4 h-4" />
-              <span>à¦²à¦¾à¦‡à¦­ à¦—à§à¦—à¦² à¦®à¦¿à¦Ÿ à¦•à§à¦²à¦¾à¦¸à¦°à§à¦®</span>
+              <span>লাইভ গুগল মিট ক্লাসরুম</span>
             </a>
           </div>
 
@@ -287,46 +279,46 @@ export default function AdminPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase">à¦®à§‹à¦Ÿ à¦•à§‹à¦°à§à¦¸</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase">মোট কোর্স</span>
                   <p className="text-3xl font-black text-white font-english">{courses.length}</p>
-                  <p className="text-xs text-emerald-400 font-bold">à¦¬à§‡à¦¸à¦¿à¦• à¦“ à¦à¦¡à¦­à¦¾à¦¨à§à¦¸à¦¡ à¦®à¦¾à¦¸à§à¦Ÿà¦¾à¦° à¦¬à§à¦¯à¦¾à¦š</p>
+                  <p className="text-xs text-emerald-400 font-bold">বেসিক ও এডভান্সড মাস্টার ব্যাচ</p>
                 </div>
 
                 <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase">à¦¸à¦«à¦² à¦­à¦°à§à¦¤à¦¿ à¦…à¦¨à§à¦®à§‹à¦¦à¦¨</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase">সফল ভর্তি অনুমোদন</span>
                   <p className="text-3xl font-black text-emerald-400 font-english">{approvedEnrollments.length}</p>
-                  <p className="text-xs text-slate-400">à¦à¦•à§à¦Ÿà¦¿à¦­ à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€ à¦¸à¦‚à¦–à§à¦¯à¦¾</p>
+                  <p className="text-xs text-slate-400">এক্টিভ শিক্ষার্থী সংখ্যা</p>
                 </div>
 
                 <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase">à¦ªà¦°à¦¿à¦¶à§‹à¦§à¦¿à¦¤ à¦®à¦¾à¦¸à¦¿à¦• à¦«à¦¿</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase">পরিশোধিত মাসিক ফি</span>
                   <p className="text-3xl font-black text-amber-400 font-english">{approvedPayments.length}</p>
-                  <p className="text-xs text-slate-400">à¦…à¦¨à§à¦®à§‹à¦¦à¦¿à¦¤ à¦®à¦¾à¦¸à¦¿à¦• à¦Ÿà§à¦°à¦¾à¦¨à¦œà§‡à¦•à¦¶à¦¨</p>
+                  <p className="text-xs text-slate-400">অনুমোদিত মাসিক ট্রানজেকশন</p>
                 </div>
 
                 <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-2">
-                  <span className="text-xs text-slate-400 font-bold uppercase">à¦«à§à¦°à¦¿ à¦•à§à¦²à¦¾à¦¸à§‡à¦° à¦²à¦¿à¦¡</span>
+                  <span className="text-xs text-slate-400 font-bold uppercase">ফ্রি ক্লাসের লিড</span>
                   <p className="text-3xl font-black text-blue-400 font-english">{leads.length}</p>
-                  <p className="text-xs text-slate-400">à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨à¦•à§ƒà¦¤ à¦†à¦—à§à¦°à¦¹à§€ à¦¸à¦‚à¦–à§à¦¯à¦¾</p>
+                  <p className="text-xs text-slate-400">রেজিস্ট্রেশনকৃত আগ্রহী সংখ্যা</p>
                 </div>
               </div>
 
               <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 space-y-4">
                 <h3 className="text-lg font-black text-white flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-emerald-400" />
-                  à¦°à§‡à¦­à¦¿à¦¨à¦¿à¦‰ à¦“ à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ à¦¸à¦¾à¦®à¦¾à¦°à¦¿
+                  রেভিনিউ ও পেমেন্ট সামারি
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                    <p className="text-xs text-slate-400">à¦­à¦°à§à¦¤à¦¿ à¦«à¦¿ à¦¬à¦¾à¦¬à¦¦ à¦®à§‹à¦Ÿ à¦†à§Ÿ (à§³à§§,à§¦à§¦à§¦ x {approvedEnrollments.length})</p>
+                    <p className="text-xs text-slate-400">ভর্তি ফি বাবদ মোট আয় (৳১,০০০ x {approvedEnrollments.length})</p>
                     <p className="text-2xl font-black text-emerald-400 font-english mt-1">
-                      à§³{(approvedEnrollments.length * 1000).toLocaleString('en-US')}/-
+                      ৳{(approvedEnrollments.length * 1000).toLocaleString('en-US')}/-
                     </p>
                   </div>
                   <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                    <p className="text-xs text-slate-400">à¦®à¦¾à¦¸à¦¿à¦• à¦«à¦¿ à¦¬à¦¾à¦¬à¦¦ à¦®à§‹à¦Ÿ à¦†à§Ÿ (à§³à§«à§¦à§¦ x {approvedPayments.length})</p>
+                    <p className="text-xs text-slate-400">মাসিক ফি বাবদ মোট আয় (৳৫০০ x {approvedPayments.length})</p>
                     <p className="text-2xl font-black text-amber-400 font-english mt-1">
-                      à§³{(approvedPayments.length * 500).toLocaleString('en-US')}/-
+                      ৳{(approvedPayments.length * 500).toLocaleString('en-US')}/-
                     </p>
                   </div>
                 </div>

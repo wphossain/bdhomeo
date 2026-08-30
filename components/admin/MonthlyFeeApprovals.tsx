@@ -10,9 +10,7 @@ import {
   Search, 
   Filter, 
   Check, 
-  AlertCircle,
-  Calendar,
-  XCircle
+  Calendar
 } from 'lucide-react';
 
 export function MonthlyFeeApprovals() {
@@ -36,7 +34,7 @@ export function MonthlyFeeApprovals() {
   const pendingCount = monthlyPayments.filter((p) => p.status === 'pending').length;
   const approvedCount = monthlyPayments.filter((p) => p.status === 'approved').length;
 
-  const months = ['à¦œà¦¾à¦¨à§à§Ÿà¦¾à¦°à¦¿', 'à¦«à§‡à¦¬à§à¦°à§à§Ÿà¦¾à¦°à¦¿', 'à¦®à¦¾à¦°à§à¦š', 'à¦à¦ªà§à¦°à¦¿à¦²', 'à¦®à§‡', 'à¦œà§à¦¨', 'à¦œà§à¦²à¦¾à¦‡', 'à¦†à¦—à¦¸à§à¦Ÿ', 'à¦¸à§‡à¦ªà§à¦Ÿà§‡à¦®à§à¦¬à¦°', 'à¦…à¦•à§à¦Ÿà§‹à¦¬à¦°', 'à¦¨à¦­à§‡à¦®à§à¦¬à¦°', 'à¦¡à¦¿à¦¸à§‡à¦®à§à¦¬à¦°'];
+  const months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
 
   return (
     <div className="space-y-6 font-bangla">
@@ -46,19 +44,19 @@ export function MonthlyFeeApprovals() {
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
             <CreditCard className="w-6 h-6 text-emerald-400" />
-            à¦®à¦¾à¦¸à¦¿à¦• à§«à§¦à§¦/- à¦Ÿà¦¾à¦•à¦¾ à¦«à¦¿ à¦¯à¦¾à¦šà¦¾à¦‡ à¦“ à¦…à¦¨à§à¦®à§‹à¦¦à¦¨ (Monthly Fee Approvals)
+            মাসিক ৫০০/- টাকা ফি যাচাই ও অনুমোদন (Monthly Fee Approvals)
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€à¦¦à§‡à¦° à¦œà¦®à¦¾ à¦¦à§‡à¦“à§Ÿà¦¾ à¦Ÿà§à¦°à¦¾à¦¨à¦œà§‡à¦•à¦¶à¦¨ à¦†à¦‡à¦¡à¦¿ à¦¯à¦¾à¦šà¦¾à¦‡ à¦•à¦°à§‡ à¦«à¦¿ à¦­à§‡à¦°à¦¿à¦«à¦¾à¦‡ à¦•à¦°à§à¦¨à¥¤
+            শিক্ষার্থীদের জমা দেওয়া ট্রানজেকশন আইডি যাচাই করে ফি ভেরিফাই করুন।
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold px-3.5 py-2 rounded-xl">
-            à¦ªà§‡à¦¨à§à¦¡à¦¿à¦‚ à¦«à¦¿: {pendingCount} à¦Ÿà¦¿
+            পেন্ডিং ফি: {pendingCount} টি
           </div>
           <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold px-3.5 py-2 rounded-xl">
-            à¦…à¦¨à§à¦®à§‹à¦¦à¦¿à¦¤: {approvedCount} à¦Ÿà¦¿
+            অনুমোদিত: {approvedCount} টি
           </div>
         </div>
       </div>
@@ -73,7 +71,7 @@ export function MonthlyFeeApprovals() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€à¦° à¦¨à¦¾à¦®, à¦«à§‹à¦¨ à¦¨à¦®à§à¦¬à¦° à¦¬à¦¾ TrxID à¦¦à¦¿à§Ÿà§‡ à¦–à§à¦à¦œà§à¦¨..."
+            placeholder="শিক্ষার্থীর নাম, ফোন নম্বর বা TrxID দিয়ে খুঁজুন..."
             className="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-slate-500 outline-none focus:border-emerald-500"
           />
         </div>
@@ -88,10 +86,10 @@ export function MonthlyFeeApprovals() {
               onChange={(e) => setMonthFilter(e.target.value)}
               className="bg-transparent text-xs text-slate-300 font-bold outline-none cursor-pointer"
             >
-              <option value="all">à¦¸à¦•à¦² à¦®à¦¾à¦¸</option>
+              <option value="all">সকল মাস</option>
               {months.map((m) => (
                 <option key={m} value={`${m} 2026`}>
-                  {m} à§¨à§¦à§¨à§¬
+                  {m} ২০২৬
                 </option>
               ))}
             </select>
@@ -104,9 +102,9 @@ export function MonthlyFeeApprovals() {
               onChange={(e) => setStatusFilter(e.target.value as any)}
               className="bg-transparent text-xs text-slate-300 font-bold outline-none cursor-pointer"
             >
-              <option value="all">à¦¸à¦•à¦² à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸</option>
-              <option value="pending">à¦ªà§‡à¦¨à§à¦¡à¦¿à¦‚ ({pendingCount})</option>
-              <option value="approved">à¦…à¦¨à§à¦®à§‹à¦¦à¦¿à¦¤ ({approvedCount})</option>
+              <option value="all">সকল স্ট্যাটাস</option>
+              <option value="pending">পেন্ডিং ({pendingCount})</option>
+              <option value="approved">অনুমোদিত ({approvedCount})</option>
             </select>
           </div>
 
@@ -118,8 +116,8 @@ export function MonthlyFeeApprovals() {
       {filteredPayments.length === 0 ? (
         <div className="bg-slate-950 rounded-3xl p-12 text-center border border-slate-800 text-slate-500 space-y-2">
           <CreditCard className="w-10 h-10 mx-auto text-slate-600" />
-          <p className="text-sm font-bold text-slate-400">à¦•à§‹à¦¨à§‹ à¦®à¦¾à¦¸à¦¿à¦• à¦«à¦¿ à¦Ÿà§à¦°à¦¾à¦¨à¦œà§‡à¦•à¦¶à¦¨ à¦ªà¦¾à¦“à§Ÿà¦¾ à¦¯à¦¾à§Ÿà¦¨à¦¿</p>
-          <p className="text-xs">à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€à¦°à¦¾ à¦«à¦¿ à¦œà¦®à¦¾ à¦¦à¦¿à¦²à§‡ à¦à¦–à¦¾à¦¨à§‡ à¦ªà§à¦°à¦¦à¦°à§à¦¶à¦¿à¦¤ à¦¹à¦¬à§‡à¥¤</p>
+          <p className="text-sm font-bold text-slate-400">কোনো মাসিক ফি ট্রানজেকশন পাওয়া যায়নি</p>
+          <p className="text-xs">শিক্ষার্থীরা ফি জমা দিলে এখানে প্রদর্শিত হবে।</p>
         </div>
       ) : (
         <div className="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
@@ -127,13 +125,13 @@ export function MonthlyFeeApprovals() {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-900 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
-                  <th className="py-4 px-5">à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€</th>
-                  <th className="py-4 px-5">à¦•à§‹à¦°à§à¦¸</th>
-                  <th className="py-4 px-5">à¦®à¦¾à¦¸ à¦“ à¦ªà¦°à¦¿à¦®à¦¾à¦£</th>
-                  <th className="py-4 px-5">à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ à¦®à§‡à¦¥à¦¡</th>
-                  <th className="py-4 px-5">TrxID à¦“ à¦ªà§à¦°à§‡à¦°à¦• à¦¨à¦®à§à¦¬à¦°</th>
-                  <th className="py-4 px-5">à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸</th>
-                  <th className="py-4 px-5 text-right">à¦…à§à¦¯à¦¾à¦•à¦¶à¦¨</th>
+                  <th className="py-4 px-5">শিক্ষার্থী</th>
+                  <th className="py-4 px-5">কোর্স</th>
+                  <th className="py-4 px-5">মাস ও পরিমাণ</th>
+                  <th className="py-4 px-5">পেমেন্ট মেথড</th>
+                  <th className="py-4 px-5">TrxID ও প্রেরক নম্বর</th>
+                  <th className="py-4 px-5">স্ট্যাটাস</th>
+                  <th className="py-4 px-5 text-right">অ্যাকশন</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80 font-medium">
@@ -148,7 +146,7 @@ export function MonthlyFeeApprovals() {
                     </td>
                     <td className="py-4 px-5">
                       <span className="font-bold text-emerald-400">{p.monthName}</span>
-                      <p className="text-[11px] text-slate-400 font-english font-bold">à§³{p.amount}/-</p>
+                      <p className="text-[11px] text-slate-400 font-english font-bold">৳{p.amount}/-</p>
                     </td>
                     <td className="py-4 px-5">
                       <span className={`inline-flex items-center gap-1 font-bold text-[11px] px-2.5 py-1 rounded-lg uppercase ${
@@ -166,11 +164,11 @@ export function MonthlyFeeApprovals() {
                     <td className="py-4 px-5">
                       {p.status === 'approved' ? (
                         <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" /> à¦…à¦¨à§à¦®à§‹à¦¦à¦¿à¦¤
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" /> অনুমোদিত
                         </span>
                       ) : (
                         <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
-                          <Clock className="w-3 h-3 text-amber-400" /> à¦…à¦ªà§‡à¦•à§à¦·à¦®à¦¾à¦¨
+                          <Clock className="w-3 h-3 text-amber-400" /> অপেক্ষমান
                         </span>
                       )}
                     </td>
@@ -181,10 +179,10 @@ export function MonthlyFeeApprovals() {
                           className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-xl shadow transition text-xs"
                         >
                           <Check className="w-3.5 h-3.5" />
-                          <span>à¦«à¦¿ à¦…à¦¨à§à¦®à§‹à¦¦à¦¨ à¦•à¦°à§à¦¨</span>
+                          <span>ফি অনুমোদন করুন</span>
                         </button>
                       ) : (
-                        <span className="text-xs text-slate-500 font-bold">à¦ªà¦°à¦¿à¦¶à§‹à¦§à¦¿à¦¤</span>
+                        <span className="text-xs text-slate-500 font-bold">পরিশোধিত</span>
                       )}
                     </td>
                   </tr>
