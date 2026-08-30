@@ -18,6 +18,7 @@ export interface Lesson {
   youtubeVideoId?: string;
   pdfNotesTitle?: string;
   pdfNotesUrl?: string;
+  notesContent?: string;
 }
 
 export interface Chapter {
