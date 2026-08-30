@@ -35,10 +35,10 @@ export function SiteSettingsForm() {
       <div className="border-b border-slate-100 pb-4">
         <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
           <Settings className="w-5 h-5 text-emerald-700" />
-          সাইট কনটেন্ট, হেডার, ফুটার ও ডাইনামিক সিএমএস কন্ট্রোল
+          সাইট কনটেন্ট, নম্বর ও ডাইনামিক সিএমএস কন্ট্রোল
         </h3>
         <p className="text-xs text-slate-500 mt-1">
-          বিকাশ/নগদ নম্বর, ফোন নম্বর, ইউটিউব ও ফেসবুক লিংক, নোটিশ এবং ল্যান্ডিং পেজের কনটেন্ট পরিবর্তন করুন।
+          বিকাশ মার্চেন্ট নম্বর, হোয়াটসঅ্যাপ নম্বর, হেল্পলাইন, নোটিশ এবং ল্যান্ডিং পেজের কনটেন্ট পরিবর্তন করুন।
         </p>
       </div>
 
@@ -49,16 +49,21 @@ export function SiteSettingsForm() {
           <div className="flex items-center gap-2 text-emerald-900 border-b border-emerald-100 pb-2">
             <CreditCard className="w-4 h-4 text-emerald-700" />
             <h4 className="font-black text-sm uppercase tracking-wider">
-              ১. অফিসিয়াল পেমেন্ট নম্বর সেটিংস (bKash & Nagad)
+              ১. অফিসিয়াল পেমেন্ট নম্বর সেটিংস (bKash Merchant & Nagad)
             </h4>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* bKash */}
             <div className="space-y-2 p-4 bg-pink-50/60 rounded-2xl border border-pink-200">
-              <label className="block text-xs font-bold text-pink-900">
-                বিকাশ নম্বর (বর্তমান পেমেন্ট নম্বর)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-pink-950">
+                  বিকাশ মার্চেন্ট পেমেন্ট নম্বর (Payment)
+                </label>
+                <span className="bg-pink-200 text-pink-900 text-[10px] font-black px-2 py-0.5 rounded">
+                  Merchant
+                </span>
+              </div>
               <input
                 type="text"
                 value={formData.bkashNumber}
@@ -66,7 +71,16 @@ export function SiteSettingsForm() {
                 className="w-full px-3.5 py-2 rounded-xl border border-pink-300 text-sm font-mono font-black bg-white text-pink-950"
               />
               <div className="flex items-center gap-4 text-xs pt-1">
-                <label className="flex items-center gap-1.5 cursor-pointer">
+                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-pink-900">
+                  <input
+                    type="radio"
+                    name="bkashType"
+                    checked={formData.bkashType === 'Merchant'}
+                    onChange={() => setFormData({ ...formData, bkashType: 'Merchant' })}
+                  />
+                  <span>Merchant (Payment - শিক্ষার্থী Payment করবে)</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer text-slate-600">
                   <input
                     type="radio"
                     name="bkashType"
@@ -75,22 +89,13 @@ export function SiteSettingsForm() {
                   />
                   <span>Personal (Send Money)</span>
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="bkashType"
-                    checked={formData.bkashType === 'Merchant'}
-                    onChange={() => setFormData({ ...formData, bkashType: 'Merchant' })}
-                  />
-                  <span>Merchant (Payment)</span>
-                </label>
               </div>
             </div>
 
             {/* Nagad */}
             <div className="space-y-2 p-4 bg-orange-50/60 rounded-2xl border border-orange-200">
-              <label className="block text-xs font-bold text-orange-900">
-                নগদ নম্বর
+              <label className="block text-xs font-bold text-orange-950">
+                নগদ নম্বর (Send Money / Payment)
               </label>
               <input
                 type="text"
@@ -99,7 +104,7 @@ export function SiteSettingsForm() {
                 className="w-full px-3.5 py-2 rounded-xl border border-orange-300 text-sm font-mono font-black bg-white text-orange-950"
               />
               <div className="flex items-center gap-4 text-xs pt-1">
-                <label className="flex items-center gap-1.5 cursor-pointer">
+                <label className="flex items-center gap-1.5 cursor-pointer font-bold text-orange-900">
                   <input
                     type="radio"
                     name="nagadType"
@@ -108,7 +113,7 @@ export function SiteSettingsForm() {
                   />
                   <span>Personal (Send Money)</span>
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
+                <label className="flex items-center gap-1.5 cursor-pointer text-slate-600">
                   <input
                     type="radio"
                     name="nagadType"
@@ -127,33 +132,35 @@ export function SiteSettingsForm() {
           <div className="flex items-center gap-2 text-emerald-900 border-b border-emerald-100 pb-2">
             <Phone className="w-4 h-4 text-emerald-700" />
             <h4 className="font-black text-sm uppercase tracking-wider">
-              ২. হেল্পলাইন, হোয়াটসঅ্যাপ ও সোশ্যাল মিডিয়া লিংক
+              ২. স্যারের মূল ফোন, হোয়াটসঅ্যাপ ও সোশ্যাল মিডিয়া লিংক
             </h4>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                হোয়াটসঅ্যাপ নম্বর (Floating Button ও সাপোর্ট)
+            <div className="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-2">
+              <label className="block text-xs font-bold text-emerald-950">
+                হোয়াটসঅ্যাপ নম্বর (WhatsApp Floating ও সাপোর্ট)
               </label>
               <input
                 type="text"
                 value={formData.whatsappNumber}
                 onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono font-bold bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold bg-white text-emerald-950"
               />
+              <p className="text-[11px] text-emerald-800 font-medium">ডিফল্ট: 01811-123993</p>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                সরাসরি ফোন কল হেল্পলাইন
+            <div className="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-2">
+              <label className="block text-xs font-bold text-emerald-950">
+                সরাসরি ফোন কল ও হেল্পলাইন
               </label>
               <input
                 type="text"
                 value={formData.helplineNumber}
                 onChange={(e) => setFormData({ ...formData, helplineNumber: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono font-bold bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-emerald-300 text-sm font-mono font-bold bg-white text-emerald-950"
               />
+              <p className="text-[11px] text-emerald-800 font-medium">ডিফল্ট: 01811-123993</p>
             </div>
 
             <div>

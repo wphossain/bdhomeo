@@ -58,8 +58,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-xs text-slate-500 font-medium">সরাসরি ফোন কল:</p>
-                    <a href={`tel:${settings.whatsappNumber}`} className="font-bold text-slate-900 text-base hover:underline">
-                      {settings.whatsappNumber}
+                    <a href={`tel:${settings.helplineNumber.replace(/[^0-9]/g, '')}`} className="font-bold text-slate-900 text-base hover:underline">
+                      {settings.helplineNumber}
                     </a>
                   </div>
                 </div>
@@ -101,7 +101,10 @@ export default function ContactPage() {
 
               <div className="space-y-4 text-sm text-slate-700">
                 <div className="p-4 bg-white rounded-2xl border border-pink-200 space-y-1">
-                  <span className="text-xs font-bold text-pink-700 uppercase">বিকাশ ({settings.bkashType})</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-pink-700 uppercase">বিকাশ ({settings.bkashType === 'Merchant' ? 'মার্চেন্ট পেমেন্ট' : settings.bkashType})</span>
+                    <span className="text-[10px] bg-pink-100 text-pink-800 font-bold px-2 py-0.5 rounded">Payment Option</span>
+                  </div>
                   <p className="text-lg font-black font-mono text-slate-900">{settings.bkashNumber}</p>
                 </div>
 
@@ -111,7 +114,7 @@ export default function ContactPage() {
                 </div>
 
                 <p className="text-xs text-slate-500 italic">
-                  * টাকা পাঠানোর পর ট্রানজেকশন আইডি (TrxID) সংরক্ষণ করুন এবং ভর্তি ফর্মে সাবমিট করুন।
+                  * বিকাশ অ্যাপে Payment অপশন ব্যবহার করে {settings.bkashNumber} নম্বরে ফি পরিশোধের পর ট্রানজেকশন আইডি (TrxID) সংরক্ষণ করুন।
                 </p>
               </div>
             </div>

@@ -43,7 +43,7 @@ export const initialSiteSettings: SiteSettings = {
   ],
   bkashNumber: '01815-883101',
   bkashType: 'Merchant',
-  nagadNumber: '01815-883101',
+  nagadNumber: '01811-123993',
   nagadType: 'Personal',
   whatsappNumber: '01811-123993',
   helplineNumber: '01811-123993',
@@ -83,7 +83,7 @@ export const initialCourses: Course[] = [
         lessons: [
           {
             id: 'l1',
-            title: '১.১ হোমিওপ্যাথির ইতিহাস ও হ্যানিম্যানের অবিচল দর্শন (ফ্রি ওরিয়েন্টেশন ক্লাস)',
+            title: '১.১ Organic Organon Basics (ফ্রি ওরিয়েন্টেশন ক্লাস)',
             durationMin: 45,
             isFreePreview: true,
             youtubeVideoId: 'M7lc1UVf-VE',

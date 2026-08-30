@@ -59,15 +59,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const savedSettings = localStorage.getItem('bdhomeo_settings');
       if (savedSettings) {
         const parsed = JSON.parse(savedSettings);
-        // If old number or ??? exists, update to fresh verified initial settings
+        // Force-migrate to verified official numbers
         if (
           !parsed.bkashNumber ||
-          parsed.bkashNumber.includes('01971') ||
-          parsed.whatsappNumber?.includes('01971') ||
+          parsed.bkashNumber !== '01815-883101' ||
+          parsed.bkashType !== 'Merchant' ||
+          parsed.whatsappNumber !== '01811-123993' ||
           (parsed.noticeText && parsed.noticeText.includes('???'))
         ) {
-          setSettings(initialSiteSettings);
-          localStorage.setItem('bdhomeo_settings', JSON.stringify(initialSiteSettings));
+          const merged = {
+            ...initialSiteSettings,
+            ...parsed,
+            bkashNumber: '01815-883101',
+            bkashType: 'Merchant' as const,
+            whatsappNumber: '01811-123993',
+            helplineNumber: '01811-123993',
+            nagadNumber: '01811-123993',
+            noticeText: initialSiteSettings.noticeText,
+          };
+          setSettings(merged);
+          localStorage.setItem('bdhomeo_settings', JSON.stringify(merged));
         } else {
           setSettings({ ...initialSiteSettings, ...parsed });
         }
